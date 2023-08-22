@@ -4,15 +4,19 @@ import { LoginRespone } from './dto/login-respone';
 import { LoginUserInput } from './dto/login-user.input';
 import { UseGuards } from '@nestjs/common';
 import { GqlAuthGruard } from './gql-auth.guard';
-import { User } from 'src/users/entities/user.entity';
+import { User } from '../users/entities/user.entity';
 import { CreateUserInput } from './dto/create-user.input'
+import { groupEnd } from 'console';
 @Resolver()
 export class AuthResolver {
     constructor(private authService: AuthService){
-    }
+    } 
     @Mutation(() => LoginRespone )
     @UseGuards(GqlAuthGruard)
-    login(@Args('loginUserInput') LoginUserInput:LoginUserInput, @Context() context){
+    login(@Args('loginUserInput') loginUserInput:LoginUserInput, @Context() context){
+        // console.group('context resolcer')
+        // console.log( context)
+        // console.groupEnd()
         return this.authService.login(context.user)
     }
 

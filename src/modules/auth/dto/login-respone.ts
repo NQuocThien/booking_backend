@@ -7,5 +7,5 @@
     access_token: string;
 
     @Field(() => User)
-    user: string;
+    user: User;
  }
