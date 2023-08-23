@@ -5,6 +5,7 @@ import { User } from '../users/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { CreateUserInput } from './dto/create-user.input';
+import { LogoutUser } from './dto/logout-user';
 @Injectable()
 export class AuthService {
     constructor(
@@ -42,5 +43,10 @@ export class AuthService {
                 password
             }
         )
+    }
+    async logout(){
+        var  reponse:LogoutUser = new LogoutUser();
+        reponse.logout = true
+        return reponse
     }
 }

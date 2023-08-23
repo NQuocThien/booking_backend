@@ -7,6 +7,7 @@ import { GqlAuthGruard } from './gql-auth.guard';
 import { User } from '../users/entities/user.entity';
 import { CreateUserInput } from './dto/create-user.input'
 import { groupEnd } from 'console';
+import { LogoutUser } from './dto/logout-user';
 @Resolver()
 export class AuthResolver {
     constructor(private authService: AuthService){
@@ -24,4 +25,10 @@ export class AuthResolver {
     signup(@Args('createUserInput') LoginUserInput:CreateUserInput){
         return this.authService.signup(LoginUserInput)
     }
+
+    @Mutation(() => LogoutUser)
+    async logout(@Context() context) {
+        context.user = null;
+    return this.authService.logout();
+}
 }

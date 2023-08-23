@@ -7,11 +7,19 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { MongooseModule } from '@nestjs/mongoose';
+import * as dotenv from 'dotenv';
+import { ConfigModule } from '@nestjs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { UploaderModule } from './modules/uploader/uploader.module';
+dotenv.config();
 @Module({
   imports: [
-    
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '../files'), 
+    }),
+    ConfigModule.forRoot({ isGlobal: true}),
     MongooseModule.forRoot(
-      'mongodb+srv://nqthienwebdev:mongoDB@cluster0.y9garcd.mongodb.net/db_dev'
+      process.env.MONGO_URI
     ),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       autoSchemaFile: join(process.cwd(), 'src.shema.gql'),
@@ -19,7 +27,8 @@ import { MongooseModule } from '@nestjs/mongoose';
       driver: ApolloDriver,
   }),
   UsersModule,
-  AuthModule
+  AuthModule,
+  UploaderModule,
 ],
   controllers: [AppController],
   providers: [AppService],

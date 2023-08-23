@@ -1,4 +1,4 @@
-import {Injectable, ExecutionContext} from '@nestjs/common'
+import {Injectable, ExecutionContext, ForbiddenException} from '@nestjs/common'
 import { GqlExecutionContext } from '@nestjs/graphql'
 import { AuthGuard } from '@nestjs/passport'
 
@@ -13,5 +13,12 @@ export class GqlAuthGruard extends AuthGuard('local'){
         request.body = ctx.getArgs().loginUserInput;
         return request;
     }
+    // canActivate(context) {
+
+    //     if (!context.user) {
+    //       throw new ForbiddenException(); 
+    //     }
+    //     return true;
+    //   }
 }
 

@@ -19,8 +19,13 @@ input LoginUserInput {
   username: String!
 }
 
+type LogoutUser {
+  logout: Boolean!
+}
+
 type Mutation {
   login(loginUserInput: LoginUserInput!): LoginRespone!
+  logout: LogoutUser!
   signup(createUserInput: CreateUserInput!): User!
 }
 
