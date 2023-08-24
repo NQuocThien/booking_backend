@@ -5,6 +5,9 @@ export class CreateUserInput {
     fullname: string;
 
     @Field()
+    type: number;
+
+    @Field()
     username: string;
 
     @Field()

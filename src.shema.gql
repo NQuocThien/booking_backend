@@ -2,11 +2,81 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Certificate {
+  associationName: String!
+  dateEnd: DateTime
+  dateStart: DateTime!
+  description: String!
+  name: String!
+  state: Boolean
+}
+
+input CertificateInput {
+  associationName: String!
+  dateEnd: DateTime
+  dateStart: DateTime!
+  description: String!
+  name: String!
+  state: Boolean
+}
+
+input CreateProfileInput {
+  certificate: CertificateInput
+  education: EducationInput
+  experience: ExperienceInput
+  introduce: String
+  prize: PrizeInput
+  skills: String
+  userId: String!
+}
+
 input CreateUserInput {
   email: String!
   fullname: String!
   password: String!
+  type: Float!
   username: String!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Education {
+  dateEnd: DateTime
+  dateStart: DateTime!
+  description: String
+  major: String!
+  schoolName: String!
+  state: Boolean!
+}
+
+input EducationInput {
+  dateEnd: DateTime
+  dateStart: DateTime!
+  description: String
+  major: String!
+  schoolName: String!
+  state: Boolean!
+}
+
+type Experience {
+  companyName: String!
+  dateEnd: DateTime
+  dateStart: DateTime!
+  description: String
+  position: String!
+  state: Boolean
+}
+
+input ExperienceInput {
+  companyName: String!
+  dateEnd: DateTime
+  dateStart: DateTime!
+  description: String
+  position: String!
+  state: Boolean
 }
 
 type LoginRespone {
@@ -24,19 +94,62 @@ type LogoutUser {
 }
 
 type Mutation {
+  createProfile(createProfileInput: CreateProfileInput!): Profile!
   login(loginUserInput: LoginUserInput!): LoginRespone!
   logout: LogoutUser!
+  removeProfile(id: Int!): Profile!
   signup(createUserInput: CreateUserInput!): User!
+  updateProfile(updateProfileInput: UpdateProfileInput!): Profile!
+}
+
+type Prize {
+  associationName: String!
+  date: DateTime!
+  description: String!
+  name: String!
+}
+
+input PrizeInput {
+  associationName: String!
+  date: DateTime!
+  description: String!
+  name: String!
+}
+
+type Profile {
+  certificate: Certificate
+  education: Education
+  experience: Experience
+  introduce: String
+  prize: Prize
+  skills: String
+  user: [User!]
+  userId: String!
 }
 
 type Query {
-  user(username: String!): User!
+  getAllProfile: [Profile!]!
+  getUser(username: String!): User!
   users: [User!]!
+}
+
+input UpdateProfileInput {
+  certificate: CertificateInput
+  education: EducationInput
+  experience: ExperienceInput
+  id: Int!
+  introduce: String
+  prize: PrizeInput
+  skills: String
+  userId: String
 }
 
 type User {
   email: String!
   fullname: String!
+  id: ID!
   password: String!
+  profile: Profile!
+  type: Float!
   username: String!
 }

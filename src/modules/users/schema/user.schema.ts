@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory} from '@nestjs/mongoose'
+import { Profile } from 'src/modules/profile/entities/profile.entity'
 @Schema({
     timestamps:true
 })
@@ -14,5 +15,9 @@ export class User{
 
     @Prop()
     password: string
+
+    @Prop({nullable: true})
+    profile: Profile
+
 }
 export const UserSchema = SchemaFactory.createForClass(User)

@@ -40,7 +40,9 @@ export class AuthService {
         return  this.userService.create(
             {
                 ...loginUserInput, 
-                password
+                password,
+                type: 1,
+                profile: null
             }
         )
     }

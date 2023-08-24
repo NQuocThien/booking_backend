@@ -29,6 +29,6 @@ export class AuthResolver {
     @Mutation(() => LogoutUser)
     async logout(@Context() context) {
         context.user = null;
-    return this.authService.logout();
-}
+        return this.authService.logout();
+    }
 }
