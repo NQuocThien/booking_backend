@@ -11,19 +11,19 @@ export class AuthService {
     constructor(
         private userService: UsersService,
         private jwtService: JwtService
-        ){    }
-    async validateUser(username: string, password: string): Promise<any>{
+    ) { }
+    async validateUser(username: string, password: string): Promise<any> {
         const user = await this.userService.findOne(username);
         const valid = await bcrypt.compare(password, user.password);
-        if(user && valid){
-            var result:User = new User()
+        if (user && valid) {
+            var result: User = new User()
             result = user
-            result.password =""
+            result.password = ""
             return result;
         }
         return null;
     }
-    async login(user: User){
+    async login(user: User) {
         return {
             access_token: this.jwtService.sign({
                 username: user.username,
@@ -32,22 +32,22 @@ export class AuthService {
             user
         }
     }
-    async signup(loginUserInput: CreateUserInput){
+    async signup(loginUserInput: CreateUserInput) {
         const user = await this.userService.findOne(loginUserInput.username)
-        if(user)
+        if (user)
             throw new Error(`User ${loginUserInput.username} already exists ! `);
         const password = await bcrypt.hash(loginUserInput.password, 10)
-        return  this.userService.create(
+        return this.userService.create(
             {
-                ...loginUserInput, 
+                ...loginUserInput,
                 password,
-                type: 1,
+                type: +process.env.INIT_TYPE,
                 profile: null
             }
         )
     }
-    async logout(){
-        var  reponse:LogoutUser = new LogoutUser();
+    async logout() {
+        var reponse: LogoutUser = new LogoutUser();
         reponse.logout = true
         return reponse
     }

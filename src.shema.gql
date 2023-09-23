@@ -34,7 +34,6 @@ input CreateUserInput {
   email: String!
   fullname: String!
   password: String!
-  type: Float!
   username: String!
 }
 
@@ -95,11 +94,14 @@ type LogoutUser {
 
 type Mutation {
   createProfile(createProfileInput: CreateProfileInput!): Profile!
+  deleteUser(id: String!): User!
   login(loginUserInput: LoginUserInput!): LoginRespone!
   logout: LogoutUser!
   removeProfile(id: Int!): Profile!
   signup(createUserInput: CreateUserInput!): User!
   updateProfile(updateProfileInput: UpdateProfileInput!): Profile!
+  updateSetting(updateSettingInput: UpdateSettingInput!): Setting!
+  updateUser(updateUserInput: UpdateUserInput!): User!
 }
 
 type Prize {
@@ -129,8 +131,13 @@ type Profile {
 
 type Query {
   getAllProfile: [Profile!]!
+  getSetting: Setting!
   getUser(username: String!): User!
   users: [User!]!
+}
+
+type Setting {
+  defaultLang: String!
 }
 
 input UpdateProfileInput {
@@ -142,6 +149,21 @@ input UpdateProfileInput {
   prize: PrizeInput
   skills: String
   userId: String
+}
+
+input UpdateSettingInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input UpdateUserInput {
+  email: String!
+  fullname: String!
+  id: String!
+  password: String!
+  type: Float!
+  username: String!
 }
 
 type User {

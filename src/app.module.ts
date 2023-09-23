@@ -12,6 +12,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { UploaderModule } from './modules/uploader/uploader.module';
 import { ProfileModule } from './modules/profile/profile.module';
+import { SettingModule } from './modules/setting/setting.module';
 dotenv.config();
 @Module({
   imports: [
@@ -31,6 +32,7 @@ dotenv.config();
   AuthModule,
   UploaderModule,
   ProfileModule,
+  SettingModule,
 ],
   controllers: [AppController],
   providers: [AppService],

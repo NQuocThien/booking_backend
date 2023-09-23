@@ -4,25 +4,25 @@ import { Profile } from 'src/modules/profile/entities/profile.entity';
 @ObjectType()
 export class User {
 
-    @Field(type=> ID)
+    @Field(type => ID)
     id: ObjectId;
 
-    @Field({nullable: false})
-    fullname: string; 
+    @Field({ nullable: false })
+    fullname: string;
 
     @Field()
-    type: number; 
+    type: number;
 
     @Field()
-    username: string; 
+    username: string;
 
     @Field()
-    email: string; 
+    email: string;
 
     @Field()
-    password: string; 
+    password: string;
 
     @Field()
-    profile: Profile; 
+    profile: Profile;
 
 }

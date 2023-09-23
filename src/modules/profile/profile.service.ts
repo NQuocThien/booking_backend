@@ -14,8 +14,10 @@ export class ProfileService {
   ){}
 
   async create(createProfileInput: CreateProfileInput): Promise<Profile> {
-    console.log('create profile', createProfileInput)
-    return await this.profileModel.create(createProfileInput);
+    // console.log('create profile', createProfileInput)
+    const profile: Profile =  await this.profileModel.create(createProfileInput)
+    log('---> Created New Profile With ID: ',  (await this.profileModel.create(createProfileInput)).id, 'Of User ID:', profile.userId);
+    return profile;
   }
 
   async findOneByUserId(id: ObjectId): Promise<Profile> {

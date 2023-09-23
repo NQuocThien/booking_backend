@@ -1,9 +1,9 @@
-import { Prop, Schema, SchemaFactory} from '@nestjs/mongoose'
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Profile } from 'src/modules/profile/entities/profile.entity'
 @Schema({
-    timestamps:true
+    timestamps: true
 })
-export class User{
+export class User {
     @Prop()
     fullname: string
 
@@ -16,7 +16,10 @@ export class User{
     @Prop()
     password: string
 
-    @Prop({nullable: true})
+    @Prop()
+    type: number
+
+    @Prop({ nullable: true })
     profile: Profile
 
 }
