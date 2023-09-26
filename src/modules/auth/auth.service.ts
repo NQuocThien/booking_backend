@@ -24,10 +24,11 @@ export class AuthService {
         return null;
     }
     async login(user: User) {
+        console.log('user login', user)
         return {
             access_token: this.jwtService.sign({
                 username: user.username,
-                // sub: user.id
+                roles: user.roles,
             }),
             user
         }

@@ -1,14 +1,14 @@
-import { Resolver, Query, Mutation, Args, Context, ResolveField, Parent } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Context, ResolveField, Parent, GqlExecutionContext } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
-// import { User } from './schema/user.schema';
 import { JWtAuthGuard } from '../auth/jwt-auth.guard';
 import { UseGuards } from '@nestjs/common';
 import { ProfileService } from '../profile/profile.service';
 import { Profile } from '../profile/entities/profile.entity';
-import { log } from 'console';
 import { UpdateUserInput } from './dto/update-user.input';
-// import { Profile } from '../profile/entities/profile.entity';
+import { Roles } from '../auth/roles.decorator';
+import { Role } from '../auth/entities/role.enum';
+import { RolesGuard } from '../auth/roles.guard';
 @Resolver(() => User)
 export class UsersResolver {
   constructor(
@@ -17,10 +17,10 @@ export class UsersResolver {
   ) { }
 
   @Query(() => [User], { name: 'users' })
-  @UseGuards(JWtAuthGuard)
+  @UseGuards(JWtAuthGuard, RolesGuard)
+  @Roles(Role.Admin)
   async findAll(@Context() context): Promise<User[]> {
-
-    // console.log('test: ', context)
+    // console.log('context', context)
     return await this.usersService.findAll();
   }
 
@@ -41,6 +41,13 @@ export class UsersResolver {
   async findOne(@Args('username') username: string) {
     // console.log('test 1: ', (await this.usersService.findOne(username)))
     return await this.usersService.findOne(username);
+  }
+
+  @Query(() => User, { name: 'checklogin' })
+  @UseGuards(JWtAuthGuard)
+  async checkLogin(@Context('req') req) {
+    // console.log('test', req.user)
+    return this.usersService.findOne(req?.user?.username)
   }
 
   @ResolveField(() => Profile)

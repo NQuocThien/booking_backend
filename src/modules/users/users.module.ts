@@ -5,7 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UserSchema } from './schema/user.schema';
 import { ProfileModule } from '../profile/profile.module';
 @Module({
-  imports:[
+  imports: [
     MongooseModule.forFeature([
       {
         name: 'User',
@@ -14,8 +14,8 @@ import { ProfileModule } from '../profile/profile.module';
     ]),
     forwardRef(() => ProfileModule)
     // ProfileModule
-],
+  ],
   providers: [UsersResolver, UsersService],
-  exports: [UsersService], 
+  exports: [UsersService]
 })
-export class UsersModule {}
+export class UsersModule { }

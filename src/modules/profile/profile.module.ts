@@ -14,9 +14,9 @@ import { UsersModule } from '../users/users.module';
         schema: ProfileSchema
       }
     ]),
-    forwardRef(()=> UsersModule)
+    forwardRef(() => UsersModule)
   ],
   providers: [ProfileResolver, ProfileService],
   exports: [ProfileService]
 })
-export class ProfileModule {}
+export class ProfileModule { }

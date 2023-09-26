@@ -1,4 +1,4 @@
-import { Injectable, ExecutionContext } from '@nestjs/common'
+import { Injectable, ExecutionContext, UnauthorizedException } from '@nestjs/common'
 import { GqlExecutionContext } from '@nestjs/graphql'
 import { AuthGuard } from '@nestjs/passport'
 
@@ -6,7 +6,8 @@ import { AuthGuard } from '@nestjs/passport'
 export class JWtAuthGuard extends AuthGuard('jwt') {
     getRequest(context: ExecutionContext) {
         const ctx = GqlExecutionContext.create(context)
-        // console.log('test : ', ctx.getContext().req)
+        console.log('=> Auth')
+        // console.log('test : ', ctx.getContext().req.headers['authorization'])
         return ctx.getContext().req;
     }
 }

@@ -19,6 +19,9 @@ export class User {
     @Prop()
     type: number
 
+    @Prop(() => [String])
+    roles: string[]
+
     @Prop({ nullable: true })
     profile: Profile
 

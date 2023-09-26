@@ -1,4 +1,4 @@
-import { ObjectType, Field, Int, ID } from '@nestjs/graphql'
+import { ObjectType, Field, ID } from '@nestjs/graphql'
 import { ObjectId } from 'mongodb';
 import { Profile } from 'src/modules/profile/entities/profile.entity';
 @ObjectType()
@@ -12,6 +12,9 @@ export class User {
 
     @Field()
     type: number;
+
+    @Field(() => [String], { nullable: true })
+    roles?: string[];
 
     @Field()
     username: string;

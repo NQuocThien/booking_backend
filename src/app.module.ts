@@ -13,13 +13,16 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { UploaderModule } from './modules/uploader/uploader.module';
 import { ProfileModule } from './modules/profile/profile.module';
 import { SettingModule } from './modules/setting/setting.module';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './modules/auth/roles.guard';
+import { JWtAuthGuard } from './modules/auth/jwt-auth.guard';
 dotenv.config();
 @Module({
   imports: [
     // ServeStaticModule.forRoot({
     //   rootPath: join(__dirname, '../files'), 
     // }),
-    ConfigModule.forRoot({ isGlobal: true}),
+    ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRoot(
       process.env.MONGO_URI
     ),
@@ -27,14 +30,18 @@ dotenv.config();
       autoSchemaFile: join(process.cwd(), 'src.shema.gql'),
       sortSchema: true,
       driver: ApolloDriver,
-  }),
-  UsersModule,
-  AuthModule,
-  UploaderModule,
-  ProfileModule,
-  SettingModule,
-],
-  controllers: [AppController],
-  providers: [AppService],
+    }),
+    UsersModule,
+    AuthModule,
+    UploaderModule,
+    ProfileModule,
+    SettingModule,
+  ],
+  controllers: [
+    AppController
+  ],
+  providers: [
+    AppService,
+  ]
 })
-export class AppModule {}
+export class AppModule { }
