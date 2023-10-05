@@ -11,18 +11,18 @@ export class ProfileService {
   constructor(
     @InjectModel(Profile.name)
     private readonly profileModel: Model<Profile>
-  ){}
+  ) { }
 
   async create(createProfileInput: CreateProfileInput): Promise<Profile> {
     // console.log('create profile', createProfileInput)
-    const profile: Profile =  await this.profileModel.create(createProfileInput)
-    log('---> Created New Profile With ID: ',  (await this.profileModel.create(createProfileInput)).id, 'Of User ID:', profile.userId);
+    const profile: Profile = await this.profileModel.create(createProfileInput)
+    log('---> Created New Profile With ID: ', (await this.profileModel.create(createProfileInput)).id, 'Of User ID:', profile.userId);
     return profile;
   }
 
-  async findOneByUserId(id: ObjectId): Promise<Profile> {
+  async findOneByUserId(id: String): Promise<Profile> {
     // log('test 3:', await this.profileModel.findOne({userId: id}))
-    return await this.profileModel.findOne({userId: id});
+    return await this.profileModel.findOne({ userId: id });
   }
 
   async getAllProfile() {

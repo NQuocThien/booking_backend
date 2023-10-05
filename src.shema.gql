@@ -75,6 +75,7 @@ type Mutation {
   updateProfile(updateProfileInput: UpdateProfileInput!): Profile!
   updateSetting(updateSettingInput: UpdateSettingInput!): Setting!
   updateUser(updateUserInput: UpdateUserInput!): User!
+  updateUserWithPass(updateUserInput: UpdateUserWithPassInput!): User!
 }
 
 input PrizeInput {
@@ -85,8 +86,10 @@ input PrizeInput {
 }
 
 type Profile {
+  id: ID!
   introduce: String
   skills: String
+  skills1: String
   user: [User!]
   userId: String!
 }
@@ -124,7 +127,16 @@ input UpdateUserInput {
   email: String!
   fullname: String!
   id: String!
+  type: Float!
+  username: String!
+}
+
+input UpdateUserWithPassInput {
+  email: String!
+  fullname: String!
+  id: String!
   password: String!
+  passwordNew: String!
   type: Float!
   username: String!
 }

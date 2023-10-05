@@ -15,7 +15,7 @@ export class UsersService {
     private userModel: Model<User>,
     private profileService: ProfileService
   ) {
-  }
+  } 
   async create(createUserInput: CreateUserInput): Promise<User> {
     const user = await this.userModel.create({ ...createUserInput })
     const createProfile: CreateProfileInput = new CreateProfileInput()
@@ -29,15 +29,16 @@ export class UsersService {
   async findAll(): Promise<[User]> { // bảo vệ bởi jwt
     // console.log(' user: ', this.userModel.find())
     var users: any
-    await this.userModel.find().lean()
+    await this.userModel.find()
       .then(data => users = data)
       .catch(err => new Error(err))
-
+    // console.log('test id:', users)
     return users;
   }
 
   async findOne(username: string): Promise<User> {
     const user: User = await this.userModel.findOne({ username: username })
+
     return user;
   }
 

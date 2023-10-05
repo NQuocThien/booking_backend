@@ -9,6 +9,8 @@ import { UpdateUserInput } from './dto/update-user.input';
 import { Roles } from '../auth/roles.decorator';
 import { Role } from '../auth/entities/role.enum';
 import { RolesGuard } from '../auth/roles.guard';
+import * as bcrypt from 'bcrypt';
+import { UpdateUserWithPassInput } from './dto/update-user-pass.input';
 @Resolver(() => User)
 export class UsersResolver {
   constructor(
@@ -19,15 +21,32 @@ export class UsersResolver {
   @Query(() => [User], { name: 'users' })
   @UseGuards(JWtAuthGuard, RolesGuard)
   @Roles(Role.Admin)
-  async findAll(@Context() context): Promise<User[]> {
+  async findAll(@Context() context): Promise<[User]> {
     // console.log('context', context)
-    return await this.usersService.findAll();
+    const users = await this.usersService.findAll()
+    // console.log('test id: ', users)
+    return users
   }
 
   @Mutation(() => User, { name: 'updateUser' })
   async updateUser(@Args('updateUserInput') updateUserInput: UpdateUserInput): Promise<User> {
-    // log('update user: ', updateUserInput)
     return this.usersService.updateUserById(updateUserInput)
+  }
+
+  @Mutation(() => User, { name: 'updateUserWithPass' })
+  async updateUserWithPass(@Args('updateUserInput') updateUserInput: UpdateUserWithPassInput): Promise<User> {
+    // check old password
+    const user = await this.usersService.findOne(updateUserInput.username);
+    const valid = await bcrypt.compare(updateUserInput.password, user.password);
+    console.log('---> Update user ' + updateUserInput.username + ' with old password: ' + updateUserInput.password + ' -> new pass: ' + updateUserInput.passwordNew + ' -> validate pass:', valid)
+    if (valid) {
+      const password = await bcrypt.hash(updateUserInput.passwordNew, 10)
+      const dataUserUpdate = { ...updateUserInput, password }
+      return this.usersService.updateUserById(dataUserUpdate)
+    }
+    else {
+      return null
+    }
   }
 
   @Mutation(() => User, { name: 'deleteUser' })
@@ -47,12 +66,14 @@ export class UsersResolver {
   @UseGuards(JWtAuthGuard)
   async checkLogin(@Context('req') req) {
     // console.log('test', req.user)
-    return this.usersService.findOne(req?.user?.username)
+    const user = await this.usersService.findOne(req?.user?.username)
+    // console.log('test login: ', user)
+    return user
   }
 
   @ResolveField(() => Profile)
   async profile(@Parent() user: User) {
-    // console.log('test 2: ', user.id)
+    // console.log('test 2: ', user.id)SS
     return await this.profileService.findOneByUserId(user.id);
   }
 
