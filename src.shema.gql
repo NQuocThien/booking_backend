@@ -51,6 +51,18 @@ input ExperienceInput {
   state: Boolean
 }
 
+type LinkImage {
+  filename: String!
+  type: String!
+  url: String!
+}
+
+input LinkImageInput {
+  filename: String!
+  type: String!
+  url: String!
+}
+
 type LoginRespone {
   access_token: String!
   user: User!
@@ -127,6 +139,7 @@ input UpdateUserInput {
   email: String!
   fullname: String!
   id: String!
+  linkImage: LinkImageInput
   type: Float!
   username: String!
 }
@@ -135,6 +148,7 @@ input UpdateUserWithPassInput {
   email: String!
   fullname: String!
   id: String!
+  linkImage: LinkImageInput
   password: String!
   passwordNew: String!
   type: Float!
@@ -145,8 +159,9 @@ type User {
   email: String!
   fullname: String!
   id: ID!
+  linkImage: LinkImage
   password: String!
-  profile: Profile!
+  profile: Profile
   roles: [String!]
   type: Float!
   username: String!

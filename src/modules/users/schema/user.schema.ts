@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import mongoose from 'mongoose';
 import { Profile } from 'src/modules/profile/entities/profile.entity'
+import { LinkImage } from './linkImage.schema';
 
 @Schema({
     timestamps: true
@@ -23,6 +24,14 @@ export class User {
 
     @Prop()
     type: number
+
+    @Prop(
+        {
+            type: Object,
+            default: null,
+        }
+    )
+    linkImage: LinkImage
 
     @Prop(() => [String])
     roles: string[]

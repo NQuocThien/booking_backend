@@ -15,7 +15,7 @@ export class UsersService {
     private userModel: Model<User>,
     private profileService: ProfileService
   ) {
-  } 
+  }
   async create(createUserInput: CreateUserInput): Promise<User> {
     const user = await this.userModel.create({ ...createUserInput })
     const createProfile: CreateProfileInput = new CreateProfileInput()
@@ -45,6 +45,7 @@ export class UsersService {
   async updateUserById(updateUserInput: UpdateUserInput): Promise<User> {
     const { id, ...userBody } = updateUserInput
     const userUpdated = await this.userModel.findByIdAndUpdate(updateUserInput.id, userBody)
+    log('----> User input:', updateUserInput)
     log('----> User Updated:', userUpdated.id)
     return userUpdated
   }

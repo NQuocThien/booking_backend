@@ -1,4 +1,5 @@
 import { InputType, Field, Int } from '@nestjs/graphql'
+import { LinkImageInput } from './linkimage.input';
 @InputType()
 export class UpdateUserInput {
 
@@ -16,5 +17,8 @@ export class UpdateUserInput {
 
     @Field()
     email: string;
+
+    @Field({ nullable: true })
+    linkImage: LinkImageInput;
 
 }

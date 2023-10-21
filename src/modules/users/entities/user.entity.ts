@@ -1,5 +1,6 @@
 import { ObjectType, Field, ID, Int } from '@nestjs/graphql'
-import { ObjectId } from 'mongodb';
+// import { ObjectId } from 'mongodb';
+import { LinkImage } from 'src/modules/users/dto/image';
 import { Profile } from 'src/modules/profile/entities/profile.entity';
 @ObjectType()
 export class User {
@@ -25,7 +26,10 @@ export class User {
     @Field()
     password: string;
 
-    @Field()
+    @Field(() => LinkImage, { nullable: true })
+    linkImage: LinkImage;
+
+    @Field({ nullable: true })
     profile: Profile;
 
 }
