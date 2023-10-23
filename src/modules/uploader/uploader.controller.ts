@@ -39,16 +39,22 @@ export class UploaderController {
       fileFilter: imageFilter,
     }),
   )
-  async uploadImage(@UploadedFiles() files: Express.Multer.File[]) {
-    const response = []
-    files.forEach((file) => {
-      const fileResponse = {
-        originalname: file.originalname,
-        filename: file.filename,
-      }
-      response.push(fileResponse)
-    })
-    return response
+  async uploadImage(@UploadedFiles() files: Express.Multer.File[]): Promise<any> {
+    try {
+      const response = []
+      files.forEach((file) => {
+        const fileResponse = {
+          originalname: file.originalname,
+          filename: file.filename,
+        }
+        response.push(fileResponse)
+      })
+      return response
+
+    } catch (e) {
+      console.error(e)
+      throw new Error('Can not Upload ');
+    }
   }
 
   @Delete('webbookingImageDelete/:filename')

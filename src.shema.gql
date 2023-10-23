@@ -51,6 +51,31 @@ input ExperienceInput {
   state: Boolean
 }
 
+type GeneralInfor {
+  ID: String
+  address: String!
+  company: String!
+  copyrigth: String!
+  email: String!
+  hotline: String!
+  liscenceBusiness: String!
+  liscenceOparating: String!
+  logoFooter: LinkImage!
+  logoHeader: LinkImage!
+}
+
+input GeneralInforUpdateInput {
+  address: String!
+  company: String!
+  copyrigth: String!
+  email: String!
+  hotline: String!
+  liscenceBusiness: String!
+  liscenceOparating: String!
+  logoFooter: LinkImageInput!
+  logoHeader: LinkImageInput!
+}
+
 type LinkImage {
   filename: String!
   type: String!
@@ -84,6 +109,7 @@ type Mutation {
   logout: LogoutUser!
   removeProfile(id: Int!): Profile!
   signup(createUserInput: CreateUserInput!): User!
+  updateGeneralInfor(updateGeneralInforInput: GeneralInforUpdateInput!): GeneralInfor!
   updateProfile(updateProfileInput: UpdateProfileInput!): Profile!
   updateSetting(updateSettingInput: UpdateSettingInput!): Setting!
   updateUser(updateUserInput: UpdateUserInput!): User!
@@ -109,6 +135,7 @@ type Profile {
 type Query {
   checklogin: User!
   getAllProfile: [Profile!]!
+  getGeneralInfor: GeneralInfor!
   getSetting: Setting!
   getUser(username: String!): User!
   users: [User!]!

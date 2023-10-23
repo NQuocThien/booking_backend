@@ -13,10 +13,11 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { UploaderModule } from './modules/uploader/uploader.module';
 import { ProfileModule } from './modules/profile/profile.module';
 import { SettingModule } from './modules/setting/setting.module';
+import { GeneralInforModule } from './modules/general-infor/general-infor.module';
 
 dotenv.config();
 @Module({
-  imports: [ 
+  imports: [
     MongooseModule.forRoot(
       process.env.MONGO_URI
     ),
@@ -34,6 +35,7 @@ dotenv.config();
     UploaderModule,
     ProfileModule,
     SettingModule,
+    GeneralInforModule,
   ],
   controllers: [
     AppController

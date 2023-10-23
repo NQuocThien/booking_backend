@@ -12,7 +12,5 @@ export class Profile {
     @Prop({ nullable: true })
     skills: string
 
-    // @Prop(() => [User])
-    // user: User[]
 }
 export const ProfileSchema = SchemaFactory.createForClass(Profile)

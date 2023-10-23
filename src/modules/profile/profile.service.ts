@@ -4,7 +4,6 @@ import { UpdateProfileInput } from './dto/update-profile.input';
 import { Model } from 'mongoose';
 import { Profile } from './entities/profile.entity';
 import { InjectModel } from '@nestjs/mongoose';
-import { ObjectId } from 'typeorm';
 import { log } from 'console';
 @Injectable()
 export class ProfileService {

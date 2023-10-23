@@ -3,14 +3,13 @@ import { ProfileService } from './profile.service';
 import { Profile } from './entities/profile.entity';
 import { CreateProfileInput } from './dto/create-profile.input';
 import { UpdateProfileInput } from './dto/update-profile.input';
-import { profile } from 'console';
 import { UsersService } from '../users/users.service';
 @Resolver(() => Profile)
 export class ProfileResolver {
   constructor(
     private readonly profileService: ProfileService,
     private userService: UsersService
-    ) {}
+  ) { }
 
   @Mutation(() => Profile)
   createProfile(@Args('createProfileInput') createProfileInput: CreateProfileInput) {
@@ -18,14 +17,14 @@ export class ProfileResolver {
   }
 
   @Query(() => [Profile], { name: 'getAllProfile' })
-  findAllProfile() { 
+  findAllProfile() {
     return this.profileService.getAllProfile();
   }
 
   @ResolveField()
-  async user(@Parent() profile: Profile) {  
+  async user(@Parent() profile: Profile) {
     return await this.userService.findAll()
-  } 
+  }
 
   @Mutation(() => Profile)
   updateProfile(@Args('updateProfileInput') updateProfileInput: UpdateProfileInput) {
