@@ -30,25 +30,24 @@ export class GeneralInforResolver {
     async updateGeneralInfor(@Args('updateGeneralInforInput') updateGeneralInforInput: GeneralInforUpdateInput) {
         try {
             const generalInfor = await this.getGeneralInfor()
-            this.deleteImage(generalInfor.logoFooter);
-            this.deleteImage(generalInfor.logoHeader)
+            updateGeneralInforInput.logoFooter && this.deleteImage(generalInfor.logoFooter);
+            updateGeneralInforInput.logoHeader && this.deleteImage(generalInfor.logoHeader)
         } catch { }
         const infor = await this.GeneralInforService.updateGeneralInfor(updateGeneralInforInput);
         return infor
     }
 
     async deleteImage(fileImage: LinkImage): Promise<void> {
-        if (fileImage?.url) {
-            const imageDirectory = `${process.env.FILE_PATH || 'files'}/images`;
-            const imagePath = `${imageDirectory}/${fileImage.filename}`;
-            const imageStat = await fsPromises.stat(imagePath);
-            if (imageStat.isFile()) {
-                await fsPromises.unlink(imagePath);
-                console.log(' Update User Deleted old image:', imageStat.isFile());
+        try {
+            if (fileImage?.url) {
+                const imageDirectory = `${process.env.FILE_PATH || 'files'}/images`;
+                const imagePath = `${imageDirectory}/${fileImage.filename}`;
+                const imageStat = await fsPromises.stat(imagePath);
+                if (imageStat.isFile()) {
+                    await fsPromises.unlink(imagePath);
+                    console.log(' Update User Deleted old image :', imageStat.isFile());
+                }
             }
-            else {
-                throw new NotFoundException('Hình ảnh không tồn tại');
-            }
-        }
+        } catch (e) { }
     }
 }

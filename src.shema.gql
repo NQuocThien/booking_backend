@@ -72,8 +72,8 @@ input GeneralInforUpdateInput {
   hotline: String!
   liscenceBusiness: String!
   liscenceOparating: String!
-  logoFooter: LinkImageInput!
-  logoHeader: LinkImageInput!
+  logoFooter: LinkImageInput
+  logoHeader: LinkImageInput
 }
 
 type LinkImage {

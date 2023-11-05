@@ -44,9 +44,10 @@ export class UsersService {
 
   async updateUserById(updateUserInput: UpdateUserInput): Promise<User> {
     const { id, ...userBody } = updateUserInput
-    const userUpdated = await this.userModel.findByIdAndUpdate(updateUserInput.id, userBody)
+    const userUpdated = await this.userModel.findByIdAndUpdate(updateUserInput.id, userBody, { new: true })
     log('----> User input:', updateUserInput)
-    log('----> User Updated:', userUpdated.id)
+    log('----> User Updated:', userUpdated)
+
     return userUpdated
   }
 

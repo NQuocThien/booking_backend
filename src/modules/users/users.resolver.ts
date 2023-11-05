@@ -34,7 +34,7 @@ export class UsersResolver {
   async updateUser(@Args('updateUserInput') updateUserInput: UpdateUserInput): Promise<User> {
     try {
       const currentUser = await this.usersService.findOne(updateUserInput.username);
-      this.deleteImage(currentUser);
+      updateUserInput.linkImage !== currentUser.linkImage && currentUser && this.deleteImage(currentUser);
 
     } catch (e) {
       console.log('Error Delete Image')
@@ -46,20 +46,21 @@ export class UsersResolver {
   @UseGuards(JWtAuthGuard)
   @Mutation(() => User, { name: 'updateUserWithPass' })
   async updateUserWithPass(@Args('updateUserInput') updateUserInput: UpdateUserWithPassInput): Promise<User> {
+    console.log(' updating user')
     const user = await this.usersService.findOne(updateUserInput.username);
     const valid = await bcrypt.compare(updateUserInput.password, user.password);
-    console.log('---> Update user ' + updateUserInput.username + ' with old password: ' + updateUserInput.password + ' -> new pass: ' + updateUserInput.passwordNew + ' -> validate pass:', valid)
+    console.log('---> Update user ' + updateUserInput.username + ' with old password:' + updateUserInput.password + ' -> new pass: ' + updateUserInput.passwordNew + ' -> validate pass:', valid)
     if (valid) {
       try {
         const currentUser = await this.findOne(updateUserInput.username);
-        currentUser && this.deleteImage(currentUser)
-      } catch (e) { console.error('Error Delete:', e) }
+        updateUserInput.linkImage !== currentUser.linkImage && currentUser && this.deleteImage(currentUser)
+      } catch (e) { console.error('Error Delete: ', e) }
       const password = await bcrypt.hash(updateUserInput.passwordNew, 10)
       const dataUserUpdate = { ...updateUserInput, password }
       return this.usersService.updateUserById(dataUserUpdate)
     }
     else {
-      return null
+      throw new Error('Password Error')
     }
   }
 

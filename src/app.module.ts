@@ -27,9 +27,9 @@ dotenv.config();
       sortSchema: true,
       driver: ApolloDriver,
     }),
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '../files'),
-    }),
+    // ServeStaticModule.forRoot({
+    //   rootPath: join(__dirname, '../files'),
+    // }), // cấu hình static files
     UsersModule,
     AuthModule,
     UploaderModule,

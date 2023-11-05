@@ -9,10 +9,10 @@ export class GeneralInforUpdateInput {
     @Field()
     hotline: string
 
-    @Field()
+    @Field({ nullable: true })
     logoHeader: LinkImageInput
 
-    @Field()
+    @Field({ nullable: true })
     logoFooter: LinkImageInput
 
     @Field()
