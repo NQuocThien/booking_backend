@@ -1,9 +1,18 @@
-import { Resolver, Query, Mutation, Args, Context, ResolveField, Parent, GqlExecutionContext } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  Context,
+  ResolveField,
+  Parent,
+  GqlExecutionContext,
+} from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
 import { JWtAuthGuard } from '../auth/jwt-auth.guard';
 import { NotFoundException, UseGuards } from '@nestjs/common';
-import { ProfileService } from '../profile/profile.service';
+// import { ProfileService } from '../profile/profile.service';
 import { Profile } from '../profile/entities/profile.entity';
 import { UpdateUserInput } from './dto/update-user.input';
 import { Roles } from '../auth/roles.decorator';
@@ -12,62 +21,98 @@ import { RolesGuard } from '../auth/roles.guard';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserWithPassInput } from './dto/update-user-pass.input';
 import { promises as fsPromises } from 'fs';
+import { LinkImage } from './dto/image';
+import deleteImage from 'src/utils/delete_image';
+import { Http2ServerRequest } from 'http2';
+import { Customer } from '../customer/entities/customer.entity';
+import { CustomerService } from '../customer/customer.service';
+import { MedicalFacilitiesService } from '../medical-facilities/medical-facilities.service';
+import { MedicalFacilities } from '../medical-facilities/entities/mecical-facilies.entity';
 @Resolver(() => User)
 export class UsersResolver {
   constructor(
     private readonly usersService: UsersService,
-    private readonly profileService: ProfileService
-  ) { }
+    private readonly customerService: CustomerService, // private readonly profileService: ProfileService,
+    private readonly medicalService: MedicalFacilitiesService,
+  ) {}
 
   @Query(() => [User], { name: 'users' })
   @UseGuards(JWtAuthGuard, RolesGuard)
   @Roles(Role.Admin)
   async findAll(@Context() context): Promise<[User]> {
-    // console.log('context', context)
-    const users = await this.usersService.findAll()
-    // console.log('test id: ', users)
-    return users
+    // console.log('request: ',context.req);
+    const users = await this.usersService.findAll();
+    return users;
   }
 
   @UseGuards(JWtAuthGuard)
   @Mutation(() => User, { name: 'updateUser' })
-  async updateUser(@Args('updateUserInput') updateUserInput: UpdateUserInput): Promise<User> {
+  async updateUser(
+    @Args('updateUserInput') updateUserInput: UpdateUserInput,
+  ): Promise<User> {
     try {
-      const currentUser = await this.usersService.findOne(updateUserInput.username);
-      updateUserInput.linkImage !== currentUser.linkImage && currentUser && this.deleteImage(currentUser);
-
+      const currentUser = await this.usersService.findOne(
+        updateUserInput.username,
+      );
+      if (
+        updateUserInput.linkImage.filename !== currentUser.linkImage.filename &&
+        currentUser
+      )
+        deleteImage(currentUser.linkImage);
     } catch (e) {
-      console.log('Error Delete Image')
+      console.log('Error Delete Image');
     }
-    return this.usersService.updateUserById(updateUserInput)
+    return this.usersService.updateUserById(updateUserInput);
   }
-
 
   @UseGuards(JWtAuthGuard)
   @Mutation(() => User, { name: 'updateUserWithPass' })
-  async updateUserWithPass(@Args('updateUserInput') updateUserInput: UpdateUserWithPassInput): Promise<User> {
-    console.log(' updating user')
+  async updateUserWithPass(
+    @Args('updateUserInput') updateUserInput: UpdateUserWithPassInput,
+  ): Promise<User> {
+    console.log(' updating user');
     const user = await this.usersService.findOne(updateUserInput.username);
     const valid = await bcrypt.compare(updateUserInput.password, user.password);
-    console.log('---> Update user ' + updateUserInput.username + ' with old password:' + updateUserInput.password + ' -> new pass: ' + updateUserInput.passwordNew + ' -> validate pass:', valid)
+    console.log(
+      '---> Update user ' +
+        updateUserInput.username +
+        ' with old password:' +
+        updateUserInput.password +
+        ' -> new pass: ' +
+        updateUserInput.passwordNew +
+        ' -> validate pass:',
+      valid,
+    );
     if (valid) {
       try {
         const currentUser = await this.findOne(updateUserInput.username);
-        updateUserInput.linkImage !== currentUser.linkImage && currentUser && this.deleteImage(currentUser)
-      } catch (e) { console.error('Error Delete: ', e) }
-      const password = await bcrypt.hash(updateUserInput.passwordNew, 10)
-      const dataUserUpdate = { ...updateUserInput, password }
-      return this.usersService.updateUserById(dataUserUpdate)
-    }
-    else {
-      throw new Error('Password Error')
+        if (
+          updateUserInput.linkImage.filename !==
+            currentUser.linkImage.filename &&
+          currentUser
+        ) {
+          deleteImage(currentUser.linkImage);
+        }
+      } catch (e) {
+        console.error('Error Delete: ', e);
+      }
+      const password = await bcrypt.hash(updateUserInput.passwordNew, 10);
+      const dataUserUpdate = { ...updateUserInput, password };
+      return this.usersService.updateUserById(dataUserUpdate);
+    } else {
+      throw new Error('Password Error');
     }
   }
 
   @Mutation(() => User, { name: 'deleteUser' })
   async deleteUser(@Args('id') id: string): Promise<User> {
     // log('update user: ', updateUserInput)
-    return this.usersService.deleteUserById(id)
+    return this.usersService.deleteUserById(id);
+  }
+  @Mutation(() => User, { name: 'activeUser' })
+  async activeUser(@Args('id') id: string): Promise<User> {
+    // log('update user: ', updateUserInput)
+    return this.usersService.activeUserById(id);
   }
 
   @Query(() => User, { name: 'getUser' })
@@ -81,29 +126,25 @@ export class UsersResolver {
   @UseGuards(JWtAuthGuard)
   async checkLogin(@Context('req') req) {
     // console.log('test', req.user)
-    const user = await this.usersService.findOne(req?.user?.username)
+    const user = await this.usersService.findOne(req?.user?.username);
     // console.log('test login: ', user)
-    return user
+    return user;
   }
 
-  @ResolveField(() => Profile)
-  async profile(@Parent() user: User) {
+  // @ResolveField(() => Profile)
+  // async profile(@Parent() user: User) {
+  //   // console.log('test 2: ', user.id)SS
+  //   return await this.profileService.findOneByUserId(user.id);
+  // }
+
+  @ResolveField(() => Customer)
+  async customer(@Parent() user: User) {
     // console.log('test 2: ', user.id)SS
-    return await this.profileService.findOneByUserId(user.id);
+    return await this.customerService.findCustomerById(user.id);
   }
-
-  async deleteImage(currentUser: any): Promise<void> {
-    if (currentUser.linkImage?.url) {
-      const imageDirectory = `${process.env.FILE_PATH || 'files'}/images`;
-      const imagePath = `${imageDirectory}/${currentUser.linkImage.filename}`;
-      const imageStat = await fsPromises.stat(imagePath);
-      if (imageStat.isFile()) {
-        await fsPromises.unlink(imagePath);
-        console.log(' Update User Deleted old image:', imageStat.isFile());
-      }
-      else {
-        throw new NotFoundException('Hình ảnh không tồn tại');
-      }
-    }
+  @ResolveField(() => [MedicalFacilities])
+  async medicalFacilities(@Parent() user: User) {
+    // console.log('test 2: ', user.id)SS
+    return await this.medicalService.findMedicalFacilitiesByUserId(user.id);
   }
 }

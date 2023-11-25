@@ -6,19 +6,18 @@ export class UpdateUserInput {
     @Field()
     id: string
 
-    @Field()
+    @Field({ nullable: true })
     fullname: string;
 
-    @Field()
-    type: number;
+    @Field({nullable:true})
+    active: boolean;
 
-    @Field()
+    @Field({ nullable: true })
     username: string;
 
-    @Field()
+    @Field({ nullable: true })
     email: string;
 
     @Field({ nullable: true })
     linkImage: LinkImageInput;
-
 }

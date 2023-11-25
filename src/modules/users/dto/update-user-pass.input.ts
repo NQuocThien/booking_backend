@@ -9,8 +9,8 @@ export class UpdateUserWithPassInput {
     @Field()
     fullname: string;
 
-    @Field()
-    type: number;
+    @Field({nullable:true})
+    active: boolean;
 
     @Field()
     username: string;

@@ -11,6 +11,19 @@ input CertificateInput {
   state: Boolean
 }
 
+input CreateCustomerInput {
+  fullname: String!
+  userId: String!
+}
+
+input CreateMedicalFacilitiesInput {
+  adress: String!
+  companyName: String!
+  discription: String!
+  image: LinkImageInput!
+  userId: String!
+}
+
 input CreateProfileInput {
   certificate: CertificateInput
   education: EducationInput
@@ -26,6 +39,11 @@ input CreateUserInput {
   fullname: String!
   password: String!
   username: String!
+}
+
+type Customer {
+  fullname: String!
+  userId: String!
 }
 
 """
@@ -102,8 +120,19 @@ type LogoutUser {
   logout: Boolean!
 }
 
+type MedicalFacilities {
+  adress: String!
+  companyName: String!
+  discription: String!
+  id: ID!
+  image: LinkImage!
+}
+
 type Mutation {
+  activeUser(id: String!): User!
+  createMedicalFacilities(createMedicalFacilitiesInput: CreateMedicalFacilitiesInput!): MedicalFacilities!
   createProfile(createProfileInput: CreateProfileInput!): Profile!
+  createcustomer(createCustomerInput: CreateCustomerInput!): Customer!
   deleteUser(id: String!): User!
   login(loginUserInput: LoginUserInput!): LoginRespone!
   logout: LogoutUser!
@@ -138,6 +167,8 @@ type Query {
   getGeneralInfor: GeneralInfor!
   getSetting: Setting!
   getUser(username: String!): User!
+  getcustomers: [Customer!]!
+  medicalfacilities: [MedicalFacilities!]!
   users: [User!]!
 }
 
@@ -163,33 +194,34 @@ input UpdateSettingInput {
 }
 
 input UpdateUserInput {
-  email: String!
-  fullname: String!
+  active: Boolean
+  email: String
+  fullname: String
   id: String!
   linkImage: LinkImageInput
-  type: Float!
-  username: String!
+  username: String
 }
 
 input UpdateUserWithPassInput {
+  active: Boolean
   email: String!
   fullname: String!
   id: String!
   linkImage: LinkImageInput
   password: String!
   passwordNew: String!
-  type: Float!
   username: String!
 }
 
 type User {
+  active: Boolean
+  customer: Customer
   email: String!
   fullname: String!
   id: ID!
   linkImage: LinkImage
+  medicalFacilities: MedicalFacilities
   password: String!
-  profile: Profile
   roles: [String!]
-  type: Float!
   username: String!
 }

@@ -4,23 +4,22 @@ import { SchemaFactory } from '@nestjs/mongoose';
 
 @ObjectType()
 export class Profile {
-
-  @Field(type => ID)
-  id: String
+  @Field((type) => ID)
+  id: String;
 
   @Field({ nullable: true })
-  introduce: string
+  introduce: string;
 
   @Field()
-  userId: string
+  userId: string;
 
   @Field({ nullable: true })
-  skills: string
+  skills: string;
 
   @Field({ nullable: true })
-  skills1: string
+  skills1: string;
 
   @Field(() => [User], { nullable: true })
-  user: User[]
+  user: User[];
 }
-export const ProfileSchema = SchemaFactory.createForClass(Profile)
+export const ProfileSchema = SchemaFactory.createForClass(Profile);

@@ -17,23 +17,23 @@ import { RolesGuard } from './roles.guard';
     MongooseModule.forFeature([
       {
         name: 'User',
-        schema: UserSchema
-      }
+        schema: UserSchema,
+      },
     ]),
     PassportModule,
     UsersModule,
     ProfileModule,
     JwtModule.register({
       signOptions: { expiresIn: '1h' },
-      secret: 'hiden-me'
-    })
+      secret: 'hiden-me',
+    }),
   ],
   providers: [
     AuthService,
     AuthResolver,
     UsersService,
     LocalStrategy,
-    JwtStrategy]
+    JwtStrategy,
+  ],
 })
-export class AuthModule {
-}
+export class AuthModule {}

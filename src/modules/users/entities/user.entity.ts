@@ -1,35 +1,41 @@
-import { ObjectType, Field, ID, Int } from '@nestjs/graphql'
+import { ObjectType, Field, ID, Int } from '@nestjs/graphql';
 // import { ObjectId } from 'mongodb';
 import { LinkImage } from 'src/modules/users/dto/image';
 import { Profile } from 'src/modules/profile/entities/profile.entity';
+import { Customer } from 'src/modules/customer/entities/customer.entity';
+import { MedicalFacilities } from 'src/modules/medical-facilities/entities/mecical-facilies.entity';
 @ObjectType()
 export class User {
+  @Field((type) => ID)
+  id: String;
 
-    @Field(type => ID)
-    id: String
+  @Field({ nullable: false })
+  fullname: string;
 
-    @Field({ nullable: false })
-    fullname: string;
+  @Field({ nullable: true })
+  active: boolean;
 
-    @Field()
-    type: number;
+  @Field(() => [String], { nullable: true })
+  roles?: string[];
 
-    @Field(() => [String], { nullable: true })
-    roles?: string[];
+  @Field()
+  username: string;
 
-    @Field()
-    username: string;
+  @Field()
+  email: string;
 
-    @Field()
-    email: string;
+  @Field()
+  password: string;
 
-    @Field()
-    password: string;
+  @Field(() => LinkImage, { nullable: true })
+  linkImage: LinkImage;
 
-    @Field(() => LinkImage, { nullable: true })
-    linkImage: LinkImage;
+  // @Field(() => Profile, { nullable: true })
+  // profile: Profile;
 
-    @Field({ nullable: true })
-    profile: Profile;
+  @Field(() => Customer, { nullable: true })
+  customer: Customer;
 
+  @Field(() => MedicalFacilities, { nullable: true })
+  medicalFacilities: MedicalFacilities;
 }
