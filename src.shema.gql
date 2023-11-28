@@ -16,12 +16,26 @@ input CreateCustomerInput {
   userId: String!
 }
 
+input CreateDoctorInput {
+  avatar: LinkImageInput!
+  degree: String!
+  evaluate: Float!
+  idSpecialist: String!
+  name: String!
+  userId: String!
+}
+
 input CreateMedicalFacilitiesInput {
   adress: String!
   companyName: String!
   discription: String!
   image: LinkImageInput!
   userId: String!
+}
+
+input CreateMedicalSpecialtiesInput {
+  discription: String!
+  name: String!
 }
 
 input CreateProfileInput {
@@ -50,6 +64,18 @@ type Customer {
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
+
+type Doctor {
+  avatar: LinkImage!
+  degree: String!
+  evaluate: Float!
+  facilitiesId: String!
+  id: ID!
+  idSpecialist: String!
+  medicalSpecialties: MedicalSpecialties
+  name: String!
+  userId: String!
+}
 
 input EducationInput {
   dateEnd: DateTime
@@ -124,12 +150,21 @@ type MedicalFacilities {
   adress: String!
   companyName: String!
   discription: String!
+  doctors: Doctor
   id: ID!
   image: LinkImage!
 }
 
+type MedicalSpecialties {
+  discription: String!
+  id: ID!
+  name: String!
+}
+
 type Mutation {
   activeUser(id: String!): User!
+  createDoctor(createDoctorInput: CreateDoctorInput!): Doctor!
+  createMecialSpecialties(mecicalSpecialtiesInput: CreateMedicalSpecialtiesInput!): MedicalSpecialties!
   createMedicalFacilities(createMedicalFacilitiesInput: CreateMedicalFacilitiesInput!): MedicalFacilities!
   createProfile(createProfileInput: CreateProfileInput!): Profile!
   createcustomer(createCustomerInput: CreateCustomerInput!): Customer!
@@ -216,6 +251,7 @@ input UpdateUserWithPassInput {
 type User {
   active: Boolean
   customer: Customer
+  doctor: Doctor
   email: String!
   fullname: String!
   id: ID!

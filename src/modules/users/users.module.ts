@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UserSchema } from './schema/user.schema';
 import { CustomerModule } from '../customer/customer.module';
 import { MedicalFacilitiesModule } from '../medical-facilities/medical-facilities.module';
+import { DoctorsModule } from '../doctors/doctors.module';
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -17,6 +18,7 @@ import { MedicalFacilitiesModule } from '../medical-facilities/medical-facilitie
     // ProfileModule
     CustomerModule,
     MedicalFacilitiesModule,
+    DoctorsModule,
   ],
   providers: [UsersResolver, UsersService],
   exports: [UsersService],

@@ -4,6 +4,7 @@ import { Profile } from 'src/modules/profile/entities/profile.entity';
 import { LinkImage } from './linkImage.schema';
 import { Customer } from 'src/modules/customer/entities/customer.entity';
 import { MedicalFacilities } from 'src/modules/medical-facilities/schema/medical-facilities.schema';
+import { Doctor } from 'src/modules/doctors/schema/docter.schema';
 
 @Schema({
   timestamps: true,
@@ -43,5 +44,8 @@ export class User {
 
   @Prop({ nullable: true })
   medicalFacilities: MedicalFacilities;
+
+  @Prop({ nullable: true })
+  doctor: Doctor;
 }
 export const UserSchema = SchemaFactory.createForClass(User);

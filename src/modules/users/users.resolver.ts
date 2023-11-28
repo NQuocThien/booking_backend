@@ -28,12 +28,15 @@ import { Customer } from '../customer/entities/customer.entity';
 import { CustomerService } from '../customer/customer.service';
 import { MedicalFacilitiesService } from '../medical-facilities/medical-facilities.service';
 import { MedicalFacilities } from '../medical-facilities/entities/mecical-facilies.entity';
+import { DoctorsService } from '../doctors/doctors.service';
+import { Doctor } from '../doctors/entities/docter.entity';
 @Resolver(() => User)
 export class UsersResolver {
   constructor(
     private readonly usersService: UsersService,
     private readonly customerService: CustomerService, // private readonly profileService: ProfileService,
     private readonly medicalService: MedicalFacilitiesService,
+    private readonly doctorService: DoctorsService,
   ) {}
 
   @Query(() => [User], { name: 'users' })
@@ -146,5 +149,10 @@ export class UsersResolver {
   async medicalFacilities(@Parent() user: User) {
     // console.log('test 2: ', user.id)SS
     return await this.medicalService.findMedicalFacilitiesByUserId(user.id);
+  }
+  @ResolveField(() => [Doctor])
+  async doctor(@Parent() user: User) {
+    // console.log('test 2: ', user.id)SS
+    return await this.doctorService.findOneByUserId(user.id);
   }
 }

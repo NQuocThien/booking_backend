@@ -1,6 +1,5 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
-import { SchemaFactory } from '@nestjs/mongoose';
-import mongoose from 'mongoose';
+import { Doctor } from 'src/modules/doctors/entities/docter.entity';
 import { LinkImage } from 'src/modules/users/dto/image';
 @ObjectType()
 export class MedicalFacilities {
@@ -18,4 +17,7 @@ export class MedicalFacilities {
 
   @Field()
   adress: string;
+
+  @Field(() => Doctor, { nullable: true })
+  doctors: Doctor;
 }

@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Doctor } from 'src/modules/doctors/schema/docter.schema';
 import { LinkImage } from 'src/modules/users/schema/linkImage.schema';
 @Schema({
   timestamps: true,
@@ -18,6 +19,9 @@ export class MedicalFacilities {
 
   @Prop()
   adress: string;
+
+  @Prop({ nullable: true })
+  doctors?: Doctor;
 }
 export const MedicalFacilitiesSchema =
   SchemaFactory.createForClass(MedicalFacilities);

@@ -16,6 +16,8 @@ import { SettingModule } from './modules/setting/setting.module';
 import { GeneralInforModule } from './modules/general-infor/general-infor.module';
 import { CustomerModule } from './modules/customer/customer.module';
 import { MedicalFacilitiesModule } from './modules/medical-facilities/medical-facilities.module';
+import { DoctorsModule } from './modules/doctors/doctors.module';
+import { MedicalSpecialtiesModule } from './modules/medical-specialties/medical-specialties.module';
 
 dotenv.config();
 @Module({
@@ -38,6 +40,8 @@ dotenv.config();
     GeneralInforModule,
     CustomerModule,
     MedicalFacilitiesModule,
+    DoctorsModule,
+    MedicalSpecialtiesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

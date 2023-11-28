@@ -6,6 +6,7 @@ import {
   MedicalFacilities,
   MedicalFacilitiesSchema,
 } from './schema/medical-facilities.schema';
+import { DoctorsModule } from '../doctors/doctors.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import {
         schema: MedicalFacilitiesSchema,
       },
     ]),
+    DoctorsModule,
   ],
   providers: [MedicalFacilitiesResolver, MedicalFacilitiesService],
   exports: [MedicalFacilitiesService],
