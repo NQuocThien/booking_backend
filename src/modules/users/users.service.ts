@@ -12,9 +12,8 @@ import { CreateProfileInput } from '../profile/dto/create-profile.input';
 export class UsersService {
   constructor(
     @InjectModel(User.name)
-    private userModel: Model<User>,
-  ) // private profileService: ProfileService
-  {}
+    private userModel: Model<User>, // private profileService: ProfileService
+  ) {}
   async create(createUserInput: CreateUserInput): Promise<User> {
     const user = await this.userModel.create({ ...createUserInput });
     const createProfile: CreateProfileInput = new CreateProfileInput();
@@ -61,6 +60,16 @@ export class UsersService {
     const userDeleted = await this.userModel.findByIdAndRemove(id);
     log('----> User Deleted:', userDeleted.id);
     return userDeleted;
+  }
+  async updateRoles(id: string, newRoles: string[]): Promise<User> {
+    // log('user input 1: ', userBody)
+    const userUpdated = await this.userModel.findByIdAndUpdate(
+      id,
+      { roles: newRoles },
+      { new: false },
+    );
+    log('----> User Update Roles:', userUpdated.id);
+    return userUpdated;
   }
   async activeUserById(id: string): Promise<User> {
     // log('user input 1: ', userBody)

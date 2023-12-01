@@ -30,6 +30,7 @@ import { MedicalFacilitiesService } from '../medical-facilities/medical-faciliti
 import { MedicalFacilities } from '../medical-facilities/entities/mecical-facilies.entity';
 import { DoctorsService } from '../doctors/doctors.service';
 import { Doctor } from '../doctors/entities/docter.entity';
+import { UpdateRolesInput } from './dto/update-roles.input ';
 @Resolver(() => User)
 export class UsersResolver {
   constructor(
@@ -112,6 +113,14 @@ export class UsersResolver {
     // log('update user: ', updateUserInput)
     return this.usersService.deleteUserById(id);
   }
+
+  @Mutation(() => User, { name: 'updateRoles' })
+  async updateRoles(
+    @Args('updateRolesInput') req: UpdateRolesInput,
+  ): Promise<User> {
+    // log('update user: ', updateUserInput)
+    return this.usersService.updateRoles(req.id, req.roles);
+  }
   @Mutation(() => User, { name: 'activeUser' })
   async activeUser(@Args('id') id: string): Promise<User> {
     // log('update user: ', updateUserInput)
@@ -133,12 +142,6 @@ export class UsersResolver {
     // console.log('test login: ', user)
     return user;
   }
-
-  // @ResolveField(() => Profile)
-  // async profile(@Parent() user: User) {
-  //   // console.log('test 2: ', user.id)SS
-  //   return await this.profileService.findOneByUserId(user.id);
-  // }
 
   @ResolveField(() => Customer)
   async customer(@Parent() user: User) {

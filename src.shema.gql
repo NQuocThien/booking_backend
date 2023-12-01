@@ -175,6 +175,7 @@ type Mutation {
   signup(createUserInput: CreateUserInput!): User!
   updateGeneralInfor(updateGeneralInforInput: GeneralInforUpdateInput!): GeneralInfor!
   updateProfile(updateProfileInput: UpdateProfileInput!): Profile!
+  updateRoles(updateRolesInput: UpdateRolesInput!): User!
   updateSetting(updateSettingInput: UpdateSettingInput!): Setting!
   updateUser(updateUserInput: UpdateUserInput!): User!
   updateUserWithPass(updateUserInput: UpdateUserWithPassInput!): User!
@@ -220,6 +221,11 @@ input UpdateProfileInput {
   prize: PrizeInput
   skills: String
   userId: String
+}
+
+input UpdateRolesInput {
+  id: String!
+  roles: [String!]!
 }
 
 input UpdateSettingInput {
