@@ -4,6 +4,7 @@ import {
   Parent,
   ResolveField,
   Resolver,
+  Query,
 } from '@nestjs/graphql';
 import { DoctorsService } from './doctors.service';
 import { CreateDoctorInput } from './entities/dtos/create-doctor.input';
@@ -17,6 +18,11 @@ export class DoctorsResolver {
     private readonly doctorService: DoctorsService,
     private readonly specialtiesService: MedicalSpecialtiesService,
   ) {}
+
+  @Query(() => [Doctor], { name: 'getDoctors' })
+  async getDoctors(): Promise<Doctor[]> {
+    return this.doctorService.findAll();
+  }
 
   @Mutation(() => Doctor, { name: 'createDoctor' })
   async createDoctor(@Args('createDoctorInput') data: CreateDoctorInput) {

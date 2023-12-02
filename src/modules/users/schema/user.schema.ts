@@ -14,9 +14,6 @@ export class User {
   // id: mongoose.Types.ObjectId;
 
   @Prop()
-  fullname: string;
-
-  @Prop()
   username: string;
 
   @Prop()
@@ -40,12 +37,12 @@ export class User {
   // @Prop({ nullable: true })
   // profile: Profile
   @Prop({ nullable: true })
-  customer: Customer;
+  customer?: Customer;
 
   @Prop({ nullable: true })
-  medicalFacilities: MedicalFacilities;
+  medicalFacilities?: MedicalFacilities;
 
   @Prop({ nullable: true })
-  doctor: Doctor;
+  doctor?: Doctor;
 }
 export const UserSchema = SchemaFactory.createForClass(User);

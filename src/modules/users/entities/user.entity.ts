@@ -10,9 +10,6 @@ export class User {
   @Field((type) => ID)
   id: String;
 
-  @Field({ nullable: false })
-  fullname: string;
-
   @Field({ nullable: true })
   active: boolean;
 

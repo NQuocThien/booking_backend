@@ -1,5 +1,4 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose from 'mongoose';
 import { MedicalSpecialties } from 'src/modules/medical-specialties/schemas/medical-specialties.schema';
 import { LinkImage } from 'src/modules/users/schema/linkImage.schema';
 @Schema({
@@ -10,7 +9,13 @@ export class Doctor {
   name: String;
 
   @Prop()
-  idSpecialist: string;
+  email?: String;
+
+  @Prop()
+  numberPhone?: String;
+
+  @Prop()
+  idSpecialist?: string;
 
   @Prop()
   userId: string;
@@ -19,13 +24,13 @@ export class Doctor {
   facilitiesId?: string;
 
   @Prop(() => LinkImage)
-  avatar: LinkImage;
+  avatar?: LinkImage;
 
   @Prop()
-  evaluate: number;
+  evaluate?: number;
 
   @Prop()
-  degree: string;
+  degree?: string;
 
   @Prop({ nullable: true })
   medicalSpecialties?: MedicalSpecialties;

@@ -1,24 +1,19 @@
-import { ObjectType, Field, Int } from '@nestjs/graphql'
+import { ObjectType, Field, Int } from '@nestjs/graphql';
 import { Profile } from 'src/modules/profile/entities/profile.entity';
 @ObjectType()
 export class CreateUserInput {
+  @Field()
+  username: string;
 
-    @Field()
-    fullname: string;
- 
-    @Field()
-    username: string;
+  @Field()
+  type: number;
 
-    @Field()
-    type: number;
+  @Field()
+  email: string;
 
-    @Field()
-    email: string;
+  @Field()
+  password: string;
 
-    @Field()
-    password: string;
-
-    @Field()
-    profile: Profile;
+  @Field()
+  profile: Profile;
 }
-

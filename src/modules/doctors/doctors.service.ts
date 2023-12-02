@@ -13,6 +13,9 @@ export class DoctorsService {
   async create(data: CreateDoctorInput) {
     return await this.doctorModel.create(data);
   }
+  async findAll() {
+    return await this.doctorModel.find();
+  }
   async findOneByUserId(userId: String) {
     return await this.doctorModel.find({ userId: userId });
   }

@@ -10,22 +10,28 @@ export class Doctor {
   @Field()
   name: String;
 
+  @Field({ nullable: true })
+  email: String;
+
+  @Field({ nullable: true })
+  numberPhone: String;
+
   @Field()
   userId: String;
 
-  @Field(() => LinkImage)
+  @Field(() => LinkImage, { nullable: true })
   avatar: LinkImage;
 
-  @Field()
+  @Field({ nullable: true })
   idSpecialist: string;
 
-  @Field()
+  @Field({ nullable: true })
   facilitiesId: string;
 
-  @Field()
+  @Field({ nullable: true })
   evaluate: number;
 
-  @Field()
+  @Field({ nullable: true })
   degree: string;
 
   @Field(() => MedicalSpecialties, { nullable: true })

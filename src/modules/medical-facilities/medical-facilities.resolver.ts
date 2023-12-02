@@ -19,7 +19,7 @@ export class MedicalFacilitiesResolver {
     private readonly doctorService: DoctorsService,
   ) {}
 
-  @Query(() => [MedicalFacilities], { name: 'medicalfacilities' })
+  @Query(() => [MedicalFacilities], { name: 'getMedicalfacilities' })
   async medicalFacilities(): Promise<MedicalFacilities[]> {
     return await this.medicalService.findAll();
   }

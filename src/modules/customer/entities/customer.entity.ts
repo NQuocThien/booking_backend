@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 import { LinkImage } from 'src/modules/users/dto/image';
 @ObjectType()
 export class Customer {
-  @Field()
+  @Field({ nullable: true })
   fullname: string;
   @Field()
   userId: string;

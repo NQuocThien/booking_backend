@@ -6,6 +6,12 @@ export class CreateDoctorInput {
   name: String;
 
   @Field()
+  email: String;
+
+  @Field()
+  numberPhone: String;
+
+  @Field()
   idSpecialist: string;
 
   @Field()
@@ -13,9 +19,6 @@ export class CreateDoctorInput {
 
   @Field()
   avatar: LinkImageInput;
-
-  @Field()
-  evaluate: number;
 
   @Field()
   degree: string;

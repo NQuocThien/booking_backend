@@ -19,9 +19,10 @@ input CreateCustomerInput {
 input CreateDoctorInput {
   avatar: LinkImageInput!
   degree: String!
-  evaluate: Float!
+  email: String!
   idSpecialist: String!
   name: String!
+  numberPhone: String!
   userId: String!
 }
 
@@ -56,7 +57,7 @@ input CreateUserInput {
 }
 
 type Customer {
-  fullname: String!
+  fullname: String
   userId: String!
 }
 
@@ -66,14 +67,16 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 scalar DateTime
 
 type Doctor {
-  avatar: LinkImage!
-  degree: String!
-  evaluate: Float!
-  facilitiesId: String!
+  avatar: LinkImage
+  degree: String
+  email: String
+  evaluate: Float
+  facilitiesId: String
   id: ID!
-  idSpecialist: String!
+  idSpecialist: String
   medicalSpecialties: MedicalSpecialties
   name: String!
+  numberPhone: String
   userId: String!
 }
 
@@ -200,11 +203,12 @@ type Profile {
 type Query {
   checklogin: User!
   getAllProfile: [Profile!]!
+  getDoctors: [Doctor!]!
   getGeneralInfor: GeneralInfor!
+  getMedicalfacilities: [MedicalFacilities!]!
   getSetting: Setting!
   getUser(username: String!): User!
   getcustomers: [Customer!]!
-  medicalfacilities: [MedicalFacilities!]!
   users: [User!]!
 }
 
@@ -237,7 +241,6 @@ input UpdateSettingInput {
 input UpdateUserInput {
   active: Boolean
   email: String
-  fullname: String
   id: String!
   linkImage: LinkImageInput
   username: String
@@ -246,7 +249,6 @@ input UpdateUserInput {
 input UpdateUserWithPassInput {
   active: Boolean
   email: String!
-  fullname: String!
   id: String!
   linkImage: LinkImageInput
   password: String!
@@ -259,7 +261,6 @@ type User {
   customer: Customer
   doctor: Doctor
   email: String!
-  fullname: String!
   id: ID!
   linkImage: LinkImage
   medicalFacilities: MedicalFacilities
