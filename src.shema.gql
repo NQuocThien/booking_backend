@@ -16,6 +16,11 @@ input CreateCustomerInput {
   userId: String!
 }
 
+input CreateDegreeInput {
+  abbreviations: String!
+  name: String!
+}
+
 input CreateDoctorInput {
   avatar: LinkImageInput!
   degree: String!
@@ -70,9 +75,17 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type Degree {
+  abbreviations: String
+  doctor: Doctor
+  id: ID!
+  name: String
+}
+
 type Doctor {
   avatar: LinkImage
-  degree: String
+  degree: Degree
+  degreeId: String
   email: String
   evaluate: Float
   facilitiesId: String
@@ -174,6 +187,7 @@ type MedicalSpecialties {
 
 type Mutation {
   activeUser(id: String!): User!
+  createDegree(input: CreateDegreeInput!): Degree!
   createDoctor(createDoctorInput: CreateDoctorInput!): Doctor!
   createMecialSpecialties(mecicalSpecialtiesInput: CreateMedicalSpecialtiesInput!): MedicalSpecialties!
   createMedicalFacilities(createMedicalFacilitiesInput: CreateMedicalFacilitiesInput!): MedicalFacilities!
@@ -184,6 +198,7 @@ type Mutation {
   logout: LogoutUser!
   removeProfile(id: Int!): Profile!
   signup(createUserInput: CreateUserInput!): User!
+  updateDegree(input: UpdateDegreeInput!): Degree!
   updateGeneralInfor(updateGeneralInforInput: GeneralInforUpdateInput!): GeneralInfor!
   updateProfile(updateProfileInput: UpdateProfileInput!): Profile!
   updateRoles(updateRolesInput: UpdateRolesInput!): User!
@@ -210,6 +225,7 @@ type Profile {
 
 type Query {
   checklogin: User!
+  getAllDegree: [Degree!]!
   getAllProfile: [Profile!]!
   getDoctors: [Doctor!]!
   getGeneralInfor: GeneralInfor!
@@ -223,6 +239,12 @@ type Query {
 
 type Setting {
   defaultLang: String!
+}
+
+input UpdateDegreeInput {
+  abbreviations: String!
+  id: String!
+  name: String!
 }
 
 input UpdateProfileInput {

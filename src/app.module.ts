@@ -6,10 +6,9 @@ import { join } from 'path';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
-import { MongooseModule, MongooseModuleOptions } from '@nestjs/mongoose';
+import { MongooseModule } from '@nestjs/mongoose';
 import * as dotenv from 'dotenv';
 import { ConfigModule } from '@nestjs/config';
-import { ServeStaticModule } from '@nestjs/serve-static';
 import { UploaderModule } from './modules/uploader/uploader.module';
 import { ProfileModule } from './modules/profile/profile.module';
 import { SettingModule } from './modules/setting/setting.module';
@@ -18,6 +17,7 @@ import { CustomerModule } from './modules/customer/customer.module';
 import { MedicalFacilitiesModule } from './modules/medical-facilities/medical-facilities.module';
 import { DoctorsModule } from './modules/doctors/doctors.module';
 import { MedicalSpecialtiesModule } from './modules/medical-specialties/medical-specialties.module';
+import { DegreeModule } from './modules/degree/degree.module';
 
 dotenv.config();
 @Module({
@@ -42,6 +42,7 @@ dotenv.config();
     MedicalFacilitiesModule,
     DoctorsModule,
     MedicalSpecialtiesModule,
+    DegreeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

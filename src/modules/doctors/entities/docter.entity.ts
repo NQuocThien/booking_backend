@@ -1,5 +1,6 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
 import mongoose from 'mongoose';
+import { Degree } from 'src/modules/degree/entities/degree.entity';
 import { MedicalSpecialties } from 'src/modules/medical-specialties/entities/medical-specialties.entity';
 import { LinkImage } from 'src/modules/users/dto/image';
 @ObjectType()
@@ -32,8 +33,11 @@ export class Doctor {
   evaluate: number;
 
   @Field({ nullable: true })
-  degree: string;
+  degreeId: string;
 
   @Field(() => MedicalSpecialties, { nullable: true })
   medicalSpecialties: MedicalSpecialties;
+
+  @Field(() => Degree, { nullable: true })
+  degree: Degree;
 }

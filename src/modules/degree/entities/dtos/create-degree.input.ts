@@ -1,9 +1,9 @@
 import { Field, InputType } from '@nestjs/graphql';
 @InputType()
-export class CreateCustomerInput {
+export class CreateDegreeInput {
   @Field()
-  fullname: string;
+  name: string;
 
   @Field()
-  userId: string;
+  abbreviations: string;
 }

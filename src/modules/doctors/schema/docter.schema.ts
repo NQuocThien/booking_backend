@@ -30,7 +30,7 @@ export class Doctor {
   evaluate?: number;
 
   @Prop()
-  degree?: string;
+  degreeId?: string;
 
   @Prop({ nullable: true })
   medicalSpecialties?: MedicalSpecialties;
