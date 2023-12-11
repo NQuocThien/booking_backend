@@ -49,6 +49,18 @@ export class UsersResolver {
     return users;
   }
 
+  @Query(() => [User], { name: 'getUserMedicalNon' })
+  @UseGuards(JWtAuthGuard, RolesGuard)
+  @Roles(Role.Admin)
+  async getUserMedicalNon(@Context() context): Promise<User[]> {
+    const users = await this.usersService.getUserMedicalNon();
+    const usersclinic = users.filter((user) =>
+      user.roles.includes(Role.Clinic),
+    );
+    console.log('res ============ ', usersclinic);
+    return usersclinic;
+  }
+
   @UseGuards(JWtAuthGuard)
   @Mutation(() => User, { name: 'updateUser' })
   async updateUser(

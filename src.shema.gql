@@ -30,7 +30,11 @@ input CreateMedicalFacilitiesInput {
   adress: String!
   companyName: String!
   discription: String!
+  email: String!
   image: LinkImageInput!
+  lat: Float
+  lng: Float
+  numberPhone: String!
   userId: String!
 }
 
@@ -154,8 +158,12 @@ type MedicalFacilities {
   companyName: String!
   discription: String!
   doctors: Doctor
+  email: String
   id: ID!
   image: LinkImage!
+  lat: Float
+  lng: Float
+  numberPhone: String
 }
 
 type MedicalSpecialties {
@@ -208,6 +216,7 @@ type Query {
   getMedicalfacilities: [MedicalFacilities!]!
   getSetting: Setting!
   getUser(username: String!): User!
+  getUserMedicalNon: [User!]!
   getcustomers: [Customer!]!
   users: [User!]!
 }

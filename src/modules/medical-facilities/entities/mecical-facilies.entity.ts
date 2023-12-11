@@ -18,6 +18,18 @@ export class MedicalFacilities {
   @Field()
   adress: string;
 
+  @Field({ nullable: true })
+  lat: number;
+
+  @Field({ nullable: true })
+  lng: number;
+
+  @Field({ nullable: true })
+  numberPhone: string;
+
+  @Field({ nullable: true })
+  email: string;
+
   @Field(() => Doctor, { nullable: true })
   doctors: Doctor;
 }

@@ -21,6 +21,18 @@ export class MedicalFacilities {
   adress: string;
 
   @Prop({ nullable: true })
+  lat?: number;
+
+  @Prop({ nullable: true })
+  lng?: number;
+
+  @Prop({ nullable: true })
+  numberPhone?: string;
+
+  @Prop({ nullable: true })
+  email?: string;
+
+  @Prop({ nullable: true })
   doctors?: Doctor;
 }
 export const MedicalFacilitiesSchema =

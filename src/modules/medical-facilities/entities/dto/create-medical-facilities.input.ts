@@ -17,4 +17,16 @@ export class CreateMedicalFacilitiesInput {
 
   @Field()
   adress: string;
+
+  @Field({ nullable: true })
+  lat: number;
+
+  @Field({ nullable: true })
+  lng: number;
+
+  @Field()
+  numberPhone: string;
+
+  @Field()
+  email: string;
 }

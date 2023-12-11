@@ -35,6 +35,17 @@ export class UsersService {
     // console.log('test id:', users)
     return users;
   }
+  async getUserMedicalNon(): Promise<[User]> {
+    // bảo vệ bởi jwt
+    // console.log(' user: ', this.userModel.find())
+    var users: any;
+    await this.userModel
+      .find({ medicalFacilities: { $exists: false, $eq: null } })
+      .then((data) => (users = data))
+      .catch((err) => new Error(err));
+    // console.log('test id:', users)
+    return users;
+  }
 
   async findOne(username: string): Promise<User> {
     const user: User = await this.userModel.findOne({ username: username });

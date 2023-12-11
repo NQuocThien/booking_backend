@@ -22,7 +22,7 @@ export class MedicalFacilitiesService {
   async createMedicalFacilities(
     data: CreateMedicalFacilitiesInput,
   ): Promise<MedicalFacilities> {
-    console.log(' test', data);
+    // console.log(' test', data);
     return await this.medicalModel.create(data);
   }
 }
