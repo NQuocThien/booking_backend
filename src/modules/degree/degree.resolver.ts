@@ -40,6 +40,12 @@ export class DegreeResolver {
     const res = await this.degreeService.updateDegree(input);
     return res;
   }
+  @Mutation(() => Degree, { name: 'deleteDegree' })
+  async delete(@Args('input') id: String): Promise<Degree> {
+    console.log('----> Delete Degree -- Input: ', id);
+    const res = await this.degreeService.delete(id);
+    return res;
+  }
 
   @ResolveField(() => Doctor, { name: 'doctor' })
   async doctor(@Parent() degree: Degree): Promise<Doctor> {

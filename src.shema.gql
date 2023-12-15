@@ -2,13 +2,15 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-input CertificateInput {
-  associationName: String!
-  dateEnd: DateTime
-  dateStart: DateTime!
-  description: String!
+type CarePackage {
+  discription: String!
+  id: ID!
+  image: LinkImage!
+  medicalFacilitiesId: String!
   name: String!
-  state: Boolean
+  price: Float!
+  register: [Register!]
+  typePackageId: String!
 }
 
 input CreateCustomerInput {
@@ -22,13 +24,14 @@ input CreateDegreeInput {
 }
 
 input CreateDoctorInput {
-  avatar: LinkImageInput!
-  degree: String!
+  avatar: LinkImageInput
+  degreeId: String
   email: String!
-  idSpecialist: String!
+  facilitiesId: String
+  idSpecialist: String
   name: String!
   numberPhone: String!
-  userId: String!
+  userId: String
 }
 
 input CreateMedicalFacilitiesInput {
@@ -49,13 +52,29 @@ input CreateMedicalSpecialtiesInput {
 }
 
 input CreateProfileInput {
-  certificate: CertificateInput
-  education: EducationInput
-  experience: ExperienceInput
-  introduce: String
-  prize: PrizeInput
-  skills: String
-  userId: String!
+  address: String!
+  customerId: String!
+  dataOfBirth: DateTime!
+  email: String!
+  ethnic: String!
+  fullname: String!
+  gender: String!
+  identity: String!
+  job: String!
+  medicalInsurance: String!
+  numberPhone: String!
+  relationship: String!
+}
+
+input CreateRegisterInput {
+  date: DateTime!
+  packegeId: String!
+  profileId: String!
+  state: String!
+}
+
+input CreateTypePackageInput {
+  typeName: String!
 }
 
 input CreateUserInput {
@@ -67,6 +86,8 @@ input CreateUserInput {
 
 type Customer {
   fullname: String
+  id: ID!
+  profile: [Profile!]!
   userId: String!
 }
 
@@ -76,43 +97,25 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 scalar DateTime
 
 type Degree {
-  abbreviations: String
+  abbreviations: String!
   doctor: Doctor
   id: ID!
-  name: String
+  name: String!
 }
 
 type Doctor {
-  avatar: LinkImage
+  avatar: LinkImage!
   degree: Degree
   degreeId: String
-  email: String
+  email: String!
   evaluate: Float
   facilitiesId: String
   id: ID!
   idSpecialist: String
   medicalSpecialties: MedicalSpecialties
   name: String!
-  numberPhone: String
-  userId: String!
-}
-
-input EducationInput {
-  dateEnd: DateTime
-  dateStart: DateTime!
-  description: String
-  major: String!
-  schoolName: String!
-  state: Boolean!
-}
-
-input ExperienceInput {
-  companyName: String!
-  dateEnd: DateTime
-  dateStart: DateTime!
-  description: String
-  position: String!
-  state: Boolean
+  numberPhone: String!
+  userId: String
 }
 
 type GeneralInfor {
@@ -168,15 +171,16 @@ type LogoutUser {
 
 type MedicalFacilities {
   adress: String!
+  carePackage: [CarePackage!]
   companyName: String!
   discription: String!
-  doctors: Doctor
-  email: String
+  doctors: [Doctor!]
+  email: String!
   id: ID!
   image: LinkImage!
   lat: Float
   lng: Float
-  numberPhone: String
+  numberPhone: String!
 }
 
 type MedicalSpecialties {
@@ -187,58 +191,88 @@ type MedicalSpecialties {
 
 type Mutation {
   activeUser(id: String!): User!
+  createCarePackage(input: createCarePackageInput!): CarePackage!
   createDegree(input: CreateDegreeInput!): Degree!
   createDoctor(createDoctorInput: CreateDoctorInput!): Doctor!
   createMecialSpecialties(mecicalSpecialtiesInput: CreateMedicalSpecialtiesInput!): MedicalSpecialties!
   createMedicalFacilities(createMedicalFacilitiesInput: CreateMedicalFacilitiesInput!): MedicalFacilities!
-  createProfile(createProfileInput: CreateProfileInput!): Profile!
+  createProfile(input: CreateProfileInput!): Profile!
+  createRegister(input: CreateRegisterInput!): Register!
+  createTypePackage(input: CreateTypePackageInput!): TypePackage!
   createcustomer(createCustomerInput: CreateCustomerInput!): Customer!
+  deleteDegree(input: String!): Degree!
+  deleteDoctor(id: String!): Doctor!
+  deleteMecialSpecialties(id: String!): MedicalSpecialties!
+  deleteTypePackage(id: String!): TypePackage!
   deleteUser(id: String!): User!
   login(loginUserInput: LoginUserInput!): LoginRespone!
   logout: LogoutUser!
-  removeProfile(id: Int!): Profile!
   signup(createUserInput: CreateUserInput!): User!
   updateDegree(input: UpdateDegreeInput!): Degree!
+  updateDoctor(updateDoctorInput: UpdateDoctorInput!): Doctor!
   updateGeneralInfor(updateGeneralInforInput: GeneralInforUpdateInput!): GeneralInfor!
-  updateProfile(updateProfileInput: UpdateProfileInput!): Profile!
+  updateMecialSpecialties(updateSpecialtiesInput: UpdateMedicalSpecialtiesInput!): MedicalSpecialties!
+  updateMedicalFacilities(createMedicalFacilitiesInput: UpdateMedicalFacilitiesInput!): MedicalFacilities!
   updateRoles(updateRolesInput: UpdateRolesInput!): User!
   updateSetting(updateSettingInput: UpdateSettingInput!): Setting!
+  updateTypePackage(input: UpdateTypePackageInput!): TypePackage!
   updateUser(updateUserInput: UpdateUserInput!): User!
   updateUserWithPass(updateUserInput: UpdateUserWithPassInput!): User!
 }
 
-input PrizeInput {
-  associationName: String!
-  date: DateTime!
-  description: String!
-  name: String!
-}
-
 type Profile {
+  address: String!
+  customerId: String!
+  dataOfBirth: DateTime!
+  email: String!
+  ethnic: String!
+  fullname: String!
+  gender: String!
   id: ID!
-  introduce: String
-  skills: String
-  skills1: String
-  user: [User!]
-  userId: String!
+  identity: String
+  job: String!
+  medicalInsurance: String
+  numberPhone: String!
+  relationship: String!
 }
 
 type Query {
   checklogin: User!
   getAllDegree: [Degree!]!
-  getAllProfile: [Profile!]!
+  getAllMecialSpecialties: [MedicalSpecialties!]!
+  getClinicById(id: String!): MedicalFacilities!
+  getClinicByUserId(id: String!): MedicalFacilities!
+  getDoctorbyId(id: String!): Doctor!
+  getDoctorbyUserId(id: String!): Doctor!
   getDoctors: [Doctor!]!
   getGeneralInfor: GeneralInfor!
   getMedicalfacilities: [MedicalFacilities!]!
+  getProfileByCustomerId(id: String!): [Profile!]!
   getSetting: Setting!
   getUser(username: String!): User!
   getUserMedicalNon: [User!]!
+  getUserSelect(roleInput: UserSelectInput!): [User!]!
   getcustomers: [Customer!]!
   users: [User!]!
 }
 
+type Register {
+  carePackage: CarePackage
+  date: DateTime!
+  id: ID!
+  packegeId: String!
+  profileId: String!
+  state: String!
+}
+
 type Setting {
   defaultLang: String!
+}
+
+type TypePackage {
+  carePackage: [CarePackage!]
+  id: ID!
+  typeName: String!
 }
 
 input UpdateDegreeInput {
@@ -247,15 +281,35 @@ input UpdateDegreeInput {
   name: String!
 }
 
-input UpdateProfileInput {
-  certificate: CertificateInput
-  education: EducationInput
-  experience: ExperienceInput
-  id: Int!
-  introduce: String
-  prize: PrizeInput
-  skills: String
+input UpdateDoctorInput {
+  avatar: LinkImageInput
+  degreeId: String
+  email: String!
+  facilitiesId: String
+  id: String!
+  idSpecialist: String
+  name: String!
+  numberPhone: String!
   userId: String
+}
+
+input UpdateMedicalFacilitiesInput {
+  adress: String!
+  companyName: String!
+  discription: String!
+  email: String!
+  id: String!
+  image: LinkImageInput
+  lat: Float
+  lng: Float
+  numberPhone: String!
+  userId: String!
+}
+
+input UpdateMedicalSpecialtiesInput {
+  discription: String!
+  id: String!
+  name: String!
 }
 
 input UpdateRolesInput {
@@ -267,6 +321,11 @@ input UpdateSettingInput {
   """Example field (placeholder)"""
   exampleField: Int
   id: Int!
+}
+
+input UpdateTypePackageInput {
+  id: String!
+  typeName: String!
 }
 
 input UpdateUserInput {
@@ -298,4 +357,17 @@ type User {
   password: String!
   roles: [String!]
   username: String!
+}
+
+input UserSelectInput {
+  role: String!
+}
+
+input createCarePackageInput {
+  discription: String!
+  image: LinkImageInput!
+  medicalFacilitiesId: String!
+  name: String!
+  price: Float!
+  typePackageId: String!
 }

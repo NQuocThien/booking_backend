@@ -11,15 +11,18 @@ export class CreateDoctorInput {
   @Field()
   numberPhone: String;
 
-  @Field()
+  @Field({ nullable: true })
   idSpecialist: string;
 
-  @Field()
+  @Field({ nullable: true })
   userId: string;
 
-  @Field()
+  @Field({ nullable: true })
   avatar: LinkImageInput;
 
-  @Field()
-  degree: string;
+  @Field({ nullable: true })
+  degreeId: string;
+
+  @Field({ nullable: true })
+  facilitiesId: string;
 }

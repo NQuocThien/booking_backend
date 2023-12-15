@@ -1,12 +1,8 @@
 import { ObjectType, Field, Int } from '@nestjs/graphql';
-import { Profile } from 'src/modules/profile/entities/profile.entity';
 @ObjectType()
 export class CreateUserInput {
   @Field()
   username: string;
-
-  @Field()
-  type: number;
 
   @Field()
   email: string;
@@ -14,6 +10,9 @@ export class CreateUserInput {
   @Field()
   password: string;
 
+  @Field(() => [String], { nullable: true })
+  roles?: string[];
+
   @Field()
-  profile: Profile;
+  active: boolean;
 }

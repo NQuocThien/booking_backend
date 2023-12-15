@@ -10,7 +10,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import * as dotenv from 'dotenv';
 import { ConfigModule } from '@nestjs/config';
 import { UploaderModule } from './modules/uploader/uploader.module';
-import { ProfileModule } from './modules/profile/profile.module';
+// import { ProfileModule } from './modules/profile/profile.module';
 import { SettingModule } from './modules/setting/setting.module';
 import { GeneralInforModule } from './modules/general-infor/general-infor.module';
 import { CustomerModule } from './modules/customer/customer.module';
@@ -18,6 +18,10 @@ import { MedicalFacilitiesModule } from './modules/medical-facilities/medical-fa
 import { DoctorsModule } from './modules/doctors/doctors.module';
 import { MedicalSpecialtiesModule } from './modules/medical-specialties/medical-specialties.module';
 import { DegreeModule } from './modules/degree/degree.module';
+import { ProfileModule } from './modules/profile/profile.module';
+import { RegisterModule } from './modules/register/register.module';
+import { CarePackageModule } from './modules/care-package/care-package.module';
+import { TypePackageModule } from './modules/type-package/type-package.module';
 
 dotenv.config();
 @Module({
@@ -35,7 +39,7 @@ dotenv.config();
     UsersModule,
     AuthModule,
     UploaderModule,
-    ProfileModule,
+    // ProfileModule,
     SettingModule,
     GeneralInforModule,
     CustomerModule,
@@ -43,6 +47,10 @@ dotenv.config();
     DoctorsModule,
     MedicalSpecialtiesModule,
     DegreeModule,
+    ProfileModule,
+    RegisterModule,
+    CarePackageModule,
+    TypePackageModule,
   ],
   controllers: [AppController],
   providers: [AppService],

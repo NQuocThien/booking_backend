@@ -4,3 +4,5 @@ export enum Role {
   Customer = 'customer',
   Clinic = 'clinic',
 }
+
+export type IRole = 'user' | 'admin' | 'customer' | 'clinic';

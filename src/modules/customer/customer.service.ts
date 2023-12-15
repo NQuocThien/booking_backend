@@ -14,7 +14,10 @@ export class CustomerService {
     return this.customerModel.find();
   }
   async findCustomerById(userId: String) {
-    return this.customerModel.findOne({ userId: userId });
+    const res = await this.customerModel.findOne({ userId: userId });
+    console.log('test user id===', userId);
+    console.log('test ===', res);
+    return res;
   }
   async createCustomer(createCustomerInput: CreateCustomerInput) {
     return this.customerModel.create(createCustomerInput);

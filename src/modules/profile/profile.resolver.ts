@@ -1,38 +1,22 @@
-import { Resolver, Query, Mutation, Args, Int, ResolveField, Parent } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { ProfileService } from './profile.service';
-import { Profile } from './entities/profile.entity';
-import { CreateProfileInput } from './dto/create-profile.input';
-import { UpdateProfileInput } from './dto/update-profile.input';
-import { UsersService } from '../users/users.service';
-@Resolver(() => Profile)
+import { CustomerService } from '../customer/customer.service';
+import { Profile } from './entity/profile.entity';
+import { CreateProfileInput } from './entity/dtos/create-profile.input';
+
+@Resolver()
 export class ProfileResolver {
   constructor(
     private readonly profileService: ProfileService,
-    private userService: UsersService
-  ) { }
+    private readonly customerService: CustomerService,
+  ) {}
 
-  @Mutation(() => Profile)
-  createProfile(@Args('createProfileInput') createProfileInput: CreateProfileInput) {
-    return this.profileService.create(createProfileInput);
+  @Mutation(() => Profile, { name: 'createProfile' })
+  async create(@Args('input') input: CreateProfileInput): Promise<Profile> {
+    return this.profileService.create(input);
   }
-
-  @Query(() => [Profile], { name: 'getAllProfile' })
-  findAllProfile() {
-    return this.profileService.getAllProfile();
-  }
-
-  @ResolveField()
-  async user(@Parent() profile: Profile) {
-    return await this.userService.findAll()
-  }
-
-  @Mutation(() => Profile)
-  updateProfile(@Args('updateProfileInput') updateProfileInput: UpdateProfileInput) {
-    return this.profileService.update(updateProfileInput.id, updateProfileInput);
-  }
-
-  @Mutation(() => Profile)
-  removeProfile(@Args('id', { type: () => Int }) id: number) {
-    return this.profileService.remove(id);
+  @Query(() => [Profile], { name: 'getProfileByCustomerId' })
+  async getProfileByCustomerId(@Args('id') id: String): Promise<Profile[]> {
+    return this.profileService.getProfileByCustomerId(id);
   }
 }

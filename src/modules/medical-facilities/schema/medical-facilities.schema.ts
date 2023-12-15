@@ -15,7 +15,7 @@ export class MedicalFacilities {
   discription: string;
 
   @Prop({ type: Object, default: null })
-  image: LinkImage;
+  image?: LinkImage;
 
   @Prop()
   adress: string;

@@ -5,22 +5,25 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FlattenMaps, Model } from 'mongoose';
 import { User } from './entities/user.entity';
 import { log } from 'console';
+import { CustomerService } from '../customer/customer.service';
 // import { ProfileService } from '../profile/profile.service';
-import { CreateProfileInput } from '../profile/dto/create-profile.input';
+// import { CreateProfileInput } from '../profile/dto/create-profile.input';
 // import { User } from './schema/user.schema';
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name)
     private userModel: Model<User>, // private profileService: ProfileService
+    private cusSv: CustomerService,
   ) {}
-  async create(createUserInput: CreateUserInput): Promise<User> {
+  async create(
+    createUserInput: CreateUserInput,
+    fullname: string,
+  ): Promise<User> {
     const user = await this.userModel.create({ ...createUserInput });
-    const createProfile: CreateProfileInput = new CreateProfileInput();
-    createProfile.userId = user.id;
-    // log('---> input:', CreateUserInput);
     log('---> Created New User With ID: ', user.id);
-    // this.profileService.create(createProfile)
+    // create customer
+    await this.cusSv.createCustomer({ fullname: fullname, userId: user.id });
     return user;
   }
 

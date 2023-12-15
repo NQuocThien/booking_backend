@@ -11,16 +11,16 @@ export class Doctor {
   @Field()
   name: String;
 
-  @Field({ nullable: true })
+  @Field()
   email: String;
 
-  @Field({ nullable: true })
+  @Field()
   numberPhone: String;
 
-  @Field()
+  @Field({ nullable: true })
   userId: String;
 
-  @Field(() => LinkImage, { nullable: true })
+  @Field(() => LinkImage)
   avatar: LinkImage;
 
   @Field({ nullable: true })

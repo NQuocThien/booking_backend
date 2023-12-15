@@ -6,17 +6,19 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { CreateUserInput } from './dto/create-user.input';
 import { LogoutUser } from './dto/logout-user';
+import { CustomerService } from '../customer/customer.service';
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UsersService,
     private jwtService: JwtService,
+    private cusSv: CustomerService,
   ) {}
   async validateUser(username: string, password: string): Promise<any> {
     const user = await this.userService.findOne(username);
     console.log('---> password input: ', password);
     const valid = await bcrypt.compare(password, user.password);
-    if (user && valid) {
+    if (user && valid && user.active) {
       var result: User = new User();
       result = user;
       result.password = '';
@@ -39,12 +41,20 @@ export class AuthService {
     if (user)
       throw new Error(`User ${loginUserInput.username} already exists ! `);
     const password = await bcrypt.hash(loginUserInput.password, 10);
-    return this.userService.create({
-      ...loginUserInput,
-      password,
-      type: +process.env.INIT_TYPE,
-      profile: null,
-    });
+    const roles = ['user'];
+    // tạo thông tin người dùng
+    // this.cusSv.createCustomer
+    const { fullname, ...createUser } = loginUserInput;
+    return this.userService.create(
+      {
+        username: loginUserInput.username,
+        active: true,
+        email: loginUserInput.email,
+        password: password,
+        roles: roles,
+      },
+      fullname,
+    );
   }
   async logout() {
     var reponse: LogoutUser = new LogoutUser();

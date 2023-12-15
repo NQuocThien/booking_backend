@@ -16,18 +16,35 @@ import { UseGuards } from '@nestjs/common';
 import { JWtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Role } from '../auth/entities/role.enum';
+import { UpdateMedicalFacilitiesInput } from './entities/dto/update-medical-facilities.input';
+import { CarePackageService } from '../care-package/care-package.service';
+import { CarePackage } from '../care-package/entities/care-package.entity';
 
 @Resolver(() => MedicalFacilities)
 export class MedicalFacilitiesResolver {
   constructor(
     private readonly medicalService: MedicalFacilitiesService,
     private readonly doctorService: DoctorsService,
+    private readonly packageService: CarePackageService,
   ) {}
-  @UseGuards(JWtAuthGuard, RolesGuard)
-  @Roles(Role.Admin)
+  // @UseGuards(JWtAuthGuard, RolesGuard)
   @Query(() => [MedicalFacilities], { name: 'getMedicalfacilities' })
   async medicalFacilities(): Promise<MedicalFacilities[]> {
     return await this.medicalService.findAll();
+  }
+
+  @UseGuards(JWtAuthGuard, RolesGuard)
+  @Roles(Role.Clinic)
+  @Query(() => MedicalFacilities, { name: 'getClinicByUserId' })
+  async getClinicByUserId(@Args('id') id: String): Promise<MedicalFacilities> {
+    const result = await this.medicalService.findOneByUserId(id);
+    return result;
+  }
+
+  @Query(() => MedicalFacilities, { name: 'getClinicById' })
+  async getClinicById(@Args('id') id: String): Promise<MedicalFacilities> {
+    const result = await this.medicalService.findById(id);
+    return result;
   }
 
   @Mutation(() => MedicalFacilities, { name: 'createMedicalFacilities' })
@@ -40,11 +57,25 @@ export class MedicalFacilitiesResolver {
     );
   }
 
+  @Mutation(() => MedicalFacilities, { name: 'updateMedicalFacilities' })
+  async updateMedicalFacilities(
+    @Args('createMedicalFacilitiesInput')
+    input: UpdateMedicalFacilitiesInput,
+  ): Promise<MedicalFacilities> {
+    return await this.medicalService.updateMedicalFacilities(input);
+  }
+
   @ResolveField(() => [Doctor])
   async doctors(@Parent() mf: MedicalFacilities): Promise<Doctor[]> {
     console.log('test');
     const docs = await this.doctorService.findByFacilitiesId(mf.id);
-    // console.log('docs', docs.length);
-    return docs.length === 0 ? null : docs;
+    return docs;
+  }
+
+  @ResolveField(() => [CarePackage], { name: 'carePackage' })
+  async carePackage(@Parent() mf: MedicalFacilities): Promise<CarePackage[]> {
+    console.log('test');
+    const docs = await this.packageService.getByFacilitiesId(mf.id);
+    return docs;
   }
 }

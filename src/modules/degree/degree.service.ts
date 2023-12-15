@@ -22,22 +22,21 @@ export class DegreeService {
   async createDegree(data: CreateDegreeInput): Promise<Degree> {
     return this.degreeModel.create(data);
   }
+  async delete(id: String): Promise<Degree> {
+    return this.degreeModel.findByIdAndDelete(id);
+  }
 
   async updateDegree(data: UpdateDegreeInput): Promise<Degree> {
     try {
       const existingDoc = await this.degreeModel.findById(data.id);
-
       if (!existingDoc) {
         console.log('Document not found for ID:', data.id);
         return null;
       }
-
       // Cập nhật dữ liệu từ input vào existingDoc
       Object.assign(existingDoc, data);
-
       // Lưu tài liệu đã cập nhật
       const updatedDoc = await existingDoc.save();
-
       console.log('---> Updated document:', updatedDoc);
       return updatedDoc;
     } catch (error) {

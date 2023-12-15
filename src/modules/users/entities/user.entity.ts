@@ -1,7 +1,7 @@
 import { ObjectType, Field, ID, Int } from '@nestjs/graphql';
 // import { ObjectId } from 'mongodb';
 import { LinkImage } from 'src/modules/users/dto/image';
-import { Profile } from 'src/modules/profile/entities/profile.entity';
+// import { Profile } from 'src/modules/profile/entities/profile.entity';
 import { Customer } from 'src/modules/customer/entities/customer.entity';
 import { MedicalFacilities } from 'src/modules/medical-facilities/entities/mecical-facilies.entity';
 import { Doctor } from 'src/modules/doctors/entities/docter.entity';
@@ -27,9 +27,6 @@ export class User {
 
   @Field(() => LinkImage, { nullable: true })
   linkImage: LinkImage;
-
-  // @Field(() => Profile, { nullable: true })
-  // profile: Profile;
 
   @Field(() => Customer, { nullable: true })
   customer: Customer;

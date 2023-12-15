@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { MedicalFacilities } from './entities/mecical-facilies.entity';
 import { Model } from 'mongoose';
 import { CreateMedicalFacilitiesInput } from './entities/dto/create-medical-facilities.input';
+import { UpdateMedicalFacilitiesInput } from './entities/dto/update-medical-facilities.input';
 
 @Injectable()
 export class MedicalFacilitiesService {
@@ -19,10 +20,40 @@ export class MedicalFacilitiesService {
   async findAll(): Promise<MedicalFacilities[]> {
     return this.medicalModel.find();
   }
+  async findById(id: String): Promise<MedicalFacilities> {
+    return this.medicalModel.findById(id);
+  }
+  async findOneByUserId(id: String): Promise<MedicalFacilities> {
+    return this.medicalModel.findOne({ userId: id });
+  }
   async createMedicalFacilities(
     data: CreateMedicalFacilitiesInput,
   ): Promise<MedicalFacilities> {
     // console.log(' test', data);
     return await this.medicalModel.create(data);
+  }
+  async updateMedicalFacilities(
+    data: UpdateMedicalFacilitiesInput,
+  ): Promise<MedicalFacilities> {
+    try {
+      const existingDoc = await this.medicalModel.findById(data.id);
+
+      if (!existingDoc) {
+        console.log('Document not found for ID:', data.id);
+        return null;
+      }
+
+      // Cập nhật dữ liệu từ input vào existingDoc
+      Object.assign(existingDoc, data);
+
+      // Lưu tài liệu đã cập nhật
+      const updatedDoc = await existingDoc.save();
+
+      console.log('---> Updated document:', updatedDoc);
+      return updatedDoc;
+    } catch (error) {
+      console.error('Error updating document:', error);
+      return null;
+    }
   }
 }

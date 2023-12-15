@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
-import { Profile } from 'src/modules/profile/entities/profile.entity';
+// import { Profile } from 'src/modules/profile/entities/profile.entity';
 import { LinkImage } from './linkImage.schema';
 import { Customer } from 'src/modules/customer/entities/customer.entity';
 import { MedicalFacilities } from 'src/modules/medical-facilities/schema/medical-facilities.schema';
@@ -34,8 +34,6 @@ export class User {
   @Prop(() => [String])
   roles: string[];
 
-  // @Prop({ nullable: true })
-  // profile: Profile
   @Prop({ nullable: true })
   customer?: Customer;
 

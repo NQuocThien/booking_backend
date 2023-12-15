@@ -1,8 +1,9 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { CustomerResolver } from './customer.resolver';
 import { CustomerService } from './customer.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Customer, CustomerSchema } from './schema/customer.schema';
+import { ProfileModule } from '../profile/profile.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { Customer, CustomerSchema } from './schema/customer.schema';
         schema: CustomerSchema,
       },
     ]),
+    forwardRef(() => ProfileModule),
   ],
   providers: [CustomerResolver, CustomerService],
   exports: [CustomerService],

@@ -13,10 +13,10 @@ import { User } from './entities/user.entity';
 import { JWtAuthGuard } from '../auth/jwt-auth.guard';
 import { NotFoundException, UseGuards } from '@nestjs/common';
 // import { ProfileService } from '../profile/profile.service';
-import { Profile } from '../profile/entities/profile.entity';
+// import { Profile } from '../profile/entities/profile.entity';
 import { UpdateUserInput } from './dto/update-user.input';
 import { Roles } from '../auth/roles.decorator';
-import { Role } from '../auth/entities/role.enum';
+import { IRole, Role } from '../auth/entities/role.enum';
 import { RolesGuard } from '../auth/roles.guard';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserWithPassInput } from './dto/update-user-pass.input';
@@ -31,6 +31,7 @@ import { MedicalFacilities } from '../medical-facilities/entities/mecical-facili
 import { DoctorsService } from '../doctors/doctors.service';
 import { Doctor } from '../doctors/entities/docter.entity';
 import { UpdateRolesInput } from './dto/update-roles.input ';
+import { UserSelectInput } from './dto/role-select.input';
 @Resolver(() => User)
 export class UsersResolver {
   constructor(
@@ -59,6 +60,18 @@ export class UsersResolver {
     );
     console.log('res ============ ', usersclinic);
     return usersclinic;
+  }
+
+  @Query(() => [User], { name: 'getUserSelect' })
+  @UseGuards(JWtAuthGuard, RolesGuard)
+  @Roles(Role.Admin)
+  async getUserSelect(
+    @Args('roleInput') input: UserSelectInput,
+  ): Promise<User[]> {
+    const users = await this.usersService.findAll();
+    const userFillter = users.filter((user) => user.roles.includes(input.role));
+    console.log('res ============ ', userFillter);
+    return userFillter;
   }
 
   @UseGuards(JWtAuthGuard)

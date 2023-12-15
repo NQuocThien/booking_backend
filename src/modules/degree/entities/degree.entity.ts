@@ -6,10 +6,10 @@ export class Degree {
   @Field((type) => ID)
   id: String;
 
-  @Field({ nullable: true })
+  @Field()
   name: string;
 
-  @Field({ nullable: true })
+  @Field()
   abbreviations: string;
 
   @Field(() => Doctor, { nullable: true })
