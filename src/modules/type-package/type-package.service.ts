@@ -14,6 +14,9 @@ export class TypePackageService {
   async create(input: CreateTypePackageInput): Promise<TypePackage> {
     return await this.model.create(input);
   }
+  async findAll(): Promise<TypePackage[]> {
+    return await this.model.find();
+  }
   async update(data: UpdateTypePackageInput): Promise<TypePackage> {
     try {
       const existingDoc = await this.model.findById(data.id);

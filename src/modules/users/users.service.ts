@@ -21,9 +21,14 @@ export class UsersService {
     fullname: string,
   ): Promise<User> {
     const user = await this.userModel.create({ ...createUserInput });
-    log('---> Created New User With ID: ', user.id);
+    log('---> Created New User With ID:', user.id);
     // create customer
     await this.cusSv.createCustomer({ fullname: fullname, userId: user.id });
+    return user;
+  }
+  async createByAdmin(createUserInput: CreateUserInput): Promise<User> {
+    const user = await this.userModel.create({ ...createUserInput });
+    log('---> Created New User With ID: ', user.id);
     return user;
   }
 

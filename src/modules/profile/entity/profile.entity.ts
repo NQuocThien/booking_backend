@@ -1,4 +1,5 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { Register } from 'src/modules/register/entities/register.entity';
 
 @ObjectType()
 export class Profile {
@@ -40,4 +41,7 @@ export class Profile {
 
   @Field()
   relationship: string; // mqh
+
+  @Field(() => [Register], { nullable: true })
+  register: Register; //
 }

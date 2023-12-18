@@ -67,14 +67,13 @@ export class MedicalFacilitiesResolver {
 
   @ResolveField(() => [Doctor])
   async doctors(@Parent() mf: MedicalFacilities): Promise<Doctor[]> {
-    console.log('test');
     const docs = await this.doctorService.findByFacilitiesId(mf.id);
     return docs;
   }
 
   @ResolveField(() => [CarePackage], { name: 'carePackage' })
   async carePackage(@Parent() mf: MedicalFacilities): Promise<CarePackage[]> {
-    console.log('test');
+    // console.log('test');
     const docs = await this.packageService.getByFacilitiesId(mf.id);
     return docs;
   }

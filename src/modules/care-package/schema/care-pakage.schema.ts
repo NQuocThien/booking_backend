@@ -16,7 +16,7 @@ export class CarePackage {
   @Prop()
   discription: string;
 
-  @Prop()
+  @Prop(() => LinkImage)
   image: LinkImage;
 
   @Prop()

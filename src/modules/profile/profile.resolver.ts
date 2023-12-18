@@ -1,22 +1,48 @@
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Mutation,
+  Query,
+  Resolver,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { ProfileService } from './profile.service';
 import { CustomerService } from '../customer/customer.service';
 import { Profile } from './entity/profile.entity';
 import { CreateProfileInput } from './entity/dtos/create-profile.input';
+import { UpdateProfileInput } from './entity/dtos/update-profile.input';
+import { RegisterService } from '../register/register.service';
+import { Register } from '../register/entities/register.entity';
 
-@Resolver()
+@Resolver(() => Profile)
 export class ProfileResolver {
   constructor(
     private readonly profileService: ProfileService,
     private readonly customerService: CustomerService,
+    private readonly regisService: RegisterService,
   ) {}
 
   @Mutation(() => Profile, { name: 'createProfile' })
   async create(@Args('input') input: CreateProfileInput): Promise<Profile> {
     return this.profileService.create(input);
   }
+
+  @Mutation(() => Profile, { name: 'updateProfile' })
+  async update(@Args('input') input: UpdateProfileInput): Promise<Profile> {
+    return this.profileService.update(input);
+  }
+
+  @Mutation(() => Profile, { name: 'deleteProfile' })
+  async delete(@Args('id') id: String): Promise<Profile> {
+    return this.profileService.delete(id);
+  }
   @Query(() => [Profile], { name: 'getProfileByCustomerId' })
   async getProfileByCustomerId(@Args('id') id: String): Promise<Profile[]> {
-    return this.profileService.getProfileByCustomerId(id);
+    const result = await this.profileService.getProfileByCustomerId(id);
+    return result;
+  }
+  @ResolveField(() => [Register, { name: 'register' }])
+  async register(@Parent() profile: Profile): Promise<Register[]> {
+    return this.regisService.getRegisterByProfileId(profile.id);
   }
 }

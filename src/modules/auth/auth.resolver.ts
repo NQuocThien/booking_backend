@@ -6,9 +6,8 @@ import { UseGuards } from '@nestjs/common';
 import { GqlAuthGruard } from './gql-auth.guard';
 import { User } from '../users/entities/user.entity';
 import { CreateUserInput } from './dto/create-user.input';
-import { groupEnd, log } from 'console';
 import { LogoutUser } from './dto/logout-user';
-import { UpdateUserInput } from './dto/update-user.input';
+import { CreateUserByAdminInput } from './dto/create-user-by-admin.input';
 @Resolver()
 export class AuthResolver {
   constructor(private authService: AuthService) {}
@@ -18,23 +17,18 @@ export class AuthResolver {
     @Args('loginUserInput') loginUserInput: LoginUserInput,
     @Context() context,
   ) {
-    // console.group('context resolcer')
     console.log('login: ', context.user);
-    // console.groupEnd()
     return this.authService.login(context.user);
   }
-
-  // @Mutation(returns => User)
-  // @UseGuards(GqlAuthGruard)
-  // updateUser(@Args('updateUserInput') updateUserInput: UpdateUserInput, @Context() context){
-  //     log('input: ', updateUserInput )
-  //     log(context.user)
-  //     return context.user;
-  // }
 
   @Mutation(() => User)
   signup(@Args('createUserInput') LoginUserInput: CreateUserInput) {
     return this.authService.signup(LoginUserInput);
+  }
+
+  @Mutation(() => User, { name: 'signupUser' })
+  signupUser(@Args('createUserInput') LoginUserInput: CreateUserByAdminInput) {
+    return this.authService.signupUser(LoginUserInput);
   }
 
   @Mutation(() => LogoutUser)

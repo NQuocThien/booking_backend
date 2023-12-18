@@ -5,12 +5,12 @@ export class Customer {
   @Field(() => ID)
   id: String;
 
-  @Field({ nullable: true })
+  @Field()
   fullname: string;
 
   @Field()
   userId: string;
 
-  @Field(() => [Profile])
+  @Field(() => [Profile], { nullable: true })
   profile: Profile[];
 }

@@ -70,11 +70,16 @@ input CreateRegisterInput {
   date: DateTime!
   packegeId: String!
   profileId: String!
-  state: String!
 }
 
 input CreateTypePackageInput {
   typeName: String!
+}
+
+input CreateUserByAdminInput {
+  email: String!
+  password: String!
+  username: String!
 }
 
 input CreateUserInput {
@@ -85,9 +90,9 @@ input CreateUserInput {
 }
 
 type Customer {
-  fullname: String
+  fullname: String!
   id: ID!
-  profile: [Profile!]!
+  profile: [Profile!]
   userId: String!
 }
 
@@ -200,19 +205,25 @@ type Mutation {
   createRegister(input: CreateRegisterInput!): Register!
   createTypePackage(input: CreateTypePackageInput!): TypePackage!
   createcustomer(createCustomerInput: CreateCustomerInput!): Customer!
+  deleteCarePackage(input: String!): CarePackage!
   deleteDegree(input: String!): Degree!
   deleteDoctor(id: String!): Doctor!
   deleteMecialSpecialties(id: String!): MedicalSpecialties!
+  deleteProfile(id: String!): Profile!
   deleteTypePackage(id: String!): TypePackage!
   deleteUser(id: String!): User!
   login(loginUserInput: LoginUserInput!): LoginRespone!
   logout: LogoutUser!
   signup(createUserInput: CreateUserInput!): User!
+  signupUser(createUserInput: CreateUserByAdminInput!): User!
+  updateCarePackage(input: UpdateCarePackageInput!): CarePackage!
   updateDegree(input: UpdateDegreeInput!): Degree!
   updateDoctor(updateDoctorInput: UpdateDoctorInput!): Doctor!
   updateGeneralInfor(updateGeneralInforInput: GeneralInforUpdateInput!): GeneralInfor!
   updateMecialSpecialties(updateSpecialtiesInput: UpdateMedicalSpecialtiesInput!): MedicalSpecialties!
   updateMedicalFacilities(createMedicalFacilitiesInput: UpdateMedicalFacilitiesInput!): MedicalFacilities!
+  updateProfile(input: UpdateProfileInput!): Profile!
+  updateRegister(input: UpdateRegisterInput!): Register!
   updateRoles(updateRolesInput: UpdateRolesInput!): User!
   updateSetting(updateSettingInput: UpdateSettingInput!): Setting!
   updateTypePackage(input: UpdateTypePackageInput!): TypePackage!
@@ -233,6 +244,7 @@ type Profile {
   job: String!
   medicalInsurance: String
   numberPhone: String!
+  register: [Register!]
   relationship: String!
 }
 
@@ -240,6 +252,8 @@ type Query {
   checklogin: User!
   getAllDegree: [Degree!]!
   getAllMecialSpecialties: [MedicalSpecialties!]!
+  getAllTypePackage: [TypePackage!]!
+  getCarePackagesByClinicId(id: String!): [CarePackage!]!
   getClinicById(id: String!): MedicalFacilities!
   getClinicByUserId(id: String!): MedicalFacilities!
   getDoctorbyId(id: String!): Doctor!
@@ -261,8 +275,16 @@ type Register {
   date: DateTime!
   id: ID!
   packegeId: String!
+  profile: Profile
   profileId: String!
-  state: String!
+  state: RegisterState!
+}
+
+"""Trạng thái của Register"""
+enum RegisterState {
+  Active
+  NoActive
+  Success
 }
 
 type Setting {
@@ -273,6 +295,16 @@ type TypePackage {
   carePackage: [CarePackage!]
   id: ID!
   typeName: String!
+}
+
+input UpdateCarePackageInput {
+  discription: String!
+  id: String!
+  image: LinkImageInput!
+  medicalFacilitiesId: String!
+  name: String!
+  price: Float!
+  typePackageId: String!
 }
 
 input UpdateDegreeInput {
@@ -310,6 +342,26 @@ input UpdateMedicalSpecialtiesInput {
   discription: String!
   id: String!
   name: String!
+}
+
+input UpdateProfileInput {
+  address: String
+  dataOfBirth: DateTime
+  email: String
+  ethnic: String
+  fullname: String
+  gender: String
+  id: String!
+  identity: String
+  job: String
+  medicalInsurance: String
+  numberPhone: String
+  relationship: String
+}
+
+input UpdateRegisterInput {
+  id: String!
+  state: String!
 }
 
 input UpdateRolesInput {

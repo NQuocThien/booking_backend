@@ -6,6 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Register, RegisterSchema } from './schema/register.schema';
 import { CarePackage } from '../care-package/entities/care-package.entity';
 import { CarePackageModule } from '../care-package/care-package.module';
+import { ProfileModule } from '../profile/profile.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { CarePackageModule } from '../care-package/care-package.module';
       },
     ]),
     forwardRef(() => CarePackageModule),
+    forwardRef(() => ProfileModule),
   ],
   providers: [RegisterResolver, RegisterService],
   exports: [RegisterService],

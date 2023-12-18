@@ -7,6 +7,7 @@ import * as bcrypt from 'bcrypt';
 import { CreateUserInput } from './dto/create-user.input';
 import { LogoutUser } from './dto/logout-user';
 import { CustomerService } from '../customer/customer.service';
+import { CreateUserByAdminInput } from './dto/create-user-by-admin.input';
 @Injectable()
 export class AuthService {
   constructor(
@@ -55,6 +56,20 @@ export class AuthService {
       },
       fullname,
     );
+  }
+  async signupUser(loginUserInput: CreateUserByAdminInput) {
+    const user = await this.userService.findOne(loginUserInput.username);
+    if (user)
+      throw new Error(`User ${loginUserInput.username} already exists ! `);
+    const password = await bcrypt.hash(loginUserInput.password, 10);
+    const roles = [''];
+    return this.userService.createByAdmin({
+      username: loginUserInput.username,
+      active: true,
+      email: loginUserInput.email,
+      password: password,
+      roles: roles,
+    });
   }
   async logout() {
     var reponse: LogoutUser = new LogoutUser();

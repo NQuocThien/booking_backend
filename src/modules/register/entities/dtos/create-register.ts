@@ -10,7 +10,4 @@ export class CreateRegisterInput {
 
   @Field()
   date: Date;
-
-  @Field()
-  state: string;
 }

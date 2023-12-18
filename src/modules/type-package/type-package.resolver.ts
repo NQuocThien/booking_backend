@@ -4,6 +4,7 @@ import {
   Resolver,
   ResolveField,
   Parent,
+  Query,
 } from '@nestjs/graphql';
 import { TypePackageService } from './type-package.service';
 import { CarePackageService } from '../care-package/care-package.service';
@@ -18,6 +19,11 @@ export class TypePackageResolver {
     private readonly typeService: TypePackageService,
     private readonly careService: CarePackageService,
   ) {}
+
+  @Query(() => [TypePackage], { name: 'getAllTypePackage' })
+  async getAllTypePackage(): Promise<TypePackage[]> {
+    return this.typeService.findAll();
+  }
 
   @Mutation(() => TypePackage, { name: 'createTypePackage' })
   async createTypePackage(
