@@ -27,8 +27,5 @@ export class RolesGuard implements CanActivate {
       if (user?.roles?.includes(Role.Admin)) return true;
     }
     return requiredRoles.some((role) => user.roles?.includes(role)); // duyệt qua cái role đã thiết lập nếu user có 1 role thỏ => true
-    // console.log('\t user', user)
-    // console.log(requiredRoles.some((role) => user?.roles?.includes(role)))
-    // return true
   }
 }
