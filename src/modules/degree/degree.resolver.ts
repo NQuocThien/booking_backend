@@ -11,7 +11,7 @@ import { Query } from '@nestjs/graphql';
 import { CreateDegreeInput } from './entities/dtos/create-degree.input';
 import { resolve } from 'path';
 import { UpdateDegreeInput } from './entities/dtos/update-degree.input';
-import { Doctor } from '../doctors/entities/docter.entity';
+import { Doctor } from '../doctors/entities/doctor.entity';
 import { DoctorsService } from '../doctors/doctors.service';
 
 @Resolver(() => Degree)

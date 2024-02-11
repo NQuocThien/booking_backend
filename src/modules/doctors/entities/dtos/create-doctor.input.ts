@@ -1,28 +1,41 @@
 import { InputType, Field } from '@nestjs/graphql';
+import { EAcademicTitle, EDegree, EGender } from 'src/contain';
 import { LinkImageInput } from 'src/modules/users/dto/linkimage.input';
 @InputType()
 export class CreateDoctorInput {
   @Field()
+  userId: string;
+
+  @Field()
+  medicalFactilitiesId?: string;
+
+  @Field()
   name: String;
 
   @Field()
-  email: String;
+  gender: EGender;
 
   @Field()
   numberPhone: String;
 
-  @Field({ nullable: true })
-  idSpecialist: string;
+  @Field()
+  email: String;
 
   @Field({ nullable: true })
-  userId: string;
+  academicTitle: EAcademicTitle;
 
-  @Field({ nullable: true })
-  avatar: LinkImageInput;
+  @Field()
+  degree: EDegree;
 
-  @Field({ nullable: true })
-  degreeId: string;
+  @Field()
+  specialistId: String;
 
-  @Field({ nullable: true })
-  facilitiesId: string;
+  @Field(() => [Date])
+  dayOff: [Date];
+
+  @Field(() => LinkImageInput)
+  avatar?: LinkImageInput;
+
+  @Field()
+  discription?: string;
 }

@@ -29,7 +29,7 @@ import { CustomerService } from '../customer/customer.service';
 import { MedicalFacilitiesService } from '../medical-facilities/medical-facilities.service';
 import { MedicalFacilities } from '../medical-facilities/entities/mecical-facilies.entity';
 import { DoctorsService } from '../doctors/doctors.service';
-import { Doctor } from '../doctors/entities/docter.entity';
+import { Doctor } from '../doctors/entities/doctor.entity';
 import { UpdateRolesInput } from './dto/update-roles.input ';
 import { UserSelectInput } from './dto/role-select.input';
 @Resolver(() => User)

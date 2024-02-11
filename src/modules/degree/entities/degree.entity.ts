@@ -1,6 +1,6 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
 import mongoose from 'mongoose';
-import { Doctor } from 'src/modules/doctors/entities/docter.entity';
+import { Doctor } from 'src/modules/doctors/entities/doctor.entity';
 @ObjectType()
 export class Degree {
   @Field((type) => ID)

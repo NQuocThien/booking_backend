@@ -4,7 +4,7 @@ import { LinkImage } from 'src/modules/users/dto/image';
 // import { Profile } from 'src/modules/profile/entities/profile.entity';
 import { Customer } from 'src/modules/customer/entities/customer.entity';
 import { MedicalFacilities } from 'src/modules/medical-facilities/entities/mecical-facilies.entity';
-import { Doctor } from 'src/modules/doctors/entities/docter.entity';
+import { Doctor } from 'src/modules/doctors/entities/doctor.entity';
 @ObjectType()
 export class User {
   @Field((type) => ID)

@@ -2,34 +2,49 @@ import { Field, InputType } from '@nestjs/graphql';
 import { LinkImageInput } from 'src/modules/users/dto/linkimage.input';
 
 @InputType()
-export class UpdateMedicalFacilitiesInput {
+export class UpdateMedicalFacilityInput {
   @Field()
-  id: string;
-
-  @Field()
-  companyName: string;
+  id: String;
 
   @Field()
   userId: string;
 
   @Field()
+  medicalFacilityName: string;
+
+  @Field()
+  address: string;
+
+  @Field()
+  numberPhone?: string;
+
+  @Field()
+  image?: LinkImageInput;
+
+  @Field()
+  email?: string;
+
+  @Field({ nullable: true })
+  lat?: number;
+
+  @Field({ nullable: true })
+  lng?: number;
+
+  @Field()
   discription: string;
 
-  @Field({ nullable: true })
-  image: LinkImageInput;
+  @Field()
+  introduce: string;
+
+  @Field(() => [Date])
+  dayOff: [Date];
 
   @Field()
-  adress: string;
-
-  @Field({ nullable: true })
-  lat: number;
-
-  @Field({ nullable: true })
-  lng: number;
+  operatingStatus: string; // trạng thái hoạt động
 
   @Field()
-  numberPhone: string;
+  legalRepresentation: string; // đại diện pháp luật
 
   @Field()
-  email: string;
+  taxCode: string; // mã số thuế
 }

@@ -10,19 +10,19 @@ export class Profile {
   fullname: string;
 
   @Prop()
+  gender: string;
+
+  @Prop()
   numberPhone: string;
 
   @Prop()
   email: string;
 
   @Prop()
-  dataOfBirth: Date;
-
-  @Prop()
-  gender: string;
-
-  @Prop()
   address: string;
+
+  @Prop()
+  dataOfBirth: Date;
 
   @Prop()
   identity: string;

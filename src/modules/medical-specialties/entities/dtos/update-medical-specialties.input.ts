@@ -1,12 +1,18 @@
 import { InputType, Field } from '@nestjs/graphql';
 @InputType()
-export class UpdateMedicalSpecialtiesInput {
+export class UpdateMedicalSpecialtyInput {
   @Field()
-  id: String;
+  id: string;
 
   @Field()
-  name: String;
+  medicalFactilityId: string;
 
   @Field()
-  discription: String;
+  name: string;
+
+  @Field()
+  price: number;
+
+  @Field()
+  discription: string;
 }

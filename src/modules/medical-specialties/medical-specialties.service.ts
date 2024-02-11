@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CreateMedicalSpecialtiesInput } from './entities/dtos/create-medical-specialties.input';
+import { CreateMedicalSpecialtyInput } from './entities/dtos/create-medical-specialties.input';
 import { MedicalSpecialties } from './entities/medical-specialties.entity';
-import { UpdateMedicalSpecialtiesInput } from './entities/dtos/update-medical-specialties.input';
+import { UpdateMedicalSpecialtyInput } from './entities/dtos/update-medical-specialties.input';
 
 @Injectable()
 export class MedicalSpecialtiesService {
@@ -11,13 +11,13 @@ export class MedicalSpecialtiesService {
     @InjectModel(MedicalSpecialties.name)
     private readonly medicalSpecialtiesModel: Model<MedicalSpecialties>,
   ) {}
-  async create(data: CreateMedicalSpecialtiesInput) {
+  async create(data: CreateMedicalSpecialtyInput) {
     return this.medicalSpecialtiesModel.create(data);
   }
   async delete(id: String) {
     return this.medicalSpecialtiesModel.findByIdAndDelete(id);
   }
-  async update(data: UpdateMedicalSpecialtiesInput) {
+  async update(data: UpdateMedicalSpecialtyInput) {
     try {
       const existingDoc = await this.medicalSpecialtiesModel.findById(data.id);
 

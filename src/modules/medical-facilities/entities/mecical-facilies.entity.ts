@@ -1,6 +1,6 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
 import { CarePackage } from 'src/modules/care-package/entities/care-package.entity';
-import { Doctor } from 'src/modules/doctors/entities/docter.entity';
+import { Doctor } from 'src/modules/doctors/entities/doctor.entity';
 import { LinkImage } from 'src/modules/users/dto/image';
 @ObjectType()
 export class MedicalFacilities {
@@ -8,28 +8,46 @@ export class MedicalFacilities {
   id: String;
 
   @Field()
-  companyName: string;
+  userId: string;
+
+  @Field()
+  medicalFacilityName: string;
+
+  @Field()
+  address: string;
+
+  @Field()
+  numberPhone?: string;
+
+  @Field()
+  image?: LinkImage;
+
+  @Field()
+  email?: string;
+
+  @Field({ nullable: true })
+  lat?: number;
+
+  @Field({ nullable: true })
+  lng?: number;
 
   @Field()
   discription: string;
 
-  @Field(() => LinkImage)
-  image: LinkImage;
+  @Field()
+  introduce: string;
+
+  @Field(() => [Date])
+  dayOff: [Date];
 
   @Field()
-  adress: string;
-
-  @Field({ nullable: true })
-  lat: number;
-
-  @Field({ nullable: true })
-  lng: number;
+  operatingStatus: string; // trạng thái hoạt động
 
   @Field()
-  numberPhone: string;
+  legalRepresentation: string; // đại diện pháp luật
 
   @Field()
-  email: string;
+  taxCode: string; // mã số thuế
 
   @Field(() => [Doctor], { nullable: true })
   doctors: Doctor[];

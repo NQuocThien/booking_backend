@@ -11,6 +11,7 @@ import { Customer } from './entities/customer.entity';
 import { CreateCustomerInput } from './entities/dto/create-customer.input';
 import { Profile } from '../profile/entity/profile.entity';
 import { ProfileService } from '../profile/profile.service';
+import { UpdateCustomerInput } from './entities/dto/update-customer.input';
 @Resolver(() => Customer)
 export class CustomerResolver {
   constructor(
@@ -18,16 +19,18 @@ export class CustomerResolver {
     private readonly profileSv: ProfileService,
   ) {}
 
-  @Query(() => [Customer], { name: 'getcustomers' })
-  async getCustomer() {
+  @Query(() => [Customer], { name: 'getAllCustomer' })
+  async getAllCustomer() {
     return this.customerService.getCustomer();
   }
 
   @Mutation(() => Customer, { name: 'createcustomer' })
-  async createCustomer(
-    @Args('createCustomerInput') createCustomerInput: CreateCustomerInput,
-  ) {
-    return this.customerService.createCustomer(createCustomerInput);
+  async createCustomer(@Args('input') input: CreateCustomerInput) {
+    return this.customerService.createCustomer(input);
+  }
+  @Mutation(() => Customer, { name: 'updateCustomer' })
+  async updateCustomer(@Args('input') input: UpdateCustomerInput) {
+    return this.customerService.updateCustomer(input);
   }
 
   @ResolveField(() => [Profile], { name: 'profile' })

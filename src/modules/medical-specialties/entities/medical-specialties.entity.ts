@@ -6,7 +6,13 @@ export class MedicalSpecialties {
   id: string;
 
   @Field()
+  medicalFactilityId: string;
+
+  @Field()
   name: string;
+
+  @Field()
+  price: number;
 
   @Field()
   discription: string;

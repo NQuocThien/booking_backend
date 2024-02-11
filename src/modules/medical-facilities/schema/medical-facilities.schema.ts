@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Doctor } from 'src/modules/doctors/schema/docter.schema';
+import { Doctor } from 'src/modules/doctors/schema/doctor.schema';
 import { LinkImage } from 'src/modules/users/schema/linkImage.schema';
 @Schema({
   timestamps: true,
@@ -9,16 +9,19 @@ export class MedicalFacilities {
   userId: string;
 
   @Prop()
-  companyName: string;
+  medicalFacilityName: string;
 
   @Prop()
-  discription: string;
+  address: string;
+
+  @Prop()
+  numberPhone?: string;
 
   @Prop({ type: Object, default: null })
   image?: LinkImage;
 
   @Prop()
-  adress: string;
+  email?: string;
 
   @Prop({ nullable: true })
   lat?: number;
@@ -26,14 +29,23 @@ export class MedicalFacilities {
   @Prop({ nullable: true })
   lng?: number;
 
-  @Prop({ nullable: true })
-  numberPhone?: string;
+  @Prop()
+  discription: string;
 
-  @Prop({ nullable: true })
-  email?: string;
+  @Prop()
+  introduce: string;
 
-  @Prop({ nullable: true })
-  doctors?: Doctor;
+  @Prop(() => [Date])
+  dayOff: [Date];
+
+  @Prop()
+  operatingStatus: string; // trạng thái hoạt động
+
+  @Prop()
+  legalRepresentation: string; // đại diện pháp luật
+
+  @Prop()
+  taxCode: string; // mã số thuế
 }
 export const MedicalFacilitiesSchema =
   SchemaFactory.createForClass(MedicalFacilities);

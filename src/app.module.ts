@@ -22,6 +22,9 @@ import { ProfileModule } from './modules/profile/profile.module';
 import { RegisterModule } from './modules/register/register.module';
 import { CarePackageModule } from './modules/care-package/care-package.module';
 import { TypePackageModule } from './modules/type-package/type-package.module';
+import { MedicalStaffModule } from './modules/medical-staff/medical-staff.module';
+import { VaccinationModule } from './modules/vaccination/vaccination.module';
+import { PackageModule } from './modules/package/package.module';
 
 dotenv.config();
 @Module({
@@ -51,6 +54,9 @@ dotenv.config();
     RegisterModule,
     CarePackageModule,
     TypePackageModule,
+    MedicalStaffModule,
+    VaccinationModule,
+    PackageModule,
   ],
   controllers: [AppController],
   providers: [AppService],

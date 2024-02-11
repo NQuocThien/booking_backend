@@ -23,7 +23,16 @@ export class UsersService {
     const user = await this.userModel.create({ ...createUserInput });
     log('---> Created New User With ID:', user.id);
     // create customer
-    await this.cusSv.createCustomer({ fullname: fullname, userId: user.id });
+    await this.cusSv.createCustomer({
+      name: fullname,
+      userId: user.id,
+      gender: undefined,
+      numberPhone: undefined,
+      email: undefined,
+      address: undefined,
+      dateOfBirth: undefined,
+      nation: undefined,
+    });
     return user;
   }
   async createByAdmin(createUserInput: CreateUserInput): Promise<User> {

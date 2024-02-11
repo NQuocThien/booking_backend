@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 import { LinkImage } from './linkImage.schema';
 import { Customer } from 'src/modules/customer/entities/customer.entity';
 import { MedicalFacilities } from 'src/modules/medical-facilities/schema/medical-facilities.schema';
-import { Doctor } from 'src/modules/doctors/schema/docter.schema';
+import { Doctor } from 'src/modules/doctors/schema/doctor.schema';
 
 @Schema({
   timestamps: true,

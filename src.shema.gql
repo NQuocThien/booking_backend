@@ -14,7 +14,13 @@ type CarePackage {
 }
 
 input CreateCustomerInput {
-  fullname: String!
+  address: String
+  dateOfBirth: DateTime
+  email: String
+  gender: String
+  name: String!
+  nation: String
+  numberPhone: String
   userId: String!
 }
 
@@ -24,31 +30,60 @@ input CreateDegreeInput {
 }
 
 input CreateDoctorInput {
-  avatar: LinkImageInput
-  degreeId: String
+  academicTitle: String
+  avatar: LinkImageInput!
+  dayOff: [DateTime!]!
+  degree: String!
+  discription: String!
   email: String!
-  facilitiesId: String
-  idSpecialist: String
+  gender: String!
+  medicalFactilitiesId: String!
   name: String!
   numberPhone: String!
-  userId: String
+  specialistId: String!
+  userId: String!
 }
 
-input CreateMedicalFacilitiesInput {
-  adress: String!
-  companyName: String!
+input CreateMedicalFacilityInput {
+  address: String!
+  dayOff: [DateTime!]!
   discription: String!
   email: String!
   image: LinkImageInput!
+  introduce: String!
   lat: Float
+  legalRepresentation: String!
   lng: Float
+  medicalFacilityName: String!
+  numberPhone: String!
+  operatingStatus: String!
+  taxCode: String!
+  userId: String!
+}
+
+input CreateMedicalSpecialtyInput {
+  discription: String!
+  medicalFactilityId: String!
+  name: String!
+  price: Float!
+}
+
+input CreateMedicalStaffInput {
+  email: String!
+  gender: String!
+  medicalFacilityId: String!
+  name: String!
   numberPhone: String!
   userId: String!
 }
 
-input CreateMedicalSpecialtiesInput {
-  discription: String!
-  name: String!
+input CreatePackageInput {
+  examinationDetails: String!
+  gender: EGender!
+  medicalFactilitiesId: String!
+  packageName: String!
+  price: Float!
+  status: String!
 }
 
 input CreateProfileInput {
@@ -89,9 +124,26 @@ input CreateUserInput {
   username: String!
 }
 
+input CreateVaccineInput {
+  countryOfOrigin: String!
+  indication: String!
+  medicalFactilitiesId: String!
+  note: String!
+  price: Float!
+  prophylactic: String!
+  status: String!
+  vaccineName: String!
+}
+
 type Customer {
-  fullname: String!
+  address: String!
+  dateOfBirth: DateTime!
+  email: String!
+  gender: String!
   id: ID!
+  name: String!
+  nation: String!
+  numberPhone: String!
   profile: [Profile!]
   userId: String!
 }
@@ -109,18 +161,37 @@ type Degree {
 }
 
 type Doctor {
+  academicTitle: EAcademicTitle
   avatar: LinkImage!
-  degree: Degree
-  degreeId: String
+  dayOff: [DateTime!]!
+  degree: EDegree!
+  discription: String!
   email: String!
-  evaluate: Float
-  facilitiesId: String
+  gender: EGender!
   id: ID!
-  idSpecialist: String
-  medicalSpecialties: MedicalSpecialties
+  medicalFactilitiesId: String!
   name: String!
   numberPhone: String!
-  userId: String
+  specialistId: String!
+  userId: String!
+}
+
+enum EAcademicTitle {
+  AssociateProfesso
+  Professor
+}
+
+enum EDegree {
+  Doctor
+  DoctorS1
+  DoctorS2
+  Doctorate
+  MasterDoctor
+}
+
+enum EGender {
+  Female
+  Male
 }
 
 type GeneralInfor {
@@ -175,23 +246,41 @@ type LogoutUser {
 }
 
 type MedicalFacilities {
-  adress: String!
+  address: String!
   carePackage: [CarePackage!]
-  companyName: String!
+  dayOff: [DateTime!]!
   discription: String!
   doctors: [Doctor!]
   email: String!
   id: ID!
   image: LinkImage!
+  introduce: String!
   lat: Float
+  legalRepresentation: String!
   lng: Float
+  medicalFacilityName: String!
   numberPhone: String!
+  operatingStatus: String!
+  taxCode: String!
+  userId: String!
 }
 
 type MedicalSpecialties {
   discription: String!
   id: ID!
+  medicalFactilityId: String!
   name: String!
+  price: Float!
+}
+
+type MedicalStaff {
+  email: String!
+  gender: String!
+  id: ID!
+  medicalFacilityId: String!
+  name: String!
+  numberPhone: String!
+  userId: String!
 }
 
 type Mutation {
@@ -199,29 +288,38 @@ type Mutation {
   createCarePackage(input: createCarePackageInput!): CarePackage!
   createDegree(input: CreateDegreeInput!): Degree!
   createDoctor(createDoctorInput: CreateDoctorInput!): Doctor!
-  createMecialSpecialties(mecicalSpecialtiesInput: CreateMedicalSpecialtiesInput!): MedicalSpecialties!
-  createMedicalFacilities(createMedicalFacilitiesInput: CreateMedicalFacilitiesInput!): MedicalFacilities!
+  createMedicalFacility(input: CreateMedicalFacilityInput!): MedicalFacilities!
+  createMedicalSpecialty(input: CreateMedicalSpecialtyInput!): MedicalSpecialties!
+  createMedicalStaff(input: CreateMedicalStaffInput!): MedicalStaff!
+  createPackage(input: CreatePackageInput!): Package!
   createProfile(input: CreateProfileInput!): Profile!
   createRegister(input: CreateRegisterInput!): Register!
   createTypePackage(input: CreateTypePackageInput!): TypePackage!
-  createcustomer(createCustomerInput: CreateCustomerInput!): Customer!
+  createVaccination(input: CreateVaccineInput!): Vaccination!
+  createcustomer(input: CreateCustomerInput!): Customer!
   deleteCarePackage(input: String!): CarePackage!
   deleteDegree(input: String!): Degree!
   deleteDoctor(id: String!): Doctor!
-  deleteMecialSpecialties(id: String!): MedicalSpecialties!
+  deleteMecialSpecialty(id: String!): MedicalSpecialties!
+  deleteMedicalStaff(input: String!): MedicalStaff!
+  deletePackage(input: String!): Package!
   deleteProfile(id: String!): Profile!
   deleteTypePackage(id: String!): TypePackage!
   deleteUser(id: String!): User!
+  deleteVaccination(input: String!): Vaccination!
   login(loginUserInput: LoginUserInput!): LoginRespone!
   logout: LogoutUser!
   signup(createUserInput: CreateUserInput!): User!
   signupUser(createUserInput: CreateUserByAdminInput!): User!
   updateCarePackage(input: UpdateCarePackageInput!): CarePackage!
+  updateCustomer(input: UpdateCustomerInput!): Customer!
   updateDegree(input: UpdateDegreeInput!): Degree!
   updateDoctor(updateDoctorInput: UpdateDoctorInput!): Doctor!
   updateGeneralInfor(updateGeneralInforInput: GeneralInforUpdateInput!): GeneralInfor!
-  updateMecialSpecialties(updateSpecialtiesInput: UpdateMedicalSpecialtiesInput!): MedicalSpecialties!
-  updateMedicalFacilities(createMedicalFacilitiesInput: UpdateMedicalFacilitiesInput!): MedicalFacilities!
+  updateMedicalFacilities(createMedicalFacilitiesInput: UpdateMedicalFacilityInput!): MedicalFacilities!
+  updateMedicalSpecialty(input: UpdateMedicalSpecialtyInput!): MedicalSpecialties!
+  updateMedicalStaff(input: UpdateMedicalStaffInput!): MedicalStaff!
+  updatePackage(input: UpdatePackageInput!): Package!
   updateProfile(input: UpdateProfileInput!): Profile!
   updateRegister(input: UpdateRegisterInput!): Register!
   updateRoles(updateRolesInput: UpdateRolesInput!): User!
@@ -229,6 +327,17 @@ type Mutation {
   updateTypePackage(input: UpdateTypePackageInput!): TypePackage!
   updateUser(updateUserInput: UpdateUserInput!): User!
   updateUserWithPass(updateUserInput: UpdateUserWithPassInput!): User!
+  updateVaccination(input: UpdateVaccineInput!): Vaccination!
+}
+
+type Package {
+  examinationDetails: String!
+  gender: EGender!
+  id: ID!
+  medicalFactilitiesId: String!
+  packageName: String!
+  price: Float!
+  status: String!
 }
 
 type Profile {
@@ -250,23 +359,26 @@ type Profile {
 
 type Query {
   checklogin: User!
+  getAllCustomer: [Customer!]!
   getAllDegree: [Degree!]!
-  getAllMecialSpecialties: [MedicalSpecialties!]!
+  getAllDoctor: [Doctor!]!
+  getAllMecialSpecialty: [MedicalSpecialties!]!
+  getAllMedicalFacility: [MedicalFacilities!]!
+  getAllMedicalStaff: [MedicalStaff!]!
+  getAllPackage: [Package!]!
   getAllTypePackage: [TypePackage!]!
+  getAllVacation: [Vaccination!]!
   getCarePackagesByClinicId(id: String!): [CarePackage!]!
-  getClinicById(id: String!): MedicalFacilities!
-  getClinicByUserId(id: String!): MedicalFacilities!
   getDoctorbyId(id: String!): Doctor!
   getDoctorbyUserId(id: String!): Doctor!
-  getDoctors: [Doctor!]!
   getGeneralInfor: GeneralInfor!
-  getMedicalfacilities: [MedicalFacilities!]!
+  getMedicalFacilityById(id: String!): MedicalFacilities!
+  getMedicalFacilityByUserId(id: String!): MedicalFacilities!
   getProfileByCustomerId(id: String!): [Profile!]!
   getSetting: Setting!
   getUser(username: String!): User!
   getUserMedicalNon: [User!]!
   getUserSelect(roleInput: UserSelectInput!): [User!]!
-  getcustomers: [Customer!]!
   users: [User!]!
 }
 
@@ -307,6 +419,17 @@ input UpdateCarePackageInput {
   typePackageId: String!
 }
 
+input UpdateCustomerInput {
+  address: String
+  dateOfBirth: DateTime
+  email: String
+  gender: String
+  id: String!
+  name: String!
+  nation: String
+  numberPhone: String
+}
+
 input UpdateDegreeInput {
   abbreviations: String!
   id: String!
@@ -314,34 +437,65 @@ input UpdateDegreeInput {
 }
 
 input UpdateDoctorInput {
-  avatar: LinkImageInput
-  degreeId: String
+  academicTitle: String
+  avatar: LinkImageInput!
+  dayOff: [DateTime!]!
+  degree: String!
+  discription: String!
   email: String!
-  facilitiesId: String
+  gender: String!
   id: String!
-  idSpecialist: String
+  medicalFactilitiesId: String!
   name: String!
   numberPhone: String!
-  userId: String
+  specialistId: String!
+  userId: String!
 }
 
-input UpdateMedicalFacilitiesInput {
-  adress: String!
-  companyName: String!
+input UpdateMedicalFacilityInput {
+  address: String!
+  dayOff: [DateTime!]!
   discription: String!
   email: String!
   id: String!
-  image: LinkImageInput
+  image: LinkImageInput!
+  introduce: String!
   lat: Float
+  legalRepresentation: String!
   lng: Float
+  medicalFacilityName: String!
+  numberPhone: String!
+  operatingStatus: String!
+  taxCode: String!
+  userId: String!
+}
+
+input UpdateMedicalSpecialtyInput {
+  discription: String!
+  id: String!
+  medicalFactilityId: String!
+  name: String!
+  price: Float!
+}
+
+input UpdateMedicalStaffInput {
+  email: String!
+  gender: String!
+  id: String!
+  medicalFacilityId: String!
+  name: String!
   numberPhone: String!
   userId: String!
 }
 
-input UpdateMedicalSpecialtiesInput {
-  discription: String!
+input UpdatePackageInput {
+  examinationDetails: String!
+  gender: EGender!
   id: String!
-  name: String!
+  medicalFactilitiesId: String!
+  packageName: String!
+  price: Float!
+  status: String!
 }
 
 input UpdateProfileInput {
@@ -398,6 +552,18 @@ input UpdateUserWithPassInput {
   username: String!
 }
 
+input UpdateVaccineInput {
+  countryOfOrigin: String!
+  id: String!
+  indication: String!
+  medicalFactilitiesId: String!
+  note: String!
+  price: Float!
+  prophylactic: String!
+  status: String!
+  vaccineName: String!
+}
+
 type User {
   active: Boolean
   customer: Customer
@@ -413,6 +579,18 @@ type User {
 
 input UserSelectInput {
   role: String!
+}
+
+type Vaccination {
+  countryOfOrigin: String!
+  id: ID!
+  indication: String!
+  medicalFactilitiesId: String!
+  note: String!
+  price: Float!
+  prophylactic: String!
+  status: String!
+  vaccineName: String!
 }
 
 input createCarePackageInput {

@@ -1,4 +1,5 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
+import { EGender } from 'src/contain';
 import { Profile } from 'src/modules/profile/entity/profile.entity';
 @ObjectType()
 export class Customer {
@@ -6,10 +7,28 @@ export class Customer {
   id: String;
 
   @Field()
-  fullname: string;
+  userId: string;
 
   @Field()
-  userId: string;
+  name: String;
+
+  @Field()
+  gender: EGender;
+
+  @Field()
+  numberPhone: String;
+
+  @Field()
+  email: String;
+
+  @Field()
+  address: String;
+
+  @Field()
+  dateOfBirth: Date;
+
+  @Field()
+  nation: String;
 
   @Field(() => [Profile], { nullable: true })
   profile: Profile[];
