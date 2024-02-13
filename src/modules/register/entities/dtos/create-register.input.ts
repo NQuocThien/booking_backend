@@ -1,18 +1,20 @@
-import { Field, ID, ObjectType, registerEnumType } from '@nestjs/graphql';
+import {
+  Field,
+  ID,
+  InputType,
+  ObjectType,
+  registerEnumType,
+} from '@nestjs/graphql';
 import { EStateRegister, ETypeOfService } from 'src/contain';
 
-// Đăng ký enum với GraphQL
 registerEnumType(EStateRegister, {
   name: 'EStateRegister',
 });
 registerEnumType(ETypeOfService, {
   name: 'ETypeOfService',
 });
-@ObjectType()
-export class Register {
-  @Field(() => ID)
-  id: String;
-
+@InputType()
+export class CreateRegisterInput {
   @Field()
   customerId: string;
 

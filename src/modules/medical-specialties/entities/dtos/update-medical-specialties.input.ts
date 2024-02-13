@@ -1,4 +1,5 @@
 import { InputType, Field } from '@nestjs/graphql';
+import { WorkScheduleInput } from 'src/modules/contains/work-schedule/work-schedule.input';
 @InputType()
 export class UpdateMedicalSpecialtyInput {
   @Field()
@@ -15,4 +16,7 @@ export class UpdateMedicalSpecialtyInput {
 
   @Field()
   discription: string;
+
+  @Field(() => WorkScheduleInput)
+  workSchedule: WorkScheduleInput;
 }

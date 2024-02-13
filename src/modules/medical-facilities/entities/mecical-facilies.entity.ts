@@ -1,5 +1,5 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
-import { CarePackage } from 'src/modules/care-package/entities/care-package.entity';
+import { WorkSchedule } from 'src/modules/contains/work-schedule/work-schedule.entity';
 import { Doctor } from 'src/modules/doctors/entities/doctor.entity';
 import { LinkImage } from 'src/modules/users/dto/image';
 @ObjectType()
@@ -52,6 +52,6 @@ export class MedicalFacilities {
   @Field(() => [Doctor], { nullable: true })
   doctors: Doctor[];
 
-  @Field(() => [CarePackage], { nullable: true })
-  carePackage: CarePackage[];
+  @Field()
+  workSchedule: WorkSchedule;
 }

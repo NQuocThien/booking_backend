@@ -1,5 +1,6 @@
 import { InputType, Field } from '@nestjs/graphql';
-import { EAcademicTitle, EDegree } from 'src/contain';
+import { EAcademicTitle, EDegree, EStatusService } from 'src/contain';
+import { WorkScheduleInput } from 'src/modules/contains/work-schedule/work-schedule.input';
 import { LinkImageInput } from 'src/modules/users/dto/linkimage.input';
 @InputType()
 export class UpdateDoctorInput {
@@ -33,12 +34,15 @@ export class UpdateDoctorInput {
   @Field()
   specialistId: String;
 
-  @Field(() => [Date])
-  dayOff: [Date];
-
   @Field(() => LinkImageInput)
   avatar?: LinkImageInput;
 
   @Field()
   discription?: string;
+
+  @Field()
+  status: EStatusService;
+
+  @Field()
+  workSchedule: WorkScheduleInput;
 }

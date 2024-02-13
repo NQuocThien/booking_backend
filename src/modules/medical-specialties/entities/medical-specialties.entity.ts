@@ -1,4 +1,5 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { WorkSchedule } from 'src/modules/contains/work-schedule/work-schedule.entity';
 
 @ObjectType()
 export class MedicalSpecialties {
@@ -16,4 +17,7 @@ export class MedicalSpecialties {
 
   @Field()
   discription: string;
+
+  @Field(() => WorkSchedule)
+  workSchedule: WorkSchedule;
 }

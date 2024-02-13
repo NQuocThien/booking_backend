@@ -1,5 +1,6 @@
 import { ObjectType, Field, registerEnumType, ID } from '@nestjs/graphql';
 import { EGender, EStatusService } from 'src/contain';
+import { WorkSchedule } from 'src/modules/contains/work-schedule/work-schedule.entity';
 @ObjectType()
 export class Package {
   @Field(() => ID)
@@ -18,10 +19,10 @@ export class Package {
   price: Number;
 
   @Field()
-  status: EStatusService;
-
-  @Field()
   examinationDetails: String;
+
+  @Field(() => WorkSchedule)
+  workSchedule: WorkSchedule;
 }
 
 registerEnumType(EStatusService, {

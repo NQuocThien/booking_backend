@@ -5,7 +5,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Doctor } from './entities/doctor.entity';
 import { DoctorSchema } from './schema/doctor.schema';
 import { MedicalSpecialtiesModule } from '../medical-specialties/medical-specialties.module';
-import { DegreeModule } from '../degree/degree.module';
 
 @Module({
   imports: [
@@ -16,7 +15,6 @@ import { DegreeModule } from '../degree/degree.module';
       },
     ]),
     MedicalSpecialtiesModule,
-    forwardRef(() => DegreeModule),
   ],
   providers: [DoctorsResolver, DoctorsService],
   exports: [DoctorsService],

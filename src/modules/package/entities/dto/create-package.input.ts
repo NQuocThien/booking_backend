@@ -6,6 +6,7 @@ import {
   InputType,
 } from '@nestjs/graphql';
 import { EGender, EStatusService } from 'src/contain';
+import { WorkScheduleInput } from 'src/modules/contains/work-schedule/work-schedule.input';
 @InputType()
 export class CreatePackageInput {
   @Field()
@@ -25,6 +26,9 @@ export class CreatePackageInput {
 
   @Field()
   examinationDetails: String;
+
+  @Field(() => WorkScheduleInput)
+  workSchedule: WorkScheduleInput;
 }
 
 registerEnumType(EStatusService, {

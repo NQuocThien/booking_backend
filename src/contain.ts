@@ -21,3 +21,15 @@ export enum EStatusService {
   Open = 'Open',
   Close = 'Close',
 }
+
+export enum EStateRegister {
+  Success = 'Đã khám',
+  Pending = 'Chưa khám',
+}
+
+export enum ETypeOfService {
+  Doctor = 'Khám theo Bác sĩ',
+  Specialty = 'Khám theo Chuyên khoa',
+  Package = 'Khám theo gói',
+  Vaccine = 'Tiêm chủng',
+}

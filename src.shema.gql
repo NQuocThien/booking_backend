@@ -2,17 +2,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type CarePackage {
-  discription: String!
-  id: ID!
-  image: LinkImage!
-  medicalFacilitiesId: String!
-  name: String!
-  price: Float!
-  register: [Register!]
-  typePackageId: String!
-}
-
 input CreateCustomerInput {
   address: String
   dateOfBirth: DateTime
@@ -24,15 +13,9 @@ input CreateCustomerInput {
   userId: String!
 }
 
-input CreateDegreeInput {
-  abbreviations: String!
-  name: String!
-}
-
 input CreateDoctorInput {
   academicTitle: String
   avatar: LinkImageInput!
-  dayOff: [DateTime!]!
   degree: String!
   discription: String!
   email: String!
@@ -41,12 +24,13 @@ input CreateDoctorInput {
   name: String!
   numberPhone: String!
   specialistId: String!
+  status: String!
   userId: String!
+  workSchedule: WorkScheduleInput!
 }
 
 input CreateMedicalFacilityInput {
   address: String!
-  dayOff: [DateTime!]!
   discription: String!
   email: String!
   image: LinkImageInput!
@@ -59,6 +43,7 @@ input CreateMedicalFacilityInput {
   operatingStatus: String!
   taxCode: String!
   userId: String!
+  workSchedule: WorkScheduleInput!
 }
 
 input CreateMedicalSpecialtyInput {
@@ -66,6 +51,7 @@ input CreateMedicalSpecialtyInput {
   medicalFactilityId: String!
   name: String!
   price: Float!
+  workSchedule: WorkScheduleInput!
 }
 
 input CreateMedicalStaffInput {
@@ -84,6 +70,7 @@ input CreatePackageInput {
   packageName: String!
   price: Float!
   status: String!
+  workSchedule: WorkScheduleInput!
 }
 
 input CreateProfileInput {
@@ -101,14 +88,40 @@ input CreateProfileInput {
   relationship: String!
 }
 
-input CreateRegisterInput {
+input CreateRegisterDoctorInput {
+  customerId: String!
   date: DateTime!
-  packegeId: String!
+  doctorId: String!
+  isHealthInsurance: Boolean!
   profileId: String!
+  sessionId: String!
 }
 
-input CreateTypePackageInput {
-  typeName: String!
+input CreateRegisterPackageInput {
+  customerId: String!
+  date: DateTime!
+  isHealthInsurance: Boolean!
+  packageId: String!
+  profileId: String!
+  sessionId: String!
+}
+
+input CreateRegisterSpecialtyInput {
+  customerId: String!
+  date: DateTime!
+  isHealthInsurance: Boolean!
+  profileId: String!
+  sessionId: String!
+  specialtyId: String!
+}
+
+input CreateRegisterVaccineInput {
+  customerId: String!
+  date: DateTime!
+  isHealthInsurance: Boolean!
+  profileId: String!
+  sessionId: String!
+  vaccineId: String!
 }
 
 input CreateUserByAdminInput {
@@ -153,17 +166,9 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
-type Degree {
-  abbreviations: String!
-  doctor: Doctor
-  id: ID!
-  name: String!
-}
-
 type Doctor {
   academicTitle: EAcademicTitle
   avatar: LinkImage!
-  dayOff: [DateTime!]!
   degree: EDegree!
   discription: String!
   email: String!
@@ -173,7 +178,9 @@ type Doctor {
   name: String!
   numberPhone: String!
   specialistId: String!
+  status: String!
   userId: String!
+  workSchedule: WorkSchedule!
 }
 
 enum EAcademicTitle {
@@ -192,6 +199,18 @@ enum EDegree {
 enum EGender {
   Female
   Male
+}
+
+enum EStateRegister {
+  Pending
+  Success
+}
+
+enum ETypeOfService {
+  Doctor
+  Package
+  Specialty
+  Vaccine
 }
 
 type GeneralInfor {
@@ -247,7 +266,6 @@ type LogoutUser {
 
 type MedicalFacilities {
   address: String!
-  carePackage: [CarePackage!]
   dayOff: [DateTime!]!
   discription: String!
   doctors: [Doctor!]
@@ -263,6 +281,7 @@ type MedicalFacilities {
   operatingStatus: String!
   taxCode: String!
   userId: String!
+  workSchedule: WorkSchedule!
 }
 
 type MedicalSpecialties {
@@ -271,6 +290,7 @@ type MedicalSpecialties {
   medicalFactilityId: String!
   name: String!
   price: Float!
+  workSchedule: WorkSchedule!
 }
 
 type MedicalStaff {
@@ -285,35 +305,30 @@ type MedicalStaff {
 
 type Mutation {
   activeUser(id: String!): User!
-  createCarePackage(input: createCarePackageInput!): CarePackage!
-  createDegree(input: CreateDegreeInput!): Degree!
   createDoctor(createDoctorInput: CreateDoctorInput!): Doctor!
   createMedicalFacility(input: CreateMedicalFacilityInput!): MedicalFacilities!
   createMedicalSpecialty(input: CreateMedicalSpecialtyInput!): MedicalSpecialties!
   createMedicalStaff(input: CreateMedicalStaffInput!): MedicalStaff!
   createPackage(input: CreatePackageInput!): Package!
   createProfile(input: CreateProfileInput!): Profile!
-  createRegister(input: CreateRegisterInput!): Register!
-  createTypePackage(input: CreateTypePackageInput!): TypePackage!
+  createRegisterDoctor(input: CreateRegisterDoctorInput!): Register!
+  createRegisterPackage(input: CreateRegisterPackageInput!): Register!
+  createRegisterSpecialty(input: CreateRegisterSpecialtyInput!): Register!
+  createRegisterVaccine(input: CreateRegisterVaccineInput!): Register!
   createVaccination(input: CreateVaccineInput!): Vaccination!
   createcustomer(input: CreateCustomerInput!): Customer!
-  deleteCarePackage(input: String!): CarePackage!
-  deleteDegree(input: String!): Degree!
   deleteDoctor(id: String!): Doctor!
   deleteMecialSpecialty(id: String!): MedicalSpecialties!
   deleteMedicalStaff(input: String!): MedicalStaff!
   deletePackage(input: String!): Package!
   deleteProfile(id: String!): Profile!
-  deleteTypePackage(id: String!): TypePackage!
   deleteUser(id: String!): User!
   deleteVaccination(input: String!): Vaccination!
   login(loginUserInput: LoginUserInput!): LoginRespone!
   logout: LogoutUser!
   signup(createUserInput: CreateUserInput!): User!
   signupUser(createUserInput: CreateUserByAdminInput!): User!
-  updateCarePackage(input: UpdateCarePackageInput!): CarePackage!
   updateCustomer(input: UpdateCustomerInput!): Customer!
-  updateDegree(input: UpdateDegreeInput!): Degree!
   updateDoctor(updateDoctorInput: UpdateDoctorInput!): Doctor!
   updateGeneralInfor(updateGeneralInforInput: GeneralInforUpdateInput!): GeneralInfor!
   updateMedicalFacilities(createMedicalFacilitiesInput: UpdateMedicalFacilityInput!): MedicalFacilities!
@@ -324,7 +339,6 @@ type Mutation {
   updateRegister(input: UpdateRegisterInput!): Register!
   updateRoles(updateRolesInput: UpdateRolesInput!): User!
   updateSetting(updateSettingInput: UpdateSettingInput!): Setting!
-  updateTypePackage(input: UpdateTypePackageInput!): TypePackage!
   updateUser(updateUserInput: UpdateUserInput!): User!
   updateUserWithPass(updateUserInput: UpdateUserWithPassInput!): User!
   updateVaccination(input: UpdateVaccineInput!): Vaccination!
@@ -337,7 +351,7 @@ type Package {
   medicalFactilitiesId: String!
   packageName: String!
   price: Float!
-  status: String!
+  workSchedule: WorkSchedule!
 }
 
 type Profile {
@@ -360,15 +374,12 @@ type Profile {
 type Query {
   checklogin: User!
   getAllCustomer: [Customer!]!
-  getAllDegree: [Degree!]!
   getAllDoctor: [Doctor!]!
   getAllMecialSpecialty: [MedicalSpecialties!]!
   getAllMedicalFacility: [MedicalFacilities!]!
   getAllMedicalStaff: [MedicalStaff!]!
   getAllPackage: [Package!]!
-  getAllTypePackage: [TypePackage!]!
   getAllVacation: [Vaccination!]!
-  getCarePackagesByClinicId(id: String!): [CarePackage!]!
   getDoctorbyId(id: String!): Doctor!
   getDoctorbyUserId(id: String!): Doctor!
   getGeneralInfor: GeneralInfor!
@@ -383,40 +394,42 @@ type Query {
 }
 
 type Register {
-  carePackage: CarePackage
+  customerId: String!
   date: DateTime!
+  doctorId: String
   id: ID!
-  packegeId: String!
-  profile: Profile
+  isHealthInsurance: Boolean!
+  packageId: String
   profileId: String!
-  state: RegisterState!
+  sessionId: String!
+  specialtyId: String
+  state: EStateRegister!
+  typeOfService: ETypeOfService!
+  vaccineId: String
 }
 
-"""Trạng thái của Register"""
-enum RegisterState {
-  Active
-  NoActive
-  Success
+type Schedule {
+  dayOfWeed: String!
+  sessions: [Session!]!
+}
+
+input ScheduleInput {
+  dayOfWeed: String!
+  sessions: [SessionInput!]!
+}
+
+type Session {
+  endTime: String!
+  startTime: String!
+}
+
+input SessionInput {
+  endTime: String!
+  startTime: String!
 }
 
 type Setting {
   defaultLang: String!
-}
-
-type TypePackage {
-  carePackage: [CarePackage!]
-  id: ID!
-  typeName: String!
-}
-
-input UpdateCarePackageInput {
-  discription: String!
-  id: String!
-  image: LinkImageInput!
-  medicalFacilitiesId: String!
-  name: String!
-  price: Float!
-  typePackageId: String!
 }
 
 input UpdateCustomerInput {
@@ -430,16 +443,9 @@ input UpdateCustomerInput {
   numberPhone: String
 }
 
-input UpdateDegreeInput {
-  abbreviations: String!
-  id: String!
-  name: String!
-}
-
 input UpdateDoctorInput {
   academicTitle: String
   avatar: LinkImageInput!
-  dayOff: [DateTime!]!
   degree: String!
   discription: String!
   email: String!
@@ -449,12 +455,13 @@ input UpdateDoctorInput {
   name: String!
   numberPhone: String!
   specialistId: String!
+  status: String!
   userId: String!
+  workSchedule: WorkScheduleInput!
 }
 
 input UpdateMedicalFacilityInput {
   address: String!
-  dayOff: [DateTime!]!
   discription: String!
   email: String!
   id: String!
@@ -468,6 +475,7 @@ input UpdateMedicalFacilityInput {
   operatingStatus: String!
   taxCode: String!
   userId: String!
+  workSchedule: WorkScheduleInput!
 }
 
 input UpdateMedicalSpecialtyInput {
@@ -476,6 +484,7 @@ input UpdateMedicalSpecialtyInput {
   medicalFactilityId: String!
   name: String!
   price: Float!
+  workSchedule: WorkScheduleInput!
 }
 
 input UpdateMedicalStaffInput {
@@ -496,6 +505,7 @@ input UpdatePackageInput {
   packageName: String!
   price: Float!
   status: String!
+  workSchedule: WorkScheduleInput!
 }
 
 input UpdateProfileInput {
@@ -515,7 +525,7 @@ input UpdateProfileInput {
 
 input UpdateRegisterInput {
   id: String!
-  state: String!
+  state: EStateRegister!
 }
 
 input UpdateRolesInput {
@@ -527,11 +537,6 @@ input UpdateSettingInput {
   """Example field (placeholder)"""
   exampleField: Int
   id: Int!
-}
-
-input UpdateTypePackageInput {
-  id: String!
-  typeName: String!
 }
 
 input UpdateUserInput {
@@ -593,11 +598,14 @@ type Vaccination {
   vaccineName: String!
 }
 
-input createCarePackageInput {
-  discription: String!
-  image: LinkImageInput!
-  medicalFacilitiesId: String!
-  name: String!
-  price: Float!
-  typePackageId: String!
+type WorkSchedule {
+  dayOff: [DateTime!]!
+  schedule: [Schedule!]!
+  status: String!
+}
+
+input WorkScheduleInput {
+  dayOff: [DateTime!]!
+  schedule: [ScheduleInput!]!
+  status: String!
 }

@@ -17,14 +17,12 @@ import { CustomerModule } from './modules/customer/customer.module';
 import { MedicalFacilitiesModule } from './modules/medical-facilities/medical-facilities.module';
 import { DoctorsModule } from './modules/doctors/doctors.module';
 import { MedicalSpecialtiesModule } from './modules/medical-specialties/medical-specialties.module';
-import { DegreeModule } from './modules/degree/degree.module';
 import { ProfileModule } from './modules/profile/profile.module';
 import { RegisterModule } from './modules/register/register.module';
-import { CarePackageModule } from './modules/care-package/care-package.module';
-import { TypePackageModule } from './modules/type-package/type-package.module';
 import { MedicalStaffModule } from './modules/medical-staff/medical-staff.module';
 import { VaccinationModule } from './modules/vaccination/vaccination.module';
 import { PackageModule } from './modules/package/package.module';
+import { WorkScheduleModule } from './modules/work-schedule/work-schedule.module';
 
 dotenv.config();
 @Module({
@@ -49,14 +47,12 @@ dotenv.config();
     MedicalFacilitiesModule,
     DoctorsModule,
     MedicalSpecialtiesModule,
-    DegreeModule,
     ProfileModule,
     RegisterModule,
-    CarePackageModule,
-    TypePackageModule,
     MedicalStaffModule,
     VaccinationModule,
     PackageModule,
+    WorkScheduleModule,
   ],
   controllers: [AppController],
   providers: [AppService],

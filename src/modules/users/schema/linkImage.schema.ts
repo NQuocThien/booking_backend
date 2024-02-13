@@ -1,20 +1,13 @@
 // import { Field, ObjectType, registerEnumType } from '@nestjs/graphql'
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-enum Etype {
-    document = 'document',
-    image = 'image',
-}
-// registerEnumType(Etype, {
-//     name: 'Etype',
-// });
+import { Prop, Schema } from '@nestjs/mongoose';
 @Schema()
 export class LinkImage {
-    @Prop()
-    filename: string;
+  @Prop()
+  filename: string;
 
-    @Prop()
-    type: string;
+  @Prop()
+  type: string;
 
-    @Prop()
-    url: string;
+  @Prop()
+  url: string;
 }

@@ -4,8 +4,6 @@ import { RegisterService } from './register.service';
 import { Mongoose } from 'mongoose';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Register, RegisterSchema } from './schema/register.schema';
-import { CarePackage } from '../care-package/entities/care-package.entity';
-import { CarePackageModule } from '../care-package/care-package.module';
 import { ProfileModule } from '../profile/profile.module';
 
 @Module({
@@ -16,7 +14,6 @@ import { ProfileModule } from '../profile/profile.module';
         schema: RegisterSchema,
       },
     ]),
-    forwardRef(() => CarePackageModule),
     forwardRef(() => ProfileModule),
   ],
   providers: [RegisterResolver, RegisterService],

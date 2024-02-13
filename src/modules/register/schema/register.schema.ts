@@ -4,10 +4,31 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 })
 export class Register {
   @Prop()
+  customerId: string;
+
+  @Prop()
   profileId: string;
 
   @Prop()
-  packegeId: string;
+  specialtyId?: String;
+
+  @Prop()
+  doctorId?: String;
+
+  @Prop()
+  packageId?: String;
+
+  @Prop()
+  vaccineId?: String;
+
+  @Prop()
+  sessionId: String;
+
+  @Prop()
+  isHealthInsurance: boolean;
+
+  @Prop()
+  typeOfService: string;
 
   @Prop()
   date: Date;

@@ -1,5 +1,6 @@
 import { ObjectType, Field, ID, registerEnumType } from '@nestjs/graphql';
-import { EAcademicTitle, EDegree, EGender } from 'src/contain';
+import { EAcademicTitle, EDegree, EGender, EStatusService } from 'src/contain';
+import { WorkSchedule } from 'src/modules/contains/work-schedule/work-schedule.entity';
 import { LinkImage } from 'src/modules/users/dto/image';
 @ObjectType()
 export class Doctor {
@@ -33,14 +34,17 @@ export class Doctor {
   @Field()
   specialistId: String;
 
-  @Field(() => [Date])
-  dayOff: [Date];
-
   @Field(() => LinkImage)
   avatar?: LinkImage;
 
   @Field()
   discription?: string;
+
+  @Field()
+  status: EStatusService;
+
+  @Field(() => WorkSchedule)
+  workSchedule: WorkSchedule;
 }
 
 registerEnumType(EDegree, {

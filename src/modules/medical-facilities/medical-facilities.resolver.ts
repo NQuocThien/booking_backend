@@ -17,15 +17,12 @@ import { JWtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Role } from '../auth/entities/role.enum';
 import { UpdateMedicalFacilityInput } from './entities/dto/update-medical-facilities.input';
-import { CarePackageService } from '../care-package/care-package.service';
-import { CarePackage } from '../care-package/entities/care-package.entity';
 
 @Resolver(() => MedicalFacilities)
 export class MedicalFacilitiesResolver {
   constructor(
     private readonly medicalService: MedicalFacilitiesService,
     private readonly doctorService: DoctorsService,
-    private readonly packageService: CarePackageService,
   ) {}
   // @UseGuards(JWtAuthGuard, RolesGuard)
   @Query(() => [MedicalFacilities], { name: 'getAllMedicalFacility' })
@@ -70,13 +67,6 @@ export class MedicalFacilitiesResolver {
   @ResolveField(() => [Doctor])
   async doctors(@Parent() mf: MedicalFacilities): Promise<Doctor[]> {
     const docs = await this.doctorService.findByFacilitiesId(mf.id);
-    return docs;
-  }
-
-  @ResolveField(() => [CarePackage], { name: 'carePackage' })
-  async carePackage(@Parent() mf: MedicalFacilities): Promise<CarePackage[]> {
-    // console.log('test');
-    const docs = await this.packageService.getByFacilitiesId(mf.id);
     return docs;
   }
 }

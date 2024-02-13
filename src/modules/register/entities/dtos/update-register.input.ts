@@ -1,11 +1,10 @@
-import { Field, ID, InputType, ObjectType } from '@nestjs/graphql';
-import { RegisterState } from '../register.entity';
+import { Field, InputType } from '@nestjs/graphql';
+import { EStateRegister } from 'src/contain';
 
 @InputType()
 export class UpdateRegisterInput {
   @Field()
   id: String;
-
-  @Field()
-  state: RegisterState;
+  @Field(() => EStateRegister)
+  state: EStateRegister;
 }

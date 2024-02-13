@@ -1,4 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
+import { WorkScheduleInput } from 'src/modules/contains/work-schedule/work-schedule.input';
 import { LinkImageInput } from 'src/modules/users/dto/linkimage.input';
 
 @InputType()
@@ -36,9 +37,6 @@ export class UpdateMedicalFacilityInput {
   @Field()
   introduce: string;
 
-  @Field(() => [Date])
-  dayOff: [Date];
-
   @Field()
   operatingStatus: string; // trạng thái hoạt động
 
@@ -47,4 +45,7 @@ export class UpdateMedicalFacilityInput {
 
   @Field()
   taxCode: string; // mã số thuế
+
+  @Field()
+  workSchedule: WorkScheduleInput;
 }

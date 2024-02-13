@@ -7,7 +7,6 @@ import {
   MedicalFacilitiesSchema,
 } from './schema/medical-facilities.schema';
 import { DoctorsModule } from '../doctors/doctors.module';
-import { CarePackageModule } from '../care-package/care-package.module';
 
 @Module({
   imports: [
@@ -18,7 +17,6 @@ import { CarePackageModule } from '../care-package/care-package.module';
       },
     ]),
     DoctorsModule,
-    forwardRef(() => CarePackageModule),
   ],
   providers: [MedicalFacilitiesResolver, MedicalFacilitiesService],
   exports: [MedicalFacilitiesService],

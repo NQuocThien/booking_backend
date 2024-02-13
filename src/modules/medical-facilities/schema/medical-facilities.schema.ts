@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Doctor } from 'src/modules/doctors/schema/doctor.schema';
+import { WorkSchedule } from 'src/modules/contains/work-schedule/work-schedule.schema';
 import { LinkImage } from 'src/modules/users/schema/linkImage.schema';
 @Schema({
   timestamps: true,
@@ -35,9 +35,6 @@ export class MedicalFacilities {
   @Prop()
   introduce: string;
 
-  @Prop(() => [Date])
-  dayOff: [Date];
-
   @Prop()
   operatingStatus: string; // trạng thái hoạt động
 
@@ -46,6 +43,9 @@ export class MedicalFacilities {
 
   @Prop()
   taxCode: string; // mã số thuế
+
+  @Prop({ type: Object, default: null })
+  workSchedule: WorkSchedule;
 }
 export const MedicalFacilitiesSchema =
   SchemaFactory.createForClass(MedicalFacilities);
