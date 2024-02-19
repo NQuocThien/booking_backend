@@ -1,6 +1,5 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { MedicalStaffService } from './medical-staff.service';
-import { query } from 'express';
 import { MedicalStaff } from './entities/medical-staff.entity';
 import { CreateMedicalStaffInput } from './entities/dto/create-medical-staff.input';
 import { UpdateMedicalStaffInput } from './entities/dto/update-medical-staff.input';

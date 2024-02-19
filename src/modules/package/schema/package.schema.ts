@@ -17,9 +17,6 @@ export class Package {
   price: Number;
 
   @Prop()
-  status: String;
-
-  @Prop()
   examinationDetails: String;
 
   @Prop({ type: Object, default: null })

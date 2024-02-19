@@ -2,6 +2,10 @@ import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { Schedule } from '../schedule/schedule.entityt';
 import { EStatusService } from 'src/contain';
 
+registerEnumType(EStatusService, {
+  name: 'EStatusService',
+});
+
 @ObjectType()
 export class WorkSchedule {
   @Field(() => [Schedule])
@@ -10,6 +14,6 @@ export class WorkSchedule {
   @Field(() => [Date])
   dayOff: [Date];
 
-  @Field()
+  @Field(() => String)
   status: EStatusService;
 }

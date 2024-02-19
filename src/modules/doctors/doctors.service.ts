@@ -56,6 +56,6 @@ export class DoctorsService {
     return await this.doctorModel.findOne({ degreeId: degreeId });
   }
   async findByFacilitiesId(id: String): Promise<Doctor[]> {
-    return await this.doctorModel.find({ facilitiesId: id });
+    return await this.doctorModel.find({ medicalFactilitiesId: id });
   }
 }

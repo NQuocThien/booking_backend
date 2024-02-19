@@ -10,6 +10,6 @@ export class WorkScheduleInput {
   @Field(() => [Date])
   dayOff: [Date];
 
-  @Field()
+  @Field(() => EStatusService)
   status: EStatusService;
 }

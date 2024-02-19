@@ -21,6 +21,6 @@ import { DoctorsModule } from '../doctors/doctors.module';
     DoctorsModule,
   ],
   providers: [UsersResolver, UsersService],
-  exports: [UsersService],
+  exports: [UsersService, UsersModule],
 })
 export class UsersModule {}

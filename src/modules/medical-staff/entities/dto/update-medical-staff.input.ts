@@ -1,5 +1,5 @@
 import { InputType, Field, registerEnumType } from '@nestjs/graphql';
-import { EGender } from 'src/contain';
+import { EGender, EPermission } from 'src/contain';
 @InputType()
 export class UpdateMedicalStaffInput {
   @Field()
@@ -11,10 +11,10 @@ export class UpdateMedicalStaffInput {
   @Field()
   medicalFacilityId: String;
 
-  @Field()
+  @Field(() => EGender)
   name: String;
 
-  @Field()
+  @Field(() => EGender)
   gender: EGender;
 
   @Field()
@@ -22,6 +22,9 @@ export class UpdateMedicalStaffInput {
 
   @Field()
   email: String;
+
+  @Field(() => [EPermission])
+  permissions: EPermission[];
 }
 
 registerEnumType(EGender, {

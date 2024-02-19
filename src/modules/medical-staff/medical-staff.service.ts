@@ -43,4 +43,9 @@ export class MedicalStaffService {
   async deleteMedicalStaff(id: String) {
     return await this.model.findByIdAndDelete(id);
   }
+  async findByMedicalFacilityId(
+    medicalFacilityId: String,
+  ): Promise<MedicalStaff[]> {
+    return await this.model.find({ medicalFacilityId: medicalFacilityId });
+  }
 }

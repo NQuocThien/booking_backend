@@ -14,6 +14,14 @@ export class MedicalSpecialtiesService {
   async create(data: CreateMedicalSpecialtyInput) {
     return this.medicalSpecialtiesModel.create(data);
   }
+
+  async findByMedicalFacilityId(
+    medicalFacilityId: String,
+  ): Promise<MedicalSpecialties[]> {
+    return await this.medicalSpecialtiesModel.find({
+      medicalFactilityId: medicalFacilityId,
+    });
+  }
   async delete(id: String) {
     return this.medicalSpecialtiesModel.findByIdAndDelete(id);
   }

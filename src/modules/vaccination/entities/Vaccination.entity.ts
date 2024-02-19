@@ -1,5 +1,6 @@
 import { ObjectType, Field, registerEnumType, ID } from '@nestjs/graphql';
 import { EStatusService } from 'src/contain';
+import { WorkSchedule } from 'src/modules/contains/work-schedule/work-schedule.entity';
 @ObjectType()
 export class Vaccination {
   @Field(() => ID)
@@ -24,10 +25,10 @@ export class Vaccination {
   indication: String;
 
   @Field()
-  status: EStatusService;
-
-  @Field()
   note: String;
+
+  @Field(() => WorkSchedule)
+  workSchedule: WorkSchedule;
 }
 
 registerEnumType(EStatusService, {

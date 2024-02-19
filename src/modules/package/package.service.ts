@@ -15,6 +15,13 @@ export class PackageService {
   async findAll(): Promise<Package[]> {
     return await this.model.find();
   }
+  async findOneByMedicalFacilityId(
+    medicalFacilityId: String,
+  ): Promise<Package[]> {
+    return await this.model.findOne({
+      medicalFactilitiesId: medicalFacilityId,
+    });
+  }
   async create(input: CreatePackageInput): Promise<Package> {
     return await this.model.create(input);
   }

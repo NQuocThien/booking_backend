@@ -11,7 +11,7 @@ export class RolesGuard implements CanActivate {
       context.getHandler(),
       context.getClass(),
     ]); // lấy mãng các role đã ràn bộc ở resolver
-    console.log('=>Role');
+    console.log('=> Role');
     if (!requiredRoles) {
       // nếu ko có ràn buộc quyền return true
       console.log('\t-> Ko có role');
@@ -21,8 +21,7 @@ export class RolesGuard implements CanActivate {
     const user = GqlExecutionContext.create(context).getContext().req?.user; // vì ở JWtAuthGuard trả về context dạng GqlExecutionContext
     if (!user) return false;
     else {
-      console.log('\t-> Required roles: ', requiredRoles);
-      console.log('\t-> roles: ', user?.roles);
+      console.log('\t-> Required: ', requiredRoles, 'exists:', user?.roles);
       if (user?.roles?.includes(Role.Admin)) return true;
     }
     return requiredRoles.some((role) => user.roles?.includes(role)); // duyệt qua cái role đã thiết lập nếu user có 1 role thỏ => true

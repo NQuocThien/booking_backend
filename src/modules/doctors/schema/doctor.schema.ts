@@ -39,7 +39,7 @@ export class Doctor {
   discription?: string;
 
   @Prop()
-  status: string;
+  price: number;
 
   @Prop({ type: Object, default: null })
   workSchedule: WorkSchedule;

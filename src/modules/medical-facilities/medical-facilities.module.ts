@@ -7,6 +7,11 @@ import {
   MedicalFacilitiesSchema,
 } from './schema/medical-facilities.schema';
 import { DoctorsModule } from '../doctors/doctors.module';
+import { PackageModule } from '../package/package.module';
+import { VaccinationModule } from '../vaccination/vaccination.module';
+import { MedicalSpecialtiesModule } from '../medical-specialties/medical-specialties.module';
+import { MedicalStaff } from '../medical-staff/entities/medical-staff.entity';
+import { MedicalStaffModule } from '../medical-staff/medical-staff.module';
 
 @Module({
   imports: [
@@ -16,7 +21,11 @@ import { DoctorsModule } from '../doctors/doctors.module';
         schema: MedicalFacilitiesSchema,
       },
     ]),
+    VaccinationModule,
     DoctorsModule,
+    PackageModule,
+    MedicalSpecialtiesModule,
+    MedicalStaffModule,
   ],
   providers: [MedicalFacilitiesResolver, MedicalFacilitiesService],
   exports: [MedicalFacilitiesService],

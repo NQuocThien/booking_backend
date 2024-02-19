@@ -1,11 +1,10 @@
 import { registerEnumType } from '@nestjs/graphql';
-
 export enum EAcademicTitle { // học hàm
   Professor = 'GS',
   AssociateProfesso = 'PGS',
 }
 
-export enum EDegree {
+export enum EDegree { // bằng cấp
   Doctorate = 'TS',
   MasterDoctor = 'ThS',
   Doctor = 'BS',
@@ -16,10 +15,13 @@ export enum EGender {
   Male = 'Nam',
   Female = 'Nữ',
 }
+registerEnumType(EGender, {
+  name: 'EGender',
+});
 
 export enum EStatusService {
-  Open = 'Open',
-  Close = 'Close',
+  Open = 'Mở',
+  Close = 'Đống',
 }
 
 export enum EStateRegister {
@@ -33,3 +35,45 @@ export enum ETypeOfService {
   Package = 'Khám theo gói',
   Vaccine = 'Tiêm chủng',
 }
+
+export enum ETypeOfNotification {
+  Seen = 'Đã xem',
+  NotSeen = 'Chưa xem',
+}
+
+export enum ERole {
+  User = 'user',
+  Admin = 'admin',
+  Customer = 'customer',
+  Clinic = 'clinic',
+}
+
+export enum EDayOfWeed {
+  Monday = '2',
+  Tuesday = '3',
+  Wednesday = '4',
+  Thursday = '5',
+  Friday = '6',
+  Saturday = '7',
+  Sunday = 'Chủ nhật',
+}
+
+export enum EPermission {
+  Magager = 'MANAGER',
+  MagagerBlog = 'MANAGER_BLOG',
+  ManagerSpecialty = 'MANAGER_SPECIALTY',
+  MagagerPackage = 'MANAGER_PACKAGE',
+  MagagerVaccine = 'MANAGER_VACCINE',
+}
+registerEnumType(EPermission, {
+  name: 'EPermission',
+});
+registerEnumType(EDayOfWeed, {
+  name: 'EDayOfWeed',
+});
+registerEnumType(ERole, {
+  name: 'IRole',
+});
+registerEnumType(EStatusService, {
+  name: 'EStatusService',
+});

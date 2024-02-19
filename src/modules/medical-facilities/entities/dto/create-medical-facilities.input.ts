@@ -1,5 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { WorkScheduleInput } from 'src/modules/contains/work-schedule/work-schedule.input';
+import { EStatusService } from 'src/contain';
 import { LinkImageInput } from 'src/modules/users/dto/linkimage.input';
 
 @InputType()
@@ -17,16 +17,19 @@ export class CreateMedicalFacilityInput {
   numberPhone?: string;
 
   @Field()
-  image?: LinkImageInput;
+  logo: LinkImageInput;
 
   @Field()
-  email?: string;
+  image: LinkImageInput;
+
+  @Field()
+  email: string;
 
   @Field({ nullable: true })
-  lat?: number;
+  lat: number;
 
   @Field({ nullable: true })
-  lng?: number;
+  lng: number;
 
   @Field()
   discription: string;
@@ -43,6 +46,12 @@ export class CreateMedicalFacilityInput {
   @Field()
   taxCode: string; // mã số thuế
 
+  @Field(() => String)
+  status: EStatusService;
+
+  @Field(() => [Date], { nullable: true })
+  dateOff: [Date];
+
   @Field()
-  workSchedule: WorkScheduleInput;
+  schedule: string;
 }

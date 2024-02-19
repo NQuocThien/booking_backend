@@ -10,7 +10,7 @@ export class Customer {
   @Prop()
   name: String;
 
-  @Prop()
+  @Prop({ type: String, enum: EGender })
   gender: EGender;
 
   @Prop()

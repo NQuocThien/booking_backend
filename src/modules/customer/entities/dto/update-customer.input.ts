@@ -8,7 +8,7 @@ export class UpdateCustomerInput {
   @Field()
   name: String;
 
-  @Field({ nullable: true })
+  @Field(() => EGender, { nullable: true })
   gender: EGender;
 
   @Field({ nullable: true })

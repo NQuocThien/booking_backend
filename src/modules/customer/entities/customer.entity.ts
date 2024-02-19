@@ -12,7 +12,7 @@ export class Customer {
   @Field()
   name: String;
 
-  @Field()
+  @Field(() => EGender)
   gender: EGender;
 
   @Field()

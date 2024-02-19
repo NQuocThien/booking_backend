@@ -22,9 +22,6 @@ export class CreatePackageInput {
   price: Number;
 
   @Field()
-  status: EStatusService;
-
-  @Field()
   examinationDetails: String;
 
   @Field(() => WorkScheduleInput)

@@ -6,6 +6,7 @@ import { FlattenMaps, Model } from 'mongoose';
 import { User } from './entities/user.entity';
 import { log } from 'console';
 import { CustomerService } from '../customer/customer.service';
+import { MedicalFacilitiesService } from '../medical-facilities/medical-facilities.service';
 // import { ProfileService } from '../profile/profile.service';
 // import { CreateProfileInput } from '../profile/dto/create-profile.input';
 // import { User } from './schema/user.schema';
@@ -52,16 +53,10 @@ export class UsersService {
     // console.log('test id:', users)
     return users;
   }
-  async getUserMedicalNon(): Promise<[User]> {
-    // bảo vệ bởi jwt
-    // console.log(' user: ', this.userModel.find())
-    var users: any;
-    await this.userModel
-      .find({ medicalFacilities: { $exists: false, $eq: null } })
-      .then((data) => (users = data))
-      .catch((err) => new Error(err));
-    // console.log('test id:', users)
-    return users;
+
+  async findOneById(id: String): Promise<User> {
+    const user = await this.userModel.findById(id);
+    return user;
   }
 
   async findOne(username: string): Promise<User> {

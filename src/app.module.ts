@@ -23,6 +23,8 @@ import { MedicalStaffModule } from './modules/medical-staff/medical-staff.module
 import { VaccinationModule } from './modules/vaccination/vaccination.module';
 import { PackageModule } from './modules/package/package.module';
 import { WorkScheduleModule } from './modules/work-schedule/work-schedule.module';
+import { EvaluateModule } from './modules/evaluate/evaluate.module';
+import { NotificationModule } from './modules/notification/notification.module';
 
 dotenv.config();
 @Module({
@@ -53,6 +55,8 @@ dotenv.config();
     VaccinationModule,
     PackageModule,
     WorkScheduleModule,
+    EvaluateModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

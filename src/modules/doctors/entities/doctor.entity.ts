@@ -1,5 +1,11 @@
 import { ObjectType, Field, ID, registerEnumType } from '@nestjs/graphql';
-import { EAcademicTitle, EDegree, EGender, EStatusService } from 'src/contain';
+import {
+  EAcademicTitle,
+  EDayOfWeed,
+  EDegree,
+  EGender,
+  EStatusService,
+} from 'src/contain';
 import { WorkSchedule } from 'src/modules/contains/work-schedule/work-schedule.entity';
 import { LinkImage } from 'src/modules/users/dto/image';
 @ObjectType()
@@ -16,7 +22,7 @@ export class Doctor {
   @Field()
   name: String;
 
-  @Field(() => EGender)
+  @Field(() => String)
   gender: EGender;
 
   @Field()
@@ -25,10 +31,10 @@ export class Doctor {
   @Field()
   email: String;
 
-  @Field(() => EAcademicTitle, { nullable: true })
+  @Field(() => String, { nullable: true })
   academicTitle: EAcademicTitle;
 
-  @Field(() => EDegree)
+  @Field(() => String)
   degree: EDegree;
 
   @Field()
@@ -41,11 +47,14 @@ export class Doctor {
   discription?: string;
 
   @Field()
-  status: EStatusService;
+  price?: number;
 
   @Field(() => WorkSchedule)
   workSchedule: WorkSchedule;
 }
+registerEnumType(EDayOfWeed, {
+  name: 'EDayOfWeed',
+});
 
 registerEnumType(EDegree, {
   name: 'EDegree',
@@ -55,4 +64,7 @@ registerEnumType(EAcademicTitle, {
 });
 registerEnumType(EGender, {
   name: 'EGender',
+});
+registerEnumType(EStatusService, {
+  name: 'EStatusService',
 });

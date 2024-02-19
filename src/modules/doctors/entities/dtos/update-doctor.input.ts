@@ -1,5 +1,5 @@
-import { InputType, Field } from '@nestjs/graphql';
-import { EAcademicTitle, EDegree, EStatusService } from 'src/contain';
+import { InputType, Field, registerEnumType } from '@nestjs/graphql';
+import { EAcademicTitle, EDegree, EGender, EStatusService } from 'src/contain';
 import { WorkScheduleInput } from 'src/modules/contains/work-schedule/work-schedule.input';
 import { LinkImageInput } from 'src/modules/users/dto/linkimage.input';
 @InputType()
@@ -16,8 +16,8 @@ export class UpdateDoctorInput {
   @Field()
   name: String;
 
-  @Field()
-  gender: String;
+  @Field(() => EGender)
+  gender: EGender;
 
   @Field()
   numberPhone: String;
@@ -25,10 +25,10 @@ export class UpdateDoctorInput {
   @Field()
   email: String;
 
-  @Field({ nullable: true })
+  @Field(() => EAcademicTitle, { nullable: true })
   academicTitle: EAcademicTitle;
 
-  @Field()
+  @Field(() => EDegree)
   degree: EDegree;
 
   @Field()
@@ -41,8 +41,11 @@ export class UpdateDoctorInput {
   discription?: string;
 
   @Field()
-  status: EStatusService;
+  price: number;
 
-  @Field()
+  @Field(() => WorkScheduleInput)
   workSchedule: WorkScheduleInput;
 }
+registerEnumType(EStatusService, {
+  name: 'EStatusService',
+});

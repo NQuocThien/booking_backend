@@ -20,6 +20,9 @@ export class MedicalFacilitiesService {
   async findAll(): Promise<MedicalFacilities[]> {
     return this.medicalModel.find();
   }
+  async findUserIds(): Promise<{ userId: string }[]> {
+    return this.medicalModel.find({}, { userId: 1, _id: 0 });
+  }
   async findById(id: String): Promise<MedicalFacilities> {
     return this.medicalModel.findById(id);
   }
@@ -48,11 +51,14 @@ export class MedicalFacilitiesService {
       // Lưu tài liệu đã cập nhật
       const updatedDoc = await existingDoc.save();
 
-      console.log('---> Updated document:', updatedDoc);
+      // console.log('---> Updated document:', updatedDoc);
       return updatedDoc;
     } catch (error) {
       console.error('Error updating document:', error);
       return null;
     }
+  }
+  async delete(id: String): Promise<MedicalFacilities> {
+    return await this.medicalModel.findByIdAndDelete(id);
   }
 }

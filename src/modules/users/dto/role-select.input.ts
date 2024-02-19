@@ -1,7 +1,8 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { IRole } from 'src/modules/auth/entities/role.enum';
+import { ERole } from 'src/contain';
+
 @InputType()
 export class UserSelectInput {
-  @Field()
-  role: IRole;
+  @Field(() => ERole)
+  role: ERole;
 }

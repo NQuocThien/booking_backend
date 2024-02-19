@@ -1,7 +1,11 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
-import { WorkSchedule } from 'src/modules/contains/work-schedule/work-schedule.entity';
+import { EStatusService } from 'src/contain';
 import { Doctor } from 'src/modules/doctors/entities/doctor.entity';
+import { MedicalSpecialties } from 'src/modules/medical-specialties/entities/medical-specialties.entity';
+import { MedicalStaff } from 'src/modules/medical-staff/entities/medical-staff.entity';
+import { Package } from 'src/modules/package/entities/package.entity';
 import { LinkImage } from 'src/modules/users/dto/image';
+import { Vaccination } from 'src/modules/vaccination/entities/Vaccination.entity';
 @ObjectType()
 export class MedicalFacilities {
   @Field((type) => ID)
@@ -20,25 +24,25 @@ export class MedicalFacilities {
   numberPhone?: string;
 
   @Field()
-  image?: LinkImage;
+  logo: LinkImage;
 
   @Field()
-  email?: string;
+  image: LinkImage;
+
+  @Field()
+  email: string;
 
   @Field({ nullable: true })
-  lat?: number;
+  lat: number;
 
   @Field({ nullable: true })
-  lng?: number;
+  lng: number;
 
   @Field()
   discription: string;
 
   @Field()
   introduce: string;
-
-  @Field(() => [Date])
-  dayOff: [Date];
 
   @Field()
   operatingStatus: string; // trạng thái hoạt động
@@ -49,9 +53,27 @@ export class MedicalFacilities {
   @Field()
   taxCode: string; // mã số thuế
 
+  @Field(() => String)
+  status: EStatusService;
+
+  @Field(() => [Date], { nullable: true })
+  dateOff: [Date];
+
+  @Field()
+  schedule: string;
+
   @Field(() => [Doctor], { nullable: true })
   doctors: Doctor[];
 
-  @Field()
-  workSchedule: WorkSchedule;
+  @Field(() => [Package], { nullable: true })
+  packages: Package[];
+
+  @Field(() => [MedicalSpecialties], { nullable: true })
+  medicalSpecialties: MedicalSpecialties[];
+
+  @Field(() => [Vaccination], { nullable: true })
+  vaccinations: Vaccination[];
+
+  @Field(() => [MedicalStaff], { nullable: true })
+  medicalStaffs: MedicalStaff[];
 }

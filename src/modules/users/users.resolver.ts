@@ -6,24 +6,20 @@ import {
   Context,
   ResolveField,
   Parent,
-  GqlExecutionContext,
 } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
 import { JWtAuthGuard } from '../auth/jwt-auth.guard';
-import { NotFoundException, UseGuards } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
 // import { ProfileService } from '../profile/profile.service';
 // import { Profile } from '../profile/entities/profile.entity';
 import { UpdateUserInput } from './dto/update-user.input';
 import { Roles } from '../auth/roles.decorator';
-import { IRole, Role } from '../auth/entities/role.enum';
+import { Role } from '../auth/entities/role.enum';
 import { RolesGuard } from '../auth/roles.guard';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserWithPassInput } from './dto/update-user-pass.input';
-import { promises as fsPromises } from 'fs';
-import { LinkImage } from './dto/image';
 import deleteImage from 'src/utils/delete_image';
-import { Http2ServerRequest } from 'http2';
 import { Customer } from '../customer/entities/customer.entity';
 import { CustomerService } from '../customer/customer.service';
 import { MedicalFacilitiesService } from '../medical-facilities/medical-facilities.service';
@@ -45,7 +41,7 @@ export class UsersResolver {
   @UseGuards(JWtAuthGuard, RolesGuard)
   @Roles(Role.Admin)
   async findAll(@Context() context): Promise<[User]> {
-    // console.log('request: ',context.req);
+    console.log('--> request: get all user');
     const users = await this.usersService.findAll();
     return users;
   }
@@ -54,12 +50,12 @@ export class UsersResolver {
   @UseGuards(JWtAuthGuard, RolesGuard)
   @Roles(Role.Admin)
   async getUserMedicalNon(@Context() context): Promise<User[]> {
-    const users = await this.usersService.getUserMedicalNon();
-    const usersclinic = users.filter((user) =>
+    const users = await this.usersService.findAll();
+    const usersClinic = users.filter((user) =>
       user.roles.includes(Role.Clinic),
     );
-    console.log('res ============ ', usersclinic);
-    return usersclinic;
+    // const clinics = this.medicalService.findAll();
+    return usersClinic;
   }
 
   @Query(() => [User], { name: 'getUserSelect' })
@@ -72,6 +68,14 @@ export class UsersResolver {
     const userFillter = users.filter((user) => user.roles.includes(input.role));
     console.log('res ============ ', userFillter);
     return userFillter;
+  }
+
+  @Query(() => User, { name: 'getUserSelected' })
+  @UseGuards(JWtAuthGuard, RolesGuard)
+  @Roles(Role.Admin)
+  async getUserSelected(@Args('id') input: String): Promise<User> {
+    const user = await this.usersService.findOneById(input);
+    return user;
   }
 
   @UseGuards(JWtAuthGuard)

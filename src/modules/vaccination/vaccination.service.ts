@@ -14,6 +14,12 @@ export class VaccinationService {
   async getAllVaccination(): Promise<Vaccination[]> {
     return await this.model.find();
   }
+
+  async findByMedicalFacilityId(
+    medicalFacilityId: String,
+  ): Promise<Vaccination[]> {
+    return await this.model.find({ medicalFactilitiesId: medicalFacilityId });
+  }
   async create(input: CreateVaccineInput): Promise<Vaccination> {
     return await this.model.create(input);
   }

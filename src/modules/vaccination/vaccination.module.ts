@@ -15,6 +15,6 @@ import { VaccinationSchema } from './schema/vaccination.schema';
     ]),
   ],
   providers: [VaccinationResolver, VaccinationService],
-  // exports: [VaccinationService],
+  exports: [VaccinationService],
 })
 export class VaccinationModule {}
