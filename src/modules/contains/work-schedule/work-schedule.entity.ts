@@ -16,4 +16,7 @@ export class WorkSchedule {
 
   @Field(() => String)
   status: EStatusService;
+
+  @Field(() => Number)
+  numberSlot: number;
 }

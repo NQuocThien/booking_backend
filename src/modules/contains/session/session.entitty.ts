@@ -2,9 +2,9 @@ import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
 
 @ObjectType()
 export class Session {
-  @Field()
+  @Field(() => String)
   startTime: string;
 
-  @Field()
+  @Field(() => String)
   endTime: string;
 }

@@ -53,4 +53,11 @@ export class MedicalSpecialtiesService {
   async getAll(): Promise<MedicalSpecialties[]> {
     return await this.medicalSpecialtiesModel.find();
   }
+  async getAllByMedicalFacilytyId(
+    medicalFactilityId: String,
+  ): Promise<MedicalSpecialties[]> {
+    return await this.medicalSpecialtiesModel.find({
+      medicalFactilityId: medicalFactilityId,
+    });
+  }
 }

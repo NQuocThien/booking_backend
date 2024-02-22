@@ -1,13 +1,25 @@
-import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
+import {
+  Args,
+  Mutation,
+  Resolver,
+  Query,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { DoctorsService } from './doctors.service';
 import { CreateDoctorInput } from './entities/dtos/create-doctor.input';
 import { Doctor } from './entities/doctor.entity';
 import { UpdateDoctorInput } from './entities/dtos/update-doctor.input';
 import deleteImage from 'src/utils/delete_image';
+import { MedicalSpecialtiesService } from '../medical-specialties/medical-specialties.service';
+import { MedicalSpecialties } from '../medical-specialties/entities/medical-specialties.entity';
 
 @Resolver(() => Doctor)
 export class DoctorsResolver {
-  constructor(private readonly doctorService: DoctorsService) {}
+  constructor(
+    private readonly doctorService: DoctorsService,
+    private readonly specialtySvr: MedicalSpecialtiesService,
+  ) {}
 
   @Query(() => [Doctor], { name: 'getAllDoctor' })
   async getAllDoctor(): Promise<Doctor[]> {
@@ -52,10 +64,10 @@ export class DoctorsResolver {
     return this.doctorService.delete(id);
   }
 
-  // @ResolveField(() => MedicalSpecialties)
-  // async medicalSpecialties(@Parent() doctor: Doctor) {
-  //   return this.specialtiesService.findOneById(doctor.idSpecialist);
-  // }
+  @ResolveField(() => MedicalSpecialties)
+  async medicalSpecialties(@Parent() doctor: Doctor) {
+    return this.specialtySvr.findOneById(doctor.specialistId);
+  }
 
   // @ResolveField(() => MedicalSpecialties, { name: 'degree' })
   // async degree(@Parent() doctor: Doctor) {

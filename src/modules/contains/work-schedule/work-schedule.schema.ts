@@ -12,4 +12,7 @@ export class WorkSchedule {
 
   @Prop()
   status: string;
+
+  @Prop()
+  numberSlot: number;
 }

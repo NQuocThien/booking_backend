@@ -2,9 +2,9 @@ import { Field, InputType, ObjectType } from '@nestjs/graphql';
 
 @InputType()
 export class SessionInput {
-  @Field()
-  startTime: string;
+  @Field(() => String)
+  startTime: String;
 
-  @Field()
-  endTime: string;
+  @Field(() => String)
+  endTime: String;
 }

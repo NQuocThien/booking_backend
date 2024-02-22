@@ -21,6 +21,7 @@ export class DoctorsService {
   async create(data: CreateDoctorInput) {
     return await this.doctorModel.create(data);
   }
+
   async updateById(data: UpdateDoctorInput) {
     try {
       const existingDoc = await this.doctorModel.findById(data.id);

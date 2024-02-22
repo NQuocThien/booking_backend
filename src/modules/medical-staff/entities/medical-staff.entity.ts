@@ -14,7 +14,7 @@ export class MedicalStaff {
   @Field()
   name: String;
 
-  @Field(() => EGender)
+  @Field(() => String)
   gender: EGender;
 
   @Field()

@@ -2,20 +2,18 @@ import { Injectable } from '@nestjs/common';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { InjectModel } from '@nestjs/mongoose';
-import { FlattenMaps, Model } from 'mongoose';
+import { Model } from 'mongoose';
 import { User } from './entities/user.entity';
 import { log } from 'console';
 import { CustomerService } from '../customer/customer.service';
-import { MedicalFacilitiesService } from '../medical-facilities/medical-facilities.service';
-// import { ProfileService } from '../profile/profile.service';
-// import { CreateProfileInput } from '../profile/dto/create-profile.input';
-// import { User } from './schema/user.schema';
+import { DoctorsService } from '../doctors/doctors.service';
+
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name)
-    private userModel: Model<User>, // private profileService: ProfileService
-    private cusSv: CustomerService,
+    private readonly userModel: Model<User>, // private readonly profileService: ProfileService
+    private readonly cusSv: CustomerService, // private readonly doctorSvr: DoctorsService,
   ) {}
   async create(
     createUserInput: CreateUserInput,
@@ -43,14 +41,11 @@ export class UsersService {
   }
 
   async findAll(): Promise<[User]> {
-    // bảo vệ bởi jwt
-    // console.log(' user: ', this.userModel.find())
     var users: any;
     await this.userModel
       .find()
       .then((data) => (users = data))
       .catch((err) => new Error(err));
-    // console.log('test id:', users)
     return users;
   }
 

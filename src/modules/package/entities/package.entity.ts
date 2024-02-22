@@ -12,7 +12,7 @@ export class Package {
   @Field()
   packageName: String;
 
-  @Field(() => EGender)
+  @Field(() => String)
   gender: EGender;
 
   @Field()

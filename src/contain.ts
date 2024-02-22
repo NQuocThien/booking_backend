@@ -5,8 +5,8 @@ export enum EAcademicTitle { // học hàm
 }
 
 export enum EDegree { // bằng cấp
-  Doctorate = 'TS',
-  MasterDoctor = 'ThS',
+  Doctorate = 'TS BS',
+  MasterDoctor = 'ThS BS',
   Doctor = 'BS',
   DoctorS1 = 'BS CKI',
   DoctorS2 = 'BS CKII',
@@ -65,6 +65,7 @@ export enum EPermission {
   MagagerPackage = 'MANAGER_PACKAGE',
   MagagerVaccine = 'MANAGER_VACCINE',
 }
+
 registerEnumType(EPermission, {
   name: 'EPermission',
 });

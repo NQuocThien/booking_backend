@@ -20,5 +20,8 @@ export class MedicalStaff {
 
   @Prop()
   email: String;
+
+  @Prop(() => [String])
+  permissions: string[];
 }
 export const MedicalStaffSchema = SchemaFactory.createForClass(MedicalStaff);

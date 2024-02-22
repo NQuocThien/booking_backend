@@ -15,10 +15,8 @@ export class PackageService {
   async findAll(): Promise<Package[]> {
     return await this.model.find();
   }
-  async findOneByMedicalFacilityId(
-    medicalFacilityId: String,
-  ): Promise<Package[]> {
-    return await this.model.findOne({
+  async findByMedicalFacilityId(medicalFacilityId: String): Promise<Package[]> {
+    return await this.model.find({
       medicalFactilitiesId: medicalFacilityId,
     });
   }

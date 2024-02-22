@@ -12,4 +12,7 @@ export class WorkScheduleInput {
 
   @Field(() => EStatusService)
   status: EStatusService;
+
+  @Field(() => Number)
+  numberSlot: number;
 }

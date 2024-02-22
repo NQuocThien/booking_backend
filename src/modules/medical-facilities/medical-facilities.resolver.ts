@@ -116,7 +116,7 @@ export class MedicalFacilitiesResolver {
 
   @ResolveField(() => [Package], { name: 'packages' })
   async packages(@Parent() mf: MedicalFacilities): Promise<Package[]> {
-    return await this.packageSrv.findOneByMedicalFacilityId(mf.id);
+    return await this.packageSrv.findByMedicalFacilityId(mf.id);
   }
 
   @ResolveField(() => [Vaccination], { name: 'vaccinations' })

@@ -54,8 +54,22 @@ export class UsersResolver {
     const usersClinic = users.filter((user) =>
       user.roles.includes(Role.Clinic),
     );
-    // const clinics = this.medicalService.findAll();
     return usersClinic;
+  }
+
+  @Query(() => [User], { name: 'getUserDoctorPending' })
+  // @UseGuards(JWtAuthGuard, RolesGuard)
+  // @Roles(Role.Admin)
+  async getUserDoctorPending(@Context() context): Promise<User[]> {
+    const users = await this.usersService.findAll();
+    const doctors = await this.doctorService.findAll();
+    const userPending = users.filter(
+      (user) => !doctors.find((doctor) => doctor.userId === user.id),
+    );
+    const userDoctorPending = userPending.filter((user) =>
+      user.roles.includes(Role.Doctor),
+    );
+    return userDoctorPending;
   }
 
   @Query(() => [User], { name: 'getUserSelect' })

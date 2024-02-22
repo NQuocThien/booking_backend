@@ -192,10 +192,12 @@ type Doctor {
   gender: String!
   id: ID!
   medicalFactilitiesId: String!
+  medicalSpecialties: MedicalSpecialties!
   name: String!
   numberPhone: String!
   price: Float!
   specialistId: String!
+  specialty: MedicalSpecialties
   userId: String!
   workSchedule: WorkSchedule!
 }
@@ -361,7 +363,7 @@ type MedicalSpecialties {
 
 type MedicalStaff {
   email: String!
-  gender: EGender!
+  gender: String!
   id: ID!
   medicalFacilityId: String!
   name: String!
@@ -428,7 +430,7 @@ type Notification {
 
 type Package {
   examinationDetails: String!
-  gender: EGender!
+  gender: String!
   id: ID!
   medicalFactilitiesId: String!
   packageName: String!
@@ -468,11 +470,13 @@ type Query {
   getDoctorbyUserId(id: String!): Doctor!
   getEvaluateById(id: String!): Evaluate!
   getGeneralInfor: GeneralInfor!
+  getMecialSpecialtiesByMedicalFacilityId(id: String!): [MedicalSpecialties!]!
   getMedicalFacilityById(id: String!): MedicalFacilities!
   getMedicalFacilityByUserId(id: String!): MedicalFacilities!
   getProfileByCustomerId(id: String!): [Profile!]!
   getSetting: Setting!
   getUser(username: String!): User!
+  getUserDoctorPending: [User!]!
   getUserMedicalNon: [User!]!
   getUserSelect(roleInput: UserSelectInput!): [User!]!
   getUserSelected(id: String!): User!
@@ -495,12 +499,12 @@ type Register {
 }
 
 type Schedule {
-  dayOfWeed: String!
+  dayOfWeek: String!
   sessions: [Session!]!
 }
 
 input ScheduleInput {
-  dayOfWeed: EDayOfWeed!
+  dayOfWeek: EDayOfWeed!
   sessions: [SessionInput!]!
 }
 
@@ -705,12 +709,14 @@ type Vaccination {
 
 type WorkSchedule {
   dayOff: [DateTime!]!
+  numberSlot: Float!
   schedule: [Schedule!]!
   status: String!
 }
 
 input WorkScheduleInput {
   dayOff: [DateTime!]!
+  numberSlot: Float!
   schedule: [ScheduleInput!]!
   status: EStatusService!
 }

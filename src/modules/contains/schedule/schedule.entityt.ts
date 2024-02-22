@@ -5,7 +5,7 @@ import { EDayOfWeed } from 'src/contain';
 @ObjectType()
 export class Schedule {
   @Field(() => String)
-  dayOfWeed: EDayOfWeed; // thứ trong tuần
+  dayOfWeek: EDayOfWeed; // thứ trong tuần
 
   @Field(() => [Session])
   sessions: Session[];
