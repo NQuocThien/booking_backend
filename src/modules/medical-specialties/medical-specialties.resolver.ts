@@ -15,6 +15,11 @@ export class MedicalSpecialtiesResolver {
     return await this.medicalSpecialtiesService.create(input);
   }
 
+  @Query(() => MedicalSpecialties, { name: 'getMedicalSpecialtyById' })
+  async getSpecialtyById(@Args('input') id: String) {
+    return await this.medicalSpecialtiesService.findById(id);
+  }
+
   @Mutation(() => MedicalSpecialties, { name: 'updateMedicalSpecialty' })
   async update(@Args('input') input: UpdateMedicalSpecialtyInput) {
     return await this.medicalSpecialtiesService.update(input);

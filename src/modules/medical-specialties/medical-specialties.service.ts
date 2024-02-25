@@ -14,6 +14,9 @@ export class MedicalSpecialtiesService {
   async create(data: CreateMedicalSpecialtyInput) {
     return this.medicalSpecialtiesModel.create(data);
   }
+  async findById(id: String) {
+    return this.medicalSpecialtiesModel.findById(id);
+  }
 
   async findByMedicalFacilityId(
     medicalFacilityId: String,

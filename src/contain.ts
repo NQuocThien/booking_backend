@@ -15,6 +15,11 @@ export enum EGender {
   Male = 'Nam',
   Female = 'Nữ',
 }
+export enum EGenderPackage {
+  Male = 'Nam',
+  Female = 'Nữ',
+  Both = 'Nam và nữ',
+}
 registerEnumType(EGender, {
   name: 'EGender',
 });

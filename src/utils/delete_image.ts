@@ -12,6 +12,7 @@ export default async function deleteImage(linkImage: LinkImage) {
           fsPromises.unlink(imagePath);
           console.log('\t --> deleted old image:', imageStat.isFile());
         }
+        console.log('\t --> image found:', imageStat.isFile());
       })
       .catch((e) => console.log('\t --> error:', e.message));
   }

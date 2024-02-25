@@ -4,6 +4,7 @@ import { Package } from './entities/package.entity';
 import { Model } from 'mongoose';
 import { CreatePackageInput } from './entities/dto/create-package.input';
 import { UpdatePackageInput } from './entities/dto/update-package.input';
+import { Console } from 'console';
 
 @Injectable()
 export class PackageService {
@@ -11,6 +12,10 @@ export class PackageService {
     @InjectModel(Package.name)
     private readonly model: Model<Package>,
   ) {}
+
+  async findById(id: String): Promise<Package> {
+    return await this.model.findById(id);
+  }
 
   async findAll(): Promise<Package[]> {
     return await this.model.find();

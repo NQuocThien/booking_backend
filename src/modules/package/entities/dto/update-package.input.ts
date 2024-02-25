@@ -5,8 +5,9 @@ import {
   ID,
   InputType,
 } from '@nestjs/graphql';
-import { EGender, EStatusService } from 'src/contain';
+import { EGender, EGenderPackage, EStatusService } from 'src/contain';
 import { WorkScheduleInput } from 'src/modules/contains/work-schedule/work-schedule.input';
+import { LinkImageInput } from 'src/modules/users/dto/linkimage.input';
 @InputType()
 export class UpdatePackageInput {
   @Field()
@@ -18,11 +19,14 @@ export class UpdatePackageInput {
   @Field()
   packageName: String;
 
-  @Field(() => EGender)
-  gender: EGender;
+  @Field(() => EGenderPackage)
+  gender: EGenderPackage;
 
   @Field()
   price: Number;
+
+  @Field(() => LinkImageInput)
+  image: LinkImageInput;
 
   @Field()
   examinationDetails: String;

@@ -71,6 +71,26 @@ export class UsersResolver {
     );
     return userDoctorPending;
   }
+  @Query(() => [User], { name: 'getUserDoctorPendingUpdate' })
+  // @UseGuards(JWtAuthGuard, RolesGuard)
+  // @Roles(Role.Admin)
+  async getUserDoctorPendingUpdate(
+    @Context() context,
+    @Args('input') idDoctor: String,
+  ): Promise<User[]> {
+    const users = await this.usersService.findAll();
+    const doctors = await this.doctorService.findAll();
+    const userPending = users.filter(
+      (user) =>
+        !doctors.find(
+          (doctor) => doctor.id !== idDoctor && doctor.userId === user.id,
+        ),
+    );
+    const userDoctorPending = userPending.filter((user) =>
+      user.roles.includes(Role.Doctor),
+    );
+    return userDoctorPending;
+  }
 
   @Query(() => [User], { name: 'getUserSelect' })
   @UseGuards(JWtAuthGuard, RolesGuard)

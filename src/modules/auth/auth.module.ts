@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthResolver } from './auth.resolver';
 import { UsersService } from '../users/users.service';
@@ -10,8 +10,6 @@ import { JwtStrategy } from './jwt.strategy';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserSchema } from '../users/schema/user.schema';
 // import { ProfileModule } from '../profile/profile.module';
-import { APP_GUARD } from '@nestjs/core';
-import { RolesGuard } from './roles.guard';
 import { CustomerModule } from '../customer/customer.module';
 @Module({
   imports: [

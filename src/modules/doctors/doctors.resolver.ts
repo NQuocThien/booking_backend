@@ -43,10 +43,11 @@ export class DoctorsResolver {
   }
 
   @Mutation(() => Doctor, { name: 'updateDoctor' })
-  async updateDoctor(@Args('updateDoctorInput') data: UpdateDoctorInput) {
+  async updateDoctor(@Args('input') data: UpdateDoctorInput) {
     try {
       const currDoctor = await this.doctorService.findOne(data.id);
-      deleteImage(currDoctor.avatar);
+      if (JSON.stringify(currDoctor.avatar) !== JSON.stringify(data.avatar))
+        deleteImage(currDoctor.avatar);
     } catch (e) {
       console.log('Error Delete Image');
     }
@@ -64,13 +65,11 @@ export class DoctorsResolver {
     return this.doctorService.delete(id);
   }
 
-  @ResolveField(() => MedicalSpecialties)
-  async medicalSpecialties(@Parent() doctor: Doctor) {
-    return this.specialtySvr.findOneById(doctor.specialistId);
+  @ResolveField(() => MedicalSpecialties, { name: 'specialty' })
+  async specialty(@Parent() doctor: Doctor): Promise<MedicalSpecialties> {
+    if (doctor.specialistId === '') {
+      return null;
+    }
+    return await this.specialtySvr.findOneById(doctor.specialistId);
   }
-
-  // @ResolveField(() => MedicalSpecialties, { name: 'degree' })
-  // async degree(@Parent() doctor: Doctor) {
-  //   return this.degreeService.findOneById(doctor.degreeId);
-  // }
 }

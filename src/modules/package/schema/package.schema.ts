@@ -1,5 +1,6 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { WorkSchedule } from 'src/modules/contains/work-schedule/work-schedule.schema';
+import { LinkImage } from 'src/modules/users/schema/linkImage.schema';
 @Schema({
   timestamps: true,
 })
@@ -12,6 +13,9 @@ export class Package {
 
   @Prop()
   gender: String;
+
+  @Prop(() => LinkImage)
+  image: LinkImage;
 
   @Prop()
   price: Number;

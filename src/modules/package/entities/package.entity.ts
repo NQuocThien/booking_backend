@@ -1,6 +1,7 @@
 import { ObjectType, Field, registerEnumType, ID } from '@nestjs/graphql';
-import { EGender, EStatusService } from 'src/contain';
+import { EGender, EGenderPackage, EStatusService } from 'src/contain';
 import { WorkSchedule } from 'src/modules/contains/work-schedule/work-schedule.entity';
+import { LinkImage } from 'src/modules/users/dto/image';
 @ObjectType()
 export class Package {
   @Field(() => ID)
@@ -13,10 +14,13 @@ export class Package {
   packageName: String;
 
   @Field(() => String)
-  gender: EGender;
+  gender: EGenderPackage;
 
   @Field()
   price: Number;
+
+  @Field(() => LinkImage)
+  image: LinkImage;
 
   @Field()
   examinationDetails: String;
@@ -28,6 +32,6 @@ export class Package {
 registerEnumType(EStatusService, {
   name: 'EStatusService',
 });
-registerEnumType(EGender, {
-  name: 'EGender',
+registerEnumType(EGenderPackage, {
+  name: 'EGenderPackage',
 });

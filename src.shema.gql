@@ -83,7 +83,8 @@ input CreateNotificationInput {
 
 input CreatePackageInput {
   examinationDetails: String!
-  gender: EGender!
+  gender: EGenderPackage!
+  image: LinkImageInput!
   medicalFactilitiesId: String!
   packageName: String!
   price: Float!
@@ -192,7 +193,6 @@ type Doctor {
   gender: String!
   id: ID!
   medicalFactilitiesId: String!
-  medicalSpecialties: MedicalSpecialties!
   name: String!
   numberPhone: String!
   price: Float!
@@ -226,6 +226,12 @@ enum EDegree {
 }
 
 enum EGender {
+  Female
+  Male
+}
+
+enum EGenderPackage {
+  Both
   Female
   Male
 }
@@ -403,7 +409,7 @@ type Mutation {
   signup(createUserInput: CreateUserInput!): User!
   signupUser(createUserInput: CreateUserByAdminInput!): User!
   updateCustomer(input: UpdateCustomerInput!): Customer!
-  updateDoctor(updateDoctorInput: UpdateDoctorInput!): Doctor!
+  updateDoctor(input: UpdateDoctorInput!): Doctor!
   updateEvaluate(input: UpdateEvaluateInput!): Evaluate!
   updateGeneralInfor(updateGeneralInforInput: GeneralInforUpdateInput!): GeneralInfor!
   updateMedicalFacility(input: UpdateMedicalFacilityInput!): MedicalFacilities!
@@ -432,6 +438,7 @@ type Package {
   examinationDetails: String!
   gender: String!
   id: ID!
+  image: LinkImage!
   medicalFactilitiesId: String!
   packageName: String!
   price: Float!
@@ -473,10 +480,13 @@ type Query {
   getMecialSpecialtiesByMedicalFacilityId(id: String!): [MedicalSpecialties!]!
   getMedicalFacilityById(id: String!): MedicalFacilities!
   getMedicalFacilityByUserId(id: String!): MedicalFacilities!
+  getMedicalSpecialtyById(input: String!): MedicalSpecialties!
+  getPackageById(input: String!): Package!
   getProfileByCustomerId(id: String!): [Profile!]!
   getSetting: Setting!
   getUser(username: String!): User!
   getUserDoctorPending: [User!]!
+  getUserDoctorPendingUpdate(input: String!): [User!]!
   getUserMedicalNon: [User!]!
   getUserSelect(roleInput: UserSelectInput!): [User!]!
   getUserSelected(id: String!): User!
@@ -609,8 +619,9 @@ input UpdateNotificationInput {
 
 input UpdatePackageInput {
   examinationDetails: String!
-  gender: EGender!
+  gender: EGenderPackage!
   id: String!
+  image: LinkImageInput!
   medicalFactilitiesId: String!
   packageName: String!
   price: Float!
