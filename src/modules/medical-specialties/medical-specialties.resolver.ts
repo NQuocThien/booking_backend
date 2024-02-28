@@ -36,6 +36,14 @@ export class MedicalSpecialtiesResolver {
     return this.medicalSpecialtiesService.getAll();
   }
 
+  @Query(() => [MedicalSpecialties], { name: 'getMedicalSpecialtySelect' })
+  async getMedicalSpecialtySelect(
+    @Args('input') input: String,
+  ): Promise<MedicalSpecialties[]> {
+    console.log('getAllMecialSpecial');
+    return this.medicalSpecialtiesService.findByMedicalFacilityId(input);
+  }
+
   @Query(() => [MedicalSpecialties], {
     name: 'getMecialSpecialtiesByMedicalFacilityId',
   })

@@ -11,8 +11,6 @@ import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
 import { JWtAuthGuard } from '../auth/jwt-auth.guard';
 import { UseGuards } from '@nestjs/common';
-// import { ProfileService } from '../profile/profile.service';
-// import { Profile } from '../profile/entities/profile.entity';
 import { UpdateUserInput } from './dto/update-user.input';
 import { Roles } from '../auth/roles.decorator';
 import { Role } from '../auth/entities/role.enum';
@@ -28,6 +26,7 @@ import { DoctorsService } from '../doctors/doctors.service';
 import { Doctor } from '../doctors/entities/doctor.entity';
 import { UpdateRolesInput } from './dto/update-roles.input ';
 import { UserSelectInput } from './dto/role-select.input';
+import { MedicalStaffService } from '../medical-staff/medical-staff.service';
 @Resolver(() => User)
 export class UsersResolver {
   constructor(
@@ -35,6 +34,7 @@ export class UsersResolver {
     private readonly customerService: CustomerService, // private readonly profileService: ProfileService,
     private readonly medicalService: MedicalFacilitiesService,
     private readonly doctorService: DoctorsService,
+    private readonly medicalStaff: MedicalStaffService,
   ) {}
 
   @Query(() => [User], { name: 'users' })
@@ -72,8 +72,6 @@ export class UsersResolver {
     return userDoctorPending;
   }
   @Query(() => [User], { name: 'getUserDoctorPendingUpdate' })
-  // @UseGuards(JWtAuthGuard, RolesGuard)
-  // @Roles(Role.Admin)
   async getUserDoctorPendingUpdate(
     @Context() context,
     @Args('input') idDoctor: String,
@@ -100,8 +98,20 @@ export class UsersResolver {
   ): Promise<User[]> {
     const users = await this.usersService.findAll();
     const userFillter = users.filter((user) => user.roles.includes(input.role));
-    console.log('res ============ ', userFillter);
     return userFillter;
+  }
+  @Query(() => [User], { name: 'getUserStaffSelect' })
+  async getUserStaffSelect(@Args('input') idStaff: String): Promise<User[]> {
+    const users = await this.usersService.findAll();
+    const staffs = await this.medicalStaff.getAllMedicalStaff();
+    const userPending = users.filter(
+      (user) =>
+        !staffs.find((st) => st.id !== idStaff && st.userId === user.id),
+    );
+    const userStaffPending = userPending.filter((user) =>
+      user.roles.includes(Role.Staff),
+    );
+    return userStaffPending;
   }
 
   @Query(() => User, { name: 'getUserSelected' })

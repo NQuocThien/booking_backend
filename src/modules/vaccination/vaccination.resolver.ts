@@ -13,6 +13,18 @@ export class VaccinationResolver {
     return await this.vaccinationService.getAllVaccination();
   }
 
+  @Query(() => Vaccination, { name: 'getVaccineById' })
+  async getVaccineById(@Args('input') input: String): Promise<Vaccination> {
+    return await this.vaccinationService.findById(input);
+  }
+
+  @Query(() => [Vaccination], { name: 'getAllVaccinationSelect' })
+  async getAllVaccinationSelect(
+    @Args('input') input: String,
+  ): Promise<Vaccination[]> {
+    return await this.vaccinationService.findByMedicalFacilityId(input);
+  }
+
   @Mutation(() => Vaccination, { name: 'createVaccination' })
   async createVaccination(
     @Args('input') input: CreateVaccineInput,

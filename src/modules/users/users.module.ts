@@ -6,6 +6,7 @@ import { UserSchema } from './schema/user.schema';
 import { CustomerModule } from '../customer/customer.module';
 import { MedicalFacilitiesModule } from '../medical-facilities/medical-facilities.module';
 import { DoctorsModule } from '../doctors/doctors.module';
+import { MedicalStaffModule } from '../medical-staff/medical-staff.module';
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -19,6 +20,7 @@ import { DoctorsModule } from '../doctors/doctors.module';
     CustomerModule,
     MedicalFacilitiesModule,
     DoctorsModule,
+    MedicalStaffModule,
   ],
   providers: [UsersResolver, UsersService],
   exports: [UsersService, UsersModule],

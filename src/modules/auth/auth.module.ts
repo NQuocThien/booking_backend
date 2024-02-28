@@ -22,7 +22,6 @@ import { CustomerModule } from '../customer/customer.module';
     PassportModule,
     UsersModule,
     CustomerModule,
-    // ProfileModule,
     JwtModule.register({
       signOptions: { expiresIn: '1h' },
       secret: 'hiden-me',

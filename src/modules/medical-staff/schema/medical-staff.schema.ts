@@ -23,5 +23,14 @@ export class MedicalStaff {
 
   @Prop(() => [String])
   permissions: string[];
+
+  @Prop(() => [String])
+  specialtyId?: [String];
+
+  @Prop(() => [String])
+  packageId?: [String];
+
+  @Prop(() => [String])
+  vaccinationId?: [String];
 }
 export const MedicalStaffSchema = SchemaFactory.createForClass(MedicalStaff);

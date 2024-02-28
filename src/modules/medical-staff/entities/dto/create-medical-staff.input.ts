@@ -20,6 +20,15 @@ export class CreateMedicalStaffInput {
   @Field()
   email: String;
 
+  @Field(() => [String], { nullable: true })
+  specialtyId?: [String];
+
+  @Field(() => [String], { nullable: true })
+  packageId?: [String];
+
+  @Field(() => [String], { nullable: true })
+  vaccinationId?: [String];
+
   @Field(() => [EPermission])
   permissions: EPermission[];
 }
