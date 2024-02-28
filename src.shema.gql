@@ -70,11 +70,9 @@ input CreateMedicalStaffInput {
   medicalFacilityId: String!
   name: String!
   numberPhone: String!
-  packageId: [String!]
   permissions: [EPermission!]!
   specialtyId: [String!]
   userId: String!
-  vaccinationId: [String!]
 }
 
 input CreateNotificationInput {
@@ -377,11 +375,9 @@ type MedicalStaff {
   medicalFacilityId: String!
   name: String!
   numberPhone: String!
-  packageId: [String!]
   permissions: [String!]!
   specialtyId: [String!]
   userId: String!
-  vaccinationId: [String!]
 }
 
 type Mutation {
@@ -616,11 +612,9 @@ input UpdateMedicalStaffInput {
   medicalFacilityId: String!
   name: EGender!
   numberPhone: String!
-  packageId: [String!]
   permissions: [EPermission!]!
   specialtyId: [String!]
   userId: String!
-  vaccinationId: [String!]
 }
 
 input UpdateNotificationInput {

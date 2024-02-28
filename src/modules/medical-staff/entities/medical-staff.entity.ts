@@ -28,12 +28,6 @@ export class MedicalStaff {
 
   @Field(() => [String], { nullable: true })
   specialtyId?: [String];
-
-  @Field(() => [String], { nullable: true })
-  packageId?: [String];
-
-  @Field(() => [String], { nullable: true })
-  vaccinationId?: [String];
 }
 registerEnumType(EGender, {
   name: 'EGender',
