@@ -3,9 +3,6 @@ import { Field, ID, InputType, ObjectType } from '@nestjs/graphql';
 @InputType()
 export class CreateRegisterSpecialtyInput {
   @Field()
-  customerId: string;
-
-  @Field()
   profileId: string;
 
   @Field()

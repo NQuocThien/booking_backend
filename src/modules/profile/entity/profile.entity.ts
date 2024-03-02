@@ -1,4 +1,5 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { Customer } from 'src/modules/customer/entities/customer.entity';
 import { Register } from 'src/modules/register/entities/register.entity';
 
 @ObjectType()
@@ -12,7 +13,7 @@ export class Profile {
   @Field()
   fullname: string;
 
-  @Field()
+  @Field(() => String)
   gender: string;
 
   @Field()
@@ -44,4 +45,7 @@ export class Profile {
 
   @Field(() => [Register], { nullable: true })
   register: Register; //
+
+  @Field(() => Customer, { nullable: true })
+  customer: Customer; //
 }

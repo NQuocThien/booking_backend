@@ -30,7 +30,7 @@ export class UsersService {
       email: undefined,
       address: undefined,
       dateOfBirth: undefined,
-      nation: undefined,
+      ethnic: undefined,
     });
     return user;
   }
@@ -106,5 +106,33 @@ export class UsersService {
         { new: true },
       );
     return userHandled;
+  }
+  // Trong UserService hoặc nơi cần thực hiện truy vấn
+  async getAllUsersPagination(
+    search: string,
+    page: number,
+    limit: number,
+    sortField: string,
+    sortOrder: string,
+  ): Promise<User[]> {
+    const query = search ? { username: { $regex: search, $options: 'i' } } : {};
+    const sortOptions: { [key: string]: 'asc' | 'desc' } = {};
+    sortOptions[sortField] = sortOrder === 'asc' ? 'asc' : 'desc';
+    const skip = (page - 1) * limit;
+    return this.userModel
+      .find({ ...query })
+      .limit(limit)
+      .skip(skip)
+      .sort(sortOptions);
+  }
+  async getTotalUser(search: string): Promise<User> {
+    return;
+  }
+  async getTotalUsersCount(search: string): Promise<number> {
+    const query = search
+      ? { username: { $regex: new RegExp(search, 'i') } }
+      : {};
+    const count = await this.userModel.countDocuments(query);
+    return count;
   }
 }

@@ -13,41 +13,44 @@ import { Role } from '../auth/entities/role.enum';
 // import { Query } from '@nestjs/common';
 @Resolver()
 export class GeneralInforResolver {
-    constructor(
-        private readonly GeneralInforService: GeneralInforService
-    ) {
-    }
+  constructor(private readonly GeneralInforService: GeneralInforService) {}
 
-    @Query(() => GeneralInfor, { name: 'getGeneralInfor' })
-    async getGeneralInfor() {
-        const infor = await this.GeneralInforService.getGeneralInfor();
-        // console.log('test resolver: ', infor);
-        return infor
-    }
-    @Mutation(() => GeneralInfor, { name: 'updateGeneralInfor' })
-    @UseGuards(JWtAuthGuard, RolesGuard)
-    @Roles(Role.Admin)
-    async updateGeneralInfor(@Args('updateGeneralInforInput') updateGeneralInforInput: GeneralInforUpdateInput) {
-        try {
-            const generalInfor = await this.getGeneralInfor()
-            updateGeneralInforInput.logoFooter && this.deleteImage(generalInfor.logoFooter);
-            updateGeneralInforInput.logoHeader && this.deleteImage(generalInfor.logoHeader)
-        } catch { }
-        const infor = await this.GeneralInforService.updateGeneralInfor(updateGeneralInforInput);
-        return infor
-    }
+  @Query(() => GeneralInfor, { name: 'getGeneralInfor' })
+  async getGeneralInfor() {
+    const infor = await this.GeneralInforService.getGeneralInfor();
+    return infor;
+  }
+  @Mutation(() => GeneralInfor, { name: 'updateGeneralInfor' })
+  @UseGuards(JWtAuthGuard, RolesGuard)
+  @Roles(Role.Admin)
+  async updateGeneralInfor(
+    @Args('updateGeneralInforInput')
+    updateGeneralInforInput: GeneralInforUpdateInput,
+  ) {
+    try {
+      const generalInfor = await this.getGeneralInfor();
+      updateGeneralInforInput.logoFooter &&
+        this.deleteImage(generalInfor.logoFooter);
+      updateGeneralInforInput.logoHeader &&
+        this.deleteImage(generalInfor.logoHeader);
+    } catch {}
+    const infor = await this.GeneralInforService.updateGeneralInfor(
+      updateGeneralInforInput,
+    );
+    return infor;
+  }
 
-    async deleteImage(fileImage: LinkImage): Promise<void> {
-        try {
-            if (fileImage?.url) {
-                const imageDirectory = `${process.env.FILE_PATH || 'files'}/images`;
-                const imagePath = `${imageDirectory}/${fileImage.filename}`;
-                const imageStat = await fsPromises.stat(imagePath);
-                if (imageStat.isFile()) {
-                    await fsPromises.unlink(imagePath);
-                    console.log(' Update User Deleted old image :', imageStat.isFile());
-                }
-            }
-        } catch (e) { }
-    }
+  async deleteImage(fileImage: LinkImage): Promise<void> {
+    try {
+      if (fileImage?.url) {
+        const imageDirectory = `${process.env.FILE_PATH || 'files'}/images`;
+        const imagePath = `${imageDirectory}/${fileImage.filename}`;
+        const imageStat = await fsPromises.stat(imagePath);
+        if (imageStat.isFile()) {
+          await fsPromises.unlink(imagePath);
+          console.log(' Update User Deleted old image :', imageStat.isFile());
+        }
+      }
+    } catch (e) {}
+  }
 }

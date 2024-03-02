@@ -16,8 +16,8 @@ import { UpdateCustomerInput } from './entities/dto/update-customer.input';
 export class CustomerResolver {
   constructor(
     private readonly customerService: CustomerService,
-    private readonly profileSv: ProfileService,
-  ) {}
+  ) // private readonly profileSv: ProfileService,
+  {}
 
   @Query(() => [Customer], { name: 'getAllCustomer' })
   async getAllCustomer() {
@@ -33,8 +33,8 @@ export class CustomerResolver {
     return this.customerService.updateCustomer(input);
   }
 
-  @ResolveField(() => [Profile], { name: 'profile' })
-  async profile(@Parent() cus: Customer): Promise<Profile[]> {
-    return this.profileSv.getProfileByCustomerId(cus.id);
-  }
+  // @ResolveField(() => [Profile], { name: 'profile' })
+  // async profile(@Parent() cus: Customer): Promise<Profile[]> {
+  //   return this.profileSv.getProfileByCustomerId(cus.id);
+  // }
 }

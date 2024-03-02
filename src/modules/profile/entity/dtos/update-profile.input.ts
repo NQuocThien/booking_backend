@@ -1,4 +1,5 @@
 import { InputType, Field } from '@nestjs/graphql';
+import { EGender } from 'src/contain';
 @InputType()
 export class UpdateProfileInput {
   @Field()
@@ -13,8 +14,8 @@ export class UpdateProfileInput {
   @Field({ nullable: true })
   email: string;
 
-  @Field({ nullable: true })
-  gender: string;
+  @Field(() => EGender)
+  gender: EGender;
 
   @Field({ nullable: true })
   address: string;

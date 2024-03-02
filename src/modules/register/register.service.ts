@@ -9,6 +9,8 @@ import { CreateRegisterSpecialtyInput } from './entities/dtos/create-register-sp
 import { CreateRegisterPackageInput } from './entities/dtos/create-register-package.Input';
 import { CreateRegisterVaccineInput } from './entities/dtos/create-register-vaccine.input';
 import { CreateRegisterInput } from './entities/dtos/create-register.input';
+import { GetRegisterDoctorInput } from './entities/dtos/get-register-doctor.input';
+import { ConfirmRegisterInput } from './entities/dtos/confirm-register.input';
 
 @Injectable()
 export class RegisterService {
@@ -26,6 +28,17 @@ export class RegisterService {
       typeOfService: ETypeOfService.Doctor,
     };
     return await this.model.create(datainput);
+  }
+  async getAllRegisterDoctorForDay(
+    input: GetRegisterDoctorInput,
+  ): Promise<Register[]> {
+    const data = await this.model
+      .find({
+        doctorId: input.doctorId,
+        date: input.date,
+      })
+      .exec();
+    return data;
   }
 
   async createRegisterSpecialty(
@@ -65,15 +78,25 @@ export class RegisterService {
     try {
       const existingDoc = await this.model.findById(data.id);
       if (!existingDoc) {
-        console.log('Document not found for ID:', data.id);
         return null;
       }
-      // Cập nhật dữ liệu từ input vào existingDoc
       Object.assign(existingDoc, data);
-      // Lưu tài liệu đã cập nhật
       const updatedDoc = await existingDoc.save();
-      console.log('---> Updated document:', updatedDoc);
       return updatedDoc;
+    } catch (error) {
+      console.error('Error updating document:', error);
+      return null;
+    }
+  }
+  async confirmRegister(input: ConfirmRegisterInput): Promise<Register> {
+    try {
+      const existingDoc = await this.model.findById(input.registerId);
+      if (existingDoc) {
+        existingDoc.state = input.state;
+        const updatedDoc = await existingDoc.save();
+        return updatedDoc;
+      }
+      return null;
     } catch (error) {
       console.error('Error updating document:', error);
       return null;

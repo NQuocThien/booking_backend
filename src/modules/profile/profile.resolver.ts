@@ -13,13 +13,15 @@ import { CreateProfileInput } from './entity/dtos/create-profile.input';
 import { UpdateProfileInput } from './entity/dtos/update-profile.input';
 import { RegisterService } from '../register/register.service';
 import { Register } from '../register/entities/register.entity';
+import { Customer } from '../customer/entities/customer.entity';
 
 @Resolver(() => Profile)
 export class ProfileResolver {
   constructor(
     private readonly profileService: ProfileService,
-    private readonly customerService: CustomerService,
+    // private readonly customerService: CustomerService,
     private readonly regisService: RegisterService,
+    private readonly customerSvr: CustomerService,
   ) {}
 
   @Mutation(() => Profile, { name: 'createProfile' })
@@ -41,8 +43,12 @@ export class ProfileResolver {
     const result = await this.profileService.getProfileByCustomerId(id);
     return result;
   }
-  @ResolveField(() => [Register, { name: 'register' }])
+  @ResolveField(() => [Register], { name: 'register' })
   async register(@Parent() profile: Profile): Promise<Register[]> {
     return this.regisService.getRegisterByProfileId(profile.id);
+  }
+  @ResolveField(() => Customer, { name: 'customer' })
+  async customer(@Parent() profile: Profile): Promise<Customer> {
+    return this.customerSvr.findById(profile.customerId);
   }
 }

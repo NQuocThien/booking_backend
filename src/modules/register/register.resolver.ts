@@ -1,4 +1,11 @@
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Mutation,
+  Resolver,
+  Query,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { RegisterService } from './register.service';
 import { Register } from './entities/register.entity';
 import { ProfileService } from '../profile/profile.service';
@@ -7,12 +14,15 @@ import { CreateRegisterDoctorInput } from './entities/dtos/create-register-docto
 import { CreateRegisterSpecialtyInput } from './entities/dtos/create-register-specialty.input';
 import { CreateRegisterPackageInput } from './entities/dtos/create-register-package.Input';
 import { CreateRegisterVaccineInput } from './entities/dtos/create-register-vaccine.input';
+import { Profile } from '../profile/entity/profile.entity';
+import { GetRegisterDoctorInput } from './entities/dtos/get-register-doctor.input';
+import { ConfirmRegisterInput } from './entities/dtos/confirm-register.input';
 
 @Resolver(() => Register)
 export class RegisterResolver {
   constructor(
     private readonly regisService: RegisterService,
-    private readonly profileService: ProfileService,
+    private readonly profileSvr: ProfileService,
   ) {}
 
   @Mutation(() => Register, { name: 'createRegisterDoctor' })
@@ -20,6 +30,13 @@ export class RegisterResolver {
     @Args('input') input: CreateRegisterDoctorInput,
   ): Promise<Register> {
     return await this.regisService.createRegisterDoctor(input);
+  }
+
+  @Query(() => [Register], { name: 'getAllRegisterDoctorForDay' })
+  async getAllRegisterDoctorForDay(
+    @Args('input') input: GetRegisterDoctorInput,
+  ): Promise<Register[]> {
+    return await this.regisService.getAllRegisterDoctorForDay(input);
   }
 
   @Mutation(() => Register, { name: 'createRegisterSpecialty' })
@@ -49,12 +66,16 @@ export class RegisterResolver {
   ): Promise<Register> {
     return await this.regisService.update(input);
   }
-  // @ResolveField(() => CarePackage, { name: 'carePackage' })
-  // async carePackage(@Parent() regis: Register): Promise<CarePackage> {
-  //   return this.packageService.finById(regis.packegeId);
-  // }
-  // @ResolveField(() => Profile, { name: 'profile' })
-  // async profile(@Parent() regis: Register): Promise<Profile> {
-  //   return this.profileService.findById(regis.profileId);
-  // }
+
+  @Mutation(() => Register, { name: 'confirmRegister' })
+  async confirmRegister(
+    @Args('input') input: ConfirmRegisterInput,
+  ): Promise<Register> {
+    return await this.regisService.confirmRegister(input);
+  }
+
+  @ResolveField(() => Profile, { name: 'profile' })
+  async profile(@Parent() regis: Register): Promise<Profile> {
+    return this.profileSvr.findById(regis.profileId);
+  }
 }

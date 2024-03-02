@@ -203,32 +203,56 @@ export class UsersResolver {
   @Query(() => User, { name: 'getUser' })
   // @UseGuards(JWtAuthGuard)
   async findOne(@Args('username') username: string) {
-    // console.log('test 1: ', (await this.usersService.findOne(username)))
     return await this.usersService.findOne(username);
   }
 
   @Query(() => User, { name: 'checklogin' })
   @UseGuards(JWtAuthGuard)
   async checkLogin(@Context('req') req) {
-    // console.log('test', req.user)
     const user = await this.usersService.findOne(req?.user?.username);
-    // console.log('test login: ', user)
     return user;
+  }
+
+  @Query(() => Number, { name: 'totalUsersCount' })
+  async getTotalUsersCount(
+    @Args('search', { nullable: true }) search?: string,
+  ): Promise<number> {
+    const count = await this.usersService.getTotalUsersCount(search || '');
+    return count;
+  }
+
+  @Query(() => [User], { name: 'getAllUsersPagination' })
+  // @UseGuards(JWtAuthGuard)
+  async getAllUsersPagination(
+    @Args('search', { nullable: true }) search: string,
+    @Args('page', { defaultValue: 1 }) page: number,
+    @Args('limit', { defaultValue: 10 }) limit: number,
+    @Args('sortField', { nullable: true, defaultValue: 'username' })
+    sortField: string,
+    @Args('sortOrder', { nullable: true }) sortOrder: string,
+  ): Promise<User[]> {
+    {
+      const user = await this.usersService.getAllUsersPagination(
+        search,
+        page,
+        limit,
+        sortField,
+        sortOrder,
+      );
+      return user;
+    }
   }
 
   @ResolveField(() => Customer)
   async customer(@Parent() user: User) {
-    // console.log('test 2: ', user.id)SS
-    return await this.customerService.findCustomerById(user.id);
+    return await this.customerService.findByUserId(user.id);
   }
   @ResolveField(() => [MedicalFacilities])
   async medicalFacilities(@Parent() user: User) {
-    // console.log('test 2: ', user.id)SS
     return await this.medicalService.findMedicalFacilitiesByUserId(user.id);
   }
   @ResolveField(() => [Doctor])
   async doctor(@Parent() user: User) {
-    // console.log('test 2: ', user.id)SS
     return await this.doctorService.findOneByUserId(user.id);
   }
 }

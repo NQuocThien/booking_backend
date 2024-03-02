@@ -40,6 +40,7 @@
     "@nestjs/typeorm": "github:nestjs/typeorm",
     "bcrypt": "^5.1.1",
     "dotenv": "^16.3.1",
+    "escape-string-regexp": "^5.0.0",
     "fluent-ffmpeg": "^2.1.2",
     "graphql": "^16.8.0",
     "mongodb-client-encryption": "^2.9.1",

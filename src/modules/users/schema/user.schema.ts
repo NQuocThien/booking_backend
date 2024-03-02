@@ -5,15 +5,15 @@ import { LinkImage } from './linkImage.schema';
 import { Customer } from 'src/modules/customer/entities/customer.entity';
 import { MedicalFacilities } from 'src/modules/medical-facilities/schema/medical-facilities.schema';
 import { Doctor } from 'src/modules/doctors/schema/doctor.schema';
-
+import { Document } from 'mongoose';
 @Schema({
   timestamps: true,
 })
-export class User {
+export class User extends Document {
   // @Prop({ type: mongoose.Schema.Types.ObjectId }) // Sử dụng kiểu dữ liệu của Mongoose
   // id: mongoose.Types.ObjectId;
 
-  @Prop()
+  @Prop({ required: true })
   username: string;
 
   @Prop()
@@ -44,3 +44,5 @@ export class User {
   doctor?: Doctor;
 }
 export const UserSchema = SchemaFactory.createForClass(User);
+UserSchema.index({ username: 'text' });
+UserSchema.index({ '$**': 'text' });

@@ -16,7 +16,7 @@ export class User {
   @Field(() => [String], { nullable: true })
   roles?: string[];
 
-  @Field()
+  @Field(() => String)
   username: string;
 
   @Field()

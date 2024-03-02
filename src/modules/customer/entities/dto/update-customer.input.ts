@@ -24,5 +24,5 @@ export class UpdateCustomerInput {
   dateOfBirth: Date;
 
   @Field({ nullable: true })
-  nation: String;
+  ethnic: String;
 }

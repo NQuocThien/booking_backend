@@ -26,6 +26,6 @@ export class Customer {
   dateOfBirth: Date;
 
   @Prop()
-  nation: String;
+  ethnic: String;
 }
 export const CustomerSchema = SchemaFactory.createForClass(Customer);

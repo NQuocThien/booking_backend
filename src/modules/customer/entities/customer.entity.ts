@@ -12,7 +12,7 @@ export class Customer {
   @Field()
   name: String;
 
-  @Field(() => EGender)
+  @Field(() => String)
   gender: EGender;
 
   @Field()
@@ -28,8 +28,8 @@ export class Customer {
   dateOfBirth: Date;
 
   @Field()
-  nation: String;
+  ethnic: String;
 
-  @Field(() => [Profile], { nullable: true })
-  profile: Profile[];
+  // @Field(() => [Profile], { nullable: true })
+  // profile: Profile[];
 }

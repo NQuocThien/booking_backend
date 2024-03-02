@@ -14,10 +14,12 @@ export class CustomerService {
   async getCustomer() {
     return this.customerModel.find();
   }
-  async findCustomerById(userId: String) {
+  async findByUserId(userId: String) {
     const res = await this.customerModel.findOne({ userId: userId });
-    console.log('test user id===', userId);
-    console.log('test ===', res);
+    return res;
+  }
+  async findById(userId: String) {
+    const res = await this.customerModel.findById(userId);
     return res;
   }
   async createCustomer(createCustomerInput: CreateCustomerInput) {

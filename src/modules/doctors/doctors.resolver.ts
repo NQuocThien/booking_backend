@@ -33,7 +33,6 @@ export class DoctorsResolver {
 
   @Query(() => Doctor, { name: 'getDoctorbyUserId' })
   async getDoctorbyUserId(@Args('id') id: String): Promise<Doctor> {
-    // console.log('Test User ID: ', id);
     return this.doctorService.findOneByUserId(id);
   }
 

@@ -1,7 +1,6 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { RegisterResolver } from './register.resolver';
 import { RegisterService } from './register.service';
-import { Mongoose } from 'mongoose';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Register, RegisterSchema } from './schema/register.schema';
 import { ProfileModule } from '../profile/profile.module';

@@ -2,13 +2,18 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+input ConfirmRegisterInput {
+  registerId: String!
+  state: EStateRegister!
+}
+
 input CreateCustomerInput {
   address: String
   dateOfBirth: DateTime
   email: String
+  ethnic: String
   gender: EGender
   name: String!
-  nation: String
   numberPhone: String
   userId: String!
 }
@@ -99,7 +104,7 @@ input CreateProfileInput {
   email: String!
   ethnic: String!
   fullname: String!
-  gender: String!
+  gender: EGender!
   identity: String!
   job: String!
   medicalInsurance: String!
@@ -108,16 +113,14 @@ input CreateProfileInput {
 }
 
 input CreateRegisterDoctorInput {
-  customerId: String!
   date: DateTime!
   doctorId: String!
   isHealthInsurance: Boolean!
   profileId: String!
-  sessionId: String!
+  session: SessionInput!
 }
 
 input CreateRegisterPackageInput {
-  customerId: String!
   date: DateTime!
   isHealthInsurance: Boolean!
   packageId: String!
@@ -126,7 +129,6 @@ input CreateRegisterPackageInput {
 }
 
 input CreateRegisterSpecialtyInput {
-  customerId: String!
   date: DateTime!
   isHealthInsurance: Boolean!
   profileId: String!
@@ -135,7 +137,6 @@ input CreateRegisterSpecialtyInput {
 }
 
 input CreateRegisterVaccineInput {
-  customerId: String!
   date: DateTime!
   isHealthInsurance: Boolean!
   profileId: String!
@@ -171,12 +172,11 @@ type Customer {
   address: String!
   dateOfBirth: DateTime!
   email: String!
-  gender: EGender!
+  ethnic: String!
+  gender: String!
   id: ID!
   name: String!
-  nation: String!
   numberPhone: String!
-  profile: [Profile!]
   userId: String!
 }
 
@@ -260,13 +260,6 @@ enum ETypeOfNotification {
   Seen
 }
 
-enum ETypeOfService {
-  Doctor
-  Package
-  Specialty
-  Vaccine
-}
-
 type Evaluate {
   comment: String!
   id: ID!
@@ -298,6 +291,11 @@ input GeneralInforUpdateInput {
   liscenceOparating: String!
   logoFooter: LinkImageInput
   logoHeader: LinkImageInput
+}
+
+input GetRegisterDoctorInput {
+  date: DateTime!
+  doctorId: String!
 }
 
 enum IRole {
@@ -382,6 +380,7 @@ type MedicalStaff {
 
 type Mutation {
   activeUser(id: String!): User!
+  confirmRegister(input: ConfirmRegisterInput!): Register!
   createDoctor(createDoctorInput: CreateDoctorInput!): Doctor!
   createEvaluate(input: CreateEvaluateInput!): Evaluate!
   createMedicalFacility(input: CreateMedicalFacilityInput!): MedicalFacilities!
@@ -449,6 +448,7 @@ type Package {
 
 type Profile {
   address: String!
+  customer: Customer
   customerId: String!
   dataOfBirth: DateTime!
   email: String!
@@ -475,6 +475,8 @@ type Query {
   getAllNotification: [Notification!]!
   getAllPackage: [Package!]!
   getAllPackageSelect(input: String!): [Package!]!
+  getAllRegisterDoctorForDay(input: GetRegisterDoctorInput!): [Register!]!
+  getAllUsersPagination(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "username", sortOrder: String): [User!]!
   getAllVacation: [Vaccination!]!
   getAllVaccinationSelect(input: String!): [Vaccination!]!
   getDoctorbyId(id: String!): Doctor!
@@ -497,21 +499,22 @@ type Query {
   getUserSelected(id: String!): User!
   getUserStaffSelect(input: String!): [User!]!
   getVaccineById(input: String!): Vaccination!
+  totalUsersCount(search: String): Float!
   users: [User!]!
 }
 
 type Register {
-  customerId: String!
   date: DateTime!
   doctorId: String
   id: ID!
   isHealthInsurance: Boolean!
   packageId: String
+  profile: Profile!
   profileId: String!
-  sessionId: String!
+  session: Session!
   specialtyId: String
-  state: EStateRegister!
-  typeOfService: ETypeOfService!
+  state: String!
+  typeOfService: String!
   vaccineId: String
 }
 
@@ -543,10 +546,10 @@ input UpdateCustomerInput {
   address: String
   dateOfBirth: DateTime
   email: String
+  ethnic: String
   gender: EGender
   id: String!
   name: String!
-  nation: String
   numberPhone: String
 }
 
@@ -642,7 +645,7 @@ input UpdateProfileInput {
   email: String
   ethnic: String
   fullname: String
-  gender: String
+  gender: EGender!
   id: String!
   identity: String
   job: String

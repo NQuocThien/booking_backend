@@ -16,9 +16,6 @@ registerEnumType(ETypeOfService, {
 @InputType()
 export class CreateRegisterInput {
   @Field()
-  customerId: string;
-
-  @Field()
   profileId: string;
 
   @Field({ nullable: true })
@@ -32,9 +29,6 @@ export class CreateRegisterInput {
 
   @Field({ nullable: true })
   vaccineId?: String;
-
-  @Field()
-  sessionId: String;
 
   @Field()
   isHealthInsurance: boolean;

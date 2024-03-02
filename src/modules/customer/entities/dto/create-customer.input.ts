@@ -24,5 +24,5 @@ export class CreateCustomerInput {
   dateOfBirth: Date;
 
   @Field({ nullable: true })
-  nation: String;
+  ethnic: String;
 }

@@ -1,11 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Session } from 'src/modules/contains/session/session.schema';
 @Schema({
   timestamps: true,
 })
 export class Register {
-  @Prop()
-  customerId: string;
-
   @Prop()
   profileId: string;
 
@@ -21,8 +19,8 @@ export class Register {
   @Prop()
   vaccineId?: String;
 
-  @Prop()
-  sessionId: String;
+  @Prop({ type: Session, default: {} })
+  session: Session;
 
   @Prop()
   isHealthInsurance: boolean;
