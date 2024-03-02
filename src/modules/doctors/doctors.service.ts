@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { Doctor } from './entities/doctor.entity';
 import { CreateDoctorInput } from './entities/dtos/create-doctor.input';
 import { UpdateDoctorInput } from './entities/dtos/update-doctor.input';
+import { deleteDatePast } from 'src/utils/contain';
 
 @Injectable()
 export class DoctorsService {
@@ -48,6 +49,18 @@ export class DoctorsService {
     return await this.doctorModel.find();
   }
   async findOneById(id: String) {
+    let currDoctor = await this.doctorModel.findById(id);
+    const dateOffs: [Date] = currDoctor.workSchedule.dayOff;
+    if (dateOffs.length > 0) {
+      const removedPastDates: [Date] = deleteDatePast(dateOffs);
+      if (removedPastDates !== dateOffs) {
+        currDoctor.workSchedule.dayOff = removedPastDates;
+        const newDoctor = await currDoctor.save();
+        return newDoctor;
+      }
+      return currDoctor;
+    }
+    return currDoctor;
     return await this.doctorModel.findById(id);
   }
   async findOneByUserId(userId: String) {

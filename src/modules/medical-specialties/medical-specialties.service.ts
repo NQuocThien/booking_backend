@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { CreateMedicalSpecialtyInput } from './entities/dtos/create-medical-specialties.input';
 import { MedicalSpecialties } from './entities/medical-specialties.entity';
 import { UpdateMedicalSpecialtyInput } from './entities/dtos/update-medical-specialties.input';
+import { deleteDatePast } from 'src/utils/contain';
 
 @Injectable()
 export class MedicalSpecialtiesService {
@@ -15,7 +16,18 @@ export class MedicalSpecialtiesService {
     return this.medicalSpecialtiesModel.create(data);
   }
   async findById(id: String) {
-    return this.medicalSpecialtiesModel.findById(id);
+    let currSpecialty = await this.medicalSpecialtiesModel.findById(id);
+    const dateOffs: [Date] = currSpecialty.workSchedule.dayOff;
+    if (dateOffs.length > 0) {
+      const removedPastDates: [Date] = deleteDatePast(dateOffs);
+      if (removedPastDates !== dateOffs) {
+        currSpecialty.workSchedule.dayOff = removedPastDates;
+        const newSpecialty = await currSpecialty.save();
+        return newSpecialty;
+      }
+      return currSpecialty;
+    }
+    return currSpecialty;
   }
 
   async findByMedicalFacilityId(
@@ -33,25 +45,36 @@ export class MedicalSpecialtiesService {
       const existingDoc = await this.medicalSpecialtiesModel.findById(data.id);
 
       if (!existingDoc) {
-        console.log('Document not found for ID:', data.id);
+        // console.log('Document not found for ID:', data.id);
         return null;
       }
 
       // Cập nhật dữ liệu từ input vào existingDoc
       Object.assign(existingDoc, data);
-
       // Lưu tài liệu đã cập nhật
       const updatedDoc = await existingDoc.save();
-
-      console.log('---> Updated document:', updatedDoc);
+      // console.log('---> Updated document:', updatedDoc);
       return updatedDoc;
     } catch (error) {
-      console.error('Error updating document:', error);
+      // console.error('Error updating document:', error);
       return null;
     }
   }
   async findOneById(id: String): Promise<MedicalSpecialties> {
-    return await this.medicalSpecialtiesModel.findById(id);
+    let currSpecialty = await this.medicalSpecialtiesModel.findById(id);
+    const dateOffs: [Date] = currSpecialty.workSchedule.dayOff;
+    console.log('-> old dayOff: ', dateOffs);
+    if (dateOffs.length > 0) {
+      const removedPastDates: [Date] = deleteDatePast(dateOffs);
+      if (removedPastDates !== dateOffs) {
+        currSpecialty.workSchedule.dayOff = removedPastDates;
+        const newSpecialty = await currSpecialty.save();
+        console.log('-> new dayOff: ', newSpecialty);
+        return newSpecialty;
+      }
+      return currSpecialty;
+    }
+    return currSpecialty;
   }
   async getAll(): Promise<MedicalSpecialties[]> {
     return await this.medicalSpecialtiesModel.find();

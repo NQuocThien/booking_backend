@@ -36,10 +36,10 @@ export class CustomerService {
       Object.assign(existingDoc, input);
       // Lưu tài liệu đã cập nhật
       const updatedDoc = await existingDoc.save();
-      console.log('---> Updated document:', updatedDoc);
+      // console.log('---> Updated document:', updatedDoc);
       return updatedDoc;
     } catch (error) {
-      console.error('Error updating document:', error);
+      // console.error('Error updating document:', error);
       return null;
     }
   }

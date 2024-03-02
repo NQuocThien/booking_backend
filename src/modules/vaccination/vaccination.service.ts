@@ -4,6 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Vaccination } from './entities/Vaccination.entity';
 import { CreateVaccineInput } from './entities/dto/create-vaccination.input';
 import { UpdateVaccineInput } from './entities/dto/update-vaccination.input';
+import { deleteDatePast } from 'src/utils/contain';
 @Injectable()
 export class VaccinationService {
   constructor(
@@ -16,7 +17,18 @@ export class VaccinationService {
   }
 
   async findById(id: String): Promise<Vaccination> {
-    return await this.model.findById(id);
+    let currVaccine = await this.model.findById(id);
+    const dateOffs: [Date] = currVaccine.workSchedule.dayOff;
+    if (dateOffs.length > 0) {
+      const removedPastDates: [Date] = deleteDatePast(dateOffs);
+      if (removedPastDates !== dateOffs) {
+        currVaccine.workSchedule.dayOff = removedPastDates;
+        const newVaccine = await currVaccine.save();
+        return newVaccine;
+      }
+      return currVaccine;
+    }
+    return currVaccine;
   }
 
   async findByMedicalFacilityId(
@@ -31,17 +43,17 @@ export class VaccinationService {
     try {
       const existingDoc = await this.model.findById(input.id);
       if (!existingDoc) {
-        console.log('Document not found for ID:', input.id);
+        // console.log('Document not found for ID:', input.id);
         return null;
       }
       // Cập nhật dữ liệu từ input vào existingDoc
       Object.assign(existingDoc, input);
       // Lưu tài liệu đã cập nhật
       const updatedDoc = await existingDoc.save();
-      console.log('---> Updated document:', updatedDoc);
+      // console.log('---> Updated document:', updatedDoc);
       return updatedDoc;
     } catch (error) {
-      console.error('Error updating document:', error);
+      // console.error('Error updating document:', error);
       return null;
     }
   }

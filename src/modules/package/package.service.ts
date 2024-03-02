@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import { CreatePackageInput } from './entities/dto/create-package.input';
 import { UpdatePackageInput } from './entities/dto/update-package.input';
 import { Console } from 'console';
+import { deleteDatePast } from 'src/utils/contain';
 
 @Injectable()
 export class PackageService {
@@ -14,7 +15,18 @@ export class PackageService {
   ) {}
 
   async findById(id: String): Promise<Package> {
-    return await this.model.findById(id);
+    let currPackage = await this.model.findById(id);
+    const dateOffs: [Date] = currPackage.workSchedule.dayOff;
+    if (dateOffs.length > 0) {
+      const removedPastDates: [Date] = deleteDatePast(dateOffs);
+      if (removedPastDates !== dateOffs) {
+        currPackage.workSchedule.dayOff = removedPastDates;
+        const newPackage = await currPackage.save();
+        return newPackage;
+      }
+      return currPackage;
+    }
+    return currPackage;
   }
 
   async findAll(): Promise<Package[]> {
@@ -32,17 +44,17 @@ export class PackageService {
     try {
       const existingDoc = await this.model.findById(input.id);
       if (!existingDoc) {
-        console.log('Document not found for ID:', input.id);
+        // console.log('Document not found for ID:', input.id);
         return null;
       }
       // Cập nhật dữ liệu từ input vào existingDoc
       Object.assign(existingDoc, input);
       // Lưu tài liệu đã cập nhật
       const updatedDoc = await existingDoc.save();
-      console.log('---> Updated document:', updatedDoc);
+      // console.log('---> Updated document:', updatedDoc);
       return updatedDoc;
     } catch (error) {
-      console.error('Error updating document:', error);
+      // console.error('Error updating document:', error);
       return null;
     }
   }
