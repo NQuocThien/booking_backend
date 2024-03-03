@@ -10,6 +10,7 @@ import { RolesGuard } from '../auth/roles.guard';
 import { JWtAuthGuard } from '../auth/jwt-auth.guard';
 import { Roles } from '../auth/roles.decorator';
 import { Role } from '../auth/entities/role.enum';
+import deleteImage from 'src/utils/delete_image';
 // import { Query } from '@nestjs/common';
 @Resolver()
 export class GeneralInforResolver {
@@ -30,27 +31,13 @@ export class GeneralInforResolver {
     try {
       const generalInfor = await this.getGeneralInfor();
       updateGeneralInforInput.logoFooter &&
-        this.deleteImage(generalInfor.logoFooter);
+        deleteImage(generalInfor.logoFooter);
       updateGeneralInforInput.logoHeader &&
-        this.deleteImage(generalInfor.logoHeader);
+        deleteImage(generalInfor.logoHeader);
     } catch {}
     const infor = await this.GeneralInforService.updateGeneralInfor(
       updateGeneralInforInput,
     );
     return infor;
-  }
-
-  async deleteImage(fileImage: LinkImage): Promise<void> {
-    try {
-      if (fileImage?.url) {
-        const imageDirectory = `${process.env.FILE_PATH || 'files'}/images`;
-        const imagePath = `${imageDirectory}/${fileImage.filename}`;
-        const imageStat = await fsPromises.stat(imagePath);
-        if (imageStat.isFile()) {
-          await fsPromises.unlink(imagePath);
-          console.log(' Update User Deleted old image :', imageStat.isFile());
-        }
-      }
-    } catch (e) {}
   }
 }

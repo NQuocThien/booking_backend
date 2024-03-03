@@ -28,7 +28,6 @@ export class PackageResolver {
   async createPackage(
     @Args('input') input: CreatePackageInput,
   ): Promise<Package> {
-    // console.log('createPackage');
     return await this.packageService.create(input);
   }
 
@@ -37,12 +36,13 @@ export class PackageResolver {
     @Args('input') input: UpdatePackageInput,
   ): Promise<Package> {
     const currDocs = await this.packageService.findById(input.id);
-    try {
-      if (JSON.stringify(currDocs) !== JSON.stringify(input.image))
-        deleteImage(currDocs.image);
-    } catch (e) {
-      console.error(e.message);
+    const compare: boolean =
+      JSON.stringify(currDocs.image) !== JSON.stringify(input.image);
+    console.log('---> Delete image: ', compare);
+    if (compare) {
+      deleteImage(currDocs.image, 'packages');
     }
+
     return await this.packageService.update(input);
   }
 
@@ -50,7 +50,7 @@ export class PackageResolver {
   async deletePackage(@Args('input') input: String): Promise<Package> {
     const currDocs = await this.packageService.findById(input);
     try {
-      deleteImage(currDocs.image);
+      deleteImage(currDocs.image, 'packages');
     } catch (e) {
       console.error(e.message);
     }

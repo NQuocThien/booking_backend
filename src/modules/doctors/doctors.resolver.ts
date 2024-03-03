@@ -45,8 +45,10 @@ export class DoctorsResolver {
   async updateDoctor(@Args('input') data: UpdateDoctorInput) {
     try {
       const currDoctor = await this.doctorService.findOne(data.id);
-      if (JSON.stringify(currDoctor.avatar) !== JSON.stringify(data.avatar))
-        deleteImage(currDoctor.avatar);
+      const compare: boolean =
+        JSON.stringify(currDoctor.avatar) !== JSON.stringify(data.avatar);
+      console.log('---> Delete old image:', compare);
+      if (compare) deleteImage(currDoctor.avatar, 'doctors');
     } catch (e) {
       console.log('Error Delete Image');
     }
@@ -57,7 +59,7 @@ export class DoctorsResolver {
   async deleteDoctor(@Args('id') id: String): Promise<Doctor> {
     try {
       const currDoctor = await this.doctorService.findOne(id);
-      deleteImage(currDoctor.avatar);
+      deleteImage(currDoctor.avatar, 'doctors');
     } catch (e) {
       console.log('Error Delete Image');
     }

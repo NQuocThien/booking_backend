@@ -76,13 +76,17 @@ export class MedicalFacilitiesResolver {
   ): Promise<MedicalFacilities> {
     try {
       const oldData = await this.medicalService.findById(input.id);
-      if (JSON.stringify(oldData.logo) !== JSON.stringify(input.logo)) {
-        console.log(' ---> delete old logo');
-        await deleteImage(oldData.logo);
+      const compareLogo =
+        JSON.stringify(oldData.logo) !== JSON.stringify(input.logo);
+      const compareImage =
+        JSON.stringify(oldData.image) !== JSON.stringify(input.image);
+      console.log(' ---> delete old logo: ', compareLogo);
+      if (compareLogo) {
+        await deleteImage(oldData.logo, 'facilities');
       }
-      if (JSON.stringify(oldData.image) !== JSON.stringify(input.image)) {
-        console.log(' ---> delete old image');
-        await deleteImage(oldData.image);
+      console.log(' ---> delete old image:', compareImage);
+      if (compareImage) {
+        await deleteImage(oldData.image, 'facilities');
       }
       return this.medicalService.updateMedicalFacilities(input);
     } catch (e) {
@@ -99,9 +103,9 @@ export class MedicalFacilitiesResolver {
     try {
       const oldData = await this.medicalService.findById(id);
       console.log(' ---> delete old logo');
-      await deleteImage(oldData.logo);
+      await deleteImage(oldData.logo, 'facilities');
       console.log(' ---> delete old image');
-      await deleteImage(oldData.image);
+      await deleteImage(oldData.image, 'facilities');
       return this.medicalService.delete(id);
     } catch (e) {
       console.log('Error', e.message);

@@ -24,7 +24,30 @@ export const imageFilter = (_, file, callback) => {
   }
   callback(null, true);
 };
+export const getDestination = (req, file, callback) => {
+  // Bạn cần truyền loại hình ảnh từ phía client, ví dụ: req.body.imageType
+  const imageType = req.headers.imagetype || '';
 
+  let destination = `${process.env.FILE_PATH || 'files'}/images`;
+
+  switch (imageType) {
+    case 'doctors':
+      destination = `${destination}/doctors`;
+      break;
+    case 'packages':
+      destination = `${destination}/packages`;
+      break;
+    case 'facilities':
+      destination = `${destination}/facilities`;
+      break;
+    case 'users':
+      destination = `${destination}/users`;
+      break;
+    default:
+      destination = `${destination}`;
+  }
+  callback(null, destination);
+};
 @Controller()
 export class UploaderController {
   // images
@@ -33,7 +56,8 @@ export class UploaderController {
   @UseInterceptors(
     FilesInterceptor('file', 10, {
       storage: diskStorage({
-        destination: `${process.env.FILE_PATH || 'files'}/images`,
+        // destination: `${process.env.FILE_PATH || 'files'}/images`,
+        destination: getDestination,
         filename: editFileName,
       }),
       fileFilter: imageFilter,
@@ -57,6 +81,37 @@ export class UploaderController {
       throw new Error('Can not Upload ');
     }
   }
+
+  // @Post('webbookingImagePackageUpload')
+  // // @Authenticated()
+  // @UseInterceptors(
+  //   FilesInterceptor('file', 10, {
+  //     storage: diskStorage({
+  //       destination: getDestination,
+  //       filename: editFileName,
+  //     }),
+  //     fileFilter: imageFilter,
+  //   }),
+  // )
+  // async uploadImagePackage(
+  //   @UploadedFiles() files: Express.Multer.File[],
+  // ): Promise<any> {
+  //   try {
+  //     console.log('--> Uploading image package');
+  //     const response = [];
+  //     files.forEach((file) => {
+  //       const fileResponse = {
+  //         originalname: file.originalname,
+  //         filename: file.filename,
+  //       };
+  //       response.push(fileResponse);
+  //     });
+  //     return response;
+  //   } catch (e) {
+  //     console.error(e);
+  //     throw new Error('Can not Upload ');
+  //   }
+  // }
 
   @Delete('webbookingImageDelete/:filename')
   async deleteImage(@Param('filename') filename: string) {

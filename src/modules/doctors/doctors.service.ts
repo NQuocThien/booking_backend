@@ -26,22 +26,13 @@ export class DoctorsService {
   async updateById(data: UpdateDoctorInput) {
     try {
       const existingDoc = await this.doctorModel.findById(data.id);
-
       if (!existingDoc) {
-        console.log('Document not found for ID:', data.id);
         return null;
       }
-
-      // Cập nhật dữ liệu từ input vào existingDoc
       Object.assign(existingDoc, data);
-
-      // Lưu tài liệu đã cập nhật
       const updatedDoc = await existingDoc.save();
-
-      console.log('---> Updated document:', updatedDoc);
       return updatedDoc;
     } catch (error) {
-      console.error('Error updating document:', error);
       return null;
     }
   }

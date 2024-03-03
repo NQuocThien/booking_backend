@@ -131,11 +131,11 @@ export class UsersResolver {
       const currentUser = await this.usersService.findOne(
         updateUserInput.username,
       );
-      if (
-        updateUserInput.linkImage.filename !== currentUser.linkImage.filename &&
-        currentUser
-      )
-        deleteImage(currentUser.linkImage);
+      const compare: boolean =
+        JSON.stringify(currentUser.linkImage) ===
+        JSON.stringify(updateUserInput.linkImage);
+      console.log('---> Delete old image: ' + compare);
+      if (compare) deleteImage(currentUser.linkImage, 'users');
     } catch (e) {
       console.log('Error Delete Image');
     }
@@ -163,12 +163,12 @@ export class UsersResolver {
     if (valid) {
       try {
         const currentUser = await this.findOne(updateUserInput.username);
-        if (
-          updateUserInput.linkImage.filename !==
-            currentUser.linkImage.filename &&
-          currentUser
-        ) {
-          deleteImage(currentUser.linkImage);
+        const compare: boolean =
+          JSON.stringify(currentUser.linkImage) ===
+          JSON.stringify(updateUserInput.linkImage);
+        console.log('---> Delete old image: ' + compare);
+        if (compare) {
+          deleteImage(currentUser.linkImage, 'users');
         }
       } catch (e) {
         console.error('Error Delete: ', e);
