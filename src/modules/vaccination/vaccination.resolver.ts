@@ -25,6 +25,13 @@ export class VaccinationResolver {
     return await this.vaccinationService.findByMedicalFacilityId(input);
   }
 
+  @Query(() => [Vaccination], { name: 'getAllVaccinationByFacilityId' })
+  async getAllVaccinationByFacilityId(
+    @Args('input') input: String,
+  ): Promise<Vaccination[]> {
+    return await this.vaccinationService.findByMedicalFacilityId(input);
+  }
+
   @Mutation(() => Vaccination, { name: 'createVaccination' })
   async createVaccination(
     @Args('input') input: CreateVaccineInput,

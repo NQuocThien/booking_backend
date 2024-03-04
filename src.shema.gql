@@ -293,9 +293,12 @@ input GeneralInforUpdateInput {
   logoHeader: LinkImageInput
 }
 
-input GetRegisterDoctorInput {
+input GetRegisterByOptionInput {
   date: DateTime!
-  doctorId: String!
+  doctorId: String
+  packageId: String
+  specialtyId: String
+  vaccineId: String
 }
 
 enum IRole {
@@ -468,29 +471,34 @@ type Query {
   checklogin: User!
   getAllCustomer: [Customer!]!
   getAllDoctor: [Doctor!]!
+  getAllDoctorByFacilityId(input: String!): [Doctor!]!
   getAllEvaluate: [Evaluate!]!
   getAllMecialSpecialty: [MedicalSpecialties!]!
   getAllMedicalFacility: [MedicalFacilities!]!
+  getAllMedicalFacilityPagination(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "medicalFacilityName", sortOrder: String): [MedicalFacilities!]!
   getAllMedicalStaff: [MedicalStaff!]!
   getAllNotification: [Notification!]!
   getAllPackage: [Package!]!
+  getAllPackageByFacilityId(input: String!): [Package!]!
   getAllPackageSelect(input: String!): [Package!]!
-  getAllRegisterDoctorForDay(input: GetRegisterDoctorInput!): [Register!]!
+  getAllRegisterByOption(input: GetRegisterByOptionInput!): [Register!]!
   getAllUsersPagination(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "username", sortOrder: String): [User!]!
   getAllVacation: [Vaccination!]!
+  getAllVaccinationByFacilityId(input: String!): [Vaccination!]!
   getAllVaccinationSelect(input: String!): [Vaccination!]!
   getDoctorbyId(id: String!): Doctor!
   getDoctorbyUserId(id: String!): Doctor!
   getEvaluateById(id: String!): Evaluate!
   getGeneralInfor: GeneralInfor!
-  getMecialSpecialtiesByMedicalFacilityId(id: String!): [MedicalSpecialties!]!
   getMedicalFacilityById(id: String!): MedicalFacilities!
   getMedicalFacilityByUserId(id: String!): MedicalFacilities!
+  getMedicalSpecialtiesByMedicalFacilityId(input: String!): [MedicalSpecialties!]!
   getMedicalSpecialtyById(input: String!): MedicalSpecialties!
   getMedicalSpecialtySelect(input: String!): [MedicalSpecialties!]!
   getPackageById(input: String!): Package!
   getProfileByCustomerId(id: String!): [Profile!]!
   getSetting: Setting!
+  getTotalFacilitiesCount(search: String): Float!
   getUser(username: String!): User!
   getUserDoctorPending: [User!]!
   getUserDoctorPendingUpdate(input: String!): [User!]!

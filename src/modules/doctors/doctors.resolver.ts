@@ -26,6 +26,13 @@ export class DoctorsResolver {
     return this.doctorService.findAll();
   }
 
+  @Query(() => [Doctor], { name: 'getAllDoctorByFacilityId' })
+  async getAllDoctorByFacilityId(
+    @Args('input') input: String,
+  ): Promise<Doctor[]> {
+    return this.doctorService.findByFacilitiesId(input);
+  }
+
   @Query(() => Doctor, { name: 'getDoctorbyId' })
   async getDoctorbyId(@Args('id') id: String): Promise<Doctor> {
     return this.doctorService.findOneById(id);

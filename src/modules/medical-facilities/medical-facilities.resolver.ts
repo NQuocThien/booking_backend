@@ -61,6 +61,37 @@ export class MedicalFacilitiesResolver {
     return result;
   }
 
+  @Query(() => [MedicalFacilities], { name: 'getAllMedicalFacilityPagination' })
+  // @UseGuards(JWtAuthGuard)
+  async getAllMedicalFacilityPagination(
+    @Args('search', { nullable: true }) search: string,
+    @Args('page', { defaultValue: 1 }) page: number,
+    @Args('limit', { defaultValue: 10 }) limit: number,
+    @Args('sortField', { nullable: true, defaultValue: 'medicalFacilityName' })
+    sortField: string,
+    @Args('sortOrder', { nullable: true }) sortOrder: string,
+  ): Promise<MedicalFacilities[]> {
+    {
+      const user = await this.medicalService.getAllMedicalFacilityPagination(
+        search,
+        page,
+        limit,
+        sortField,
+        sortOrder,
+      );
+      return user;
+    }
+  }
+
+  @Query(() => Number, { name: 'getTotalFacilitiesCount' })
+  async getTotalFacilitiesCount(
+    @Args('search', { nullable: true }) search?: string,
+  ): Promise<number> {
+    const count = await this.medicalService.getTotalFacilitiesCount(
+      search || '',
+    );
+    return count;
+  }
   @Mutation(() => MedicalFacilities, { name: 'createMedicalFacility' })
   async createMedicalFacility(
     @Args('input')

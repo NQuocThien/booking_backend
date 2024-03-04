@@ -9,7 +9,7 @@ import { CreateRegisterSpecialtyInput } from './entities/dtos/create-register-sp
 import { CreateRegisterPackageInput } from './entities/dtos/create-register-package.Input';
 import { CreateRegisterVaccineInput } from './entities/dtos/create-register-vaccine.input';
 import { CreateRegisterInput } from './entities/dtos/create-register.input';
-import { GetRegisterDoctorInput } from './entities/dtos/get-register-doctor.input';
+import { GetRegisterByOptionInput } from './entities/dtos/get-register-option.input';
 import { ConfirmRegisterInput } from './entities/dtos/confirm-register.input';
 
 @Injectable()
@@ -29,13 +29,12 @@ export class RegisterService {
     };
     return await this.model.create(datainput);
   }
-  async getAllRegisterDoctorForDay(
-    input: GetRegisterDoctorInput,
+  async getAllRegisterByOption(
+    input: GetRegisterByOptionInput,
   ): Promise<Register[]> {
     const data = await this.model
       .find({
-        doctorId: input.doctorId,
-        date: input.date,
+        ...input,
       })
       .exec();
     return data;

@@ -125,9 +125,7 @@ export class UsersService {
       .skip(skip)
       .sort(sortOptions);
   }
-  async getTotalUser(search: string): Promise<User> {
-    return;
-  }
+
   async getTotalUsersCount(search: string): Promise<number> {
     const query = search
       ? { username: { $regex: new RegExp(search, 'i') } }

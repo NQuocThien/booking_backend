@@ -26,6 +26,33 @@ export class MedicalFacilitiesService {
   async findById(id: String): Promise<MedicalFacilities> {
     return this.medicalModel.findById(id);
   }
+  async getTotalFacilitiesCount(search: string): Promise<number> {
+    const query = search
+      ? { medicalFacilityName: { $regex: new RegExp(search, 'i') } }
+      : {};
+    const count = await this.medicalModel.countDocuments(query);
+    return count;
+  }
+  async getAllMedicalFacilityPagination(
+    search: string,
+    page: number,
+    limit: number,
+    sortField: string,
+    sortOrder: string,
+  ): Promise<MedicalFacilities[]> {
+    const query = search
+      ? { medicalFacilityName: { $regex: search, $options: 'i' } }
+      : {};
+    const sortOptions: { [key: string]: 'asc' | 'desc' } = {};
+    sortOptions[sortField] = sortOrder === 'asc' ? 'asc' : 'desc';
+    const skip = (page - 1) * limit;
+    return this.medicalModel
+      .find({ ...query })
+      .limit(limit)
+      .skip(skip)
+      .sort(sortOptions);
+  }
+
   async findOneByUserId(id: String): Promise<MedicalFacilities> {
     return this.medicalModel.findOne({ userId: id });
   }

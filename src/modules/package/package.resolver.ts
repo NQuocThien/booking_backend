@@ -19,6 +19,13 @@ export class PackageResolver {
     return await this.packageService.findById(input);
   }
 
+  @Query(() => [Package], { name: 'getAllPackageByFacilityId' })
+  async getAllPackageByFacilityId(
+    @Args('input') input: String,
+  ): Promise<Package[]> {
+    return await this.packageService.findByMedicalFacilityId(input);
+  }
+
   @Query(() => [Package], { name: 'getAllPackageSelect' })
   async getAllPackageSelect(@Args('input') input: String): Promise<Package[]> {
     return await this.packageService.findByMedicalFacilityId(input);

@@ -15,7 +15,7 @@ import { CreateRegisterSpecialtyInput } from './entities/dtos/create-register-sp
 import { CreateRegisterPackageInput } from './entities/dtos/create-register-package.Input';
 import { CreateRegisterVaccineInput } from './entities/dtos/create-register-vaccine.input';
 import { Profile } from '../profile/entity/profile.entity';
-import { GetRegisterDoctorInput } from './entities/dtos/get-register-doctor.input';
+import { GetRegisterByOptionInput } from './entities/dtos/get-register-option.input';
 import { ConfirmRegisterInput } from './entities/dtos/confirm-register.input';
 
 @Resolver(() => Register)
@@ -32,11 +32,11 @@ export class RegisterResolver {
     return await this.regisService.createRegisterDoctor(input);
   }
 
-  @Query(() => [Register], { name: 'getAllRegisterDoctorForDay' })
-  async getAllRegisterDoctorForDay(
-    @Args('input') input: GetRegisterDoctorInput,
+  @Query(() => [Register], { name: 'getAllRegisterByOption' })
+  async getAllRegisterByOption(
+    @Args('input') input: GetRegisterByOptionInput,
   ): Promise<Register[]> {
-    return await this.regisService.getAllRegisterDoctorForDay(input);
+    return await this.regisService.getAllRegisterByOption(input);
   }
 
   @Mutation(() => Register, { name: 'createRegisterSpecialty' })
