@@ -11,7 +11,7 @@ export class UpdateMedicalStaffInput {
   @Field()
   medicalFacilityId: String;
 
-  @Field(() => EGender)
+  @Field(() => String)
   name: String;
 
   @Field(() => EGender)

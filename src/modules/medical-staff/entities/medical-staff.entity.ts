@@ -12,7 +12,7 @@ export class MedicalStaff {
   medicalFacilityId: String;
 
   @Field()
-  name: String;
+  name: string;
 
   @Field(() => String)
   gender: EGender;

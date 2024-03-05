@@ -26,11 +26,50 @@ export class DoctorsResolver {
     return this.doctorService.findAll();
   }
 
+  @Query(() => Number, { name: 'getTotalDoctorsCount' })
+  async getTotalDoctorsCount(
+    @Args('search', { nullable: true }) search?: string,
+  ): Promise<number> {
+    const count = await this.doctorService.getTotalDoctorsCount(search || '');
+    return count;
+  }
+
+  @Query(() => [Doctor], { name: 'getAllDoctorPagination' })
+  // @UseGuards(JWtAuthGuard)
+  async getAllDoctorPagination(
+    @Args('search', { nullable: true }) search: string,
+    @Args('page', { defaultValue: 1 }) page: number,
+    @Args('limit', { defaultValue: 10 }) limit: number,
+    @Args('sortField', { nullable: true, defaultValue: 'name' })
+    sortField: string,
+    @Args('sortOrder', { nullable: true }) sortOrder: string,
+  ): Promise<Doctor[]> {
+    {
+      const user = await this.doctorService.getAllDoctorPagination(
+        search,
+        page,
+        limit,
+        sortField,
+        sortOrder,
+      );
+      return user;
+    }
+  }
+
   @Query(() => [Doctor], { name: 'getAllDoctorByFacilityId' })
   async getAllDoctorByFacilityId(
     @Args('input') input: String,
   ): Promise<Doctor[]> {
     return this.doctorService.findByFacilitiesId(input);
+  }
+
+  @Query(() => [Doctor], { name: 'getAllDoctorPending' })
+  async getAllDoctorPending(): Promise<Doctor[]> {
+    const allDoctor = await this.doctorService.findAll();
+    const doctorsPending = allDoctor.filter(
+      (doc) => doc.medicalFactilitiesId === '',
+    );
+    return doctorsPending;
   }
 
   @Query(() => Doctor, { name: 'getDoctorbyId' })

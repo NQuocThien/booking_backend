@@ -26,7 +26,7 @@ registerEnumType(EGender, {
 
 export enum EStatusService {
   Open = 'Mở',
-  Close = 'Đống',
+  Close = 'Đóng',
 }
 
 export enum EStateRegister {
@@ -64,11 +64,11 @@ export enum EDayOfWeed {
 }
 
 export enum EPermission {
-  Magager = 'MANAGER',
-  MagagerBlog = 'MANAGER_BLOG',
-  ManagerSpecialty = 'MANAGER_SPECIALTY',
-  MagagerPackage = 'MANAGER_PACKAGE',
-  MagagerVaccine = 'MANAGER_VACCINE',
+  Magager = 'Quản lý',
+  MagagerBlog = 'Quản lý bài viết',
+  ManagerSpecialty = 'Quản lý chuyên khoa',
+  MagagerPackage = 'Quản lý gói khám',
+  MagagerVaccine = 'Quản lý tim chủng',
 }
 
 registerEnumType(EPermission, {

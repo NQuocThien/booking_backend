@@ -92,6 +92,7 @@ export class MedicalFacilitiesResolver {
     );
     return count;
   }
+
   @Mutation(() => MedicalFacilities, { name: 'createMedicalFacility' })
   async createMedicalFacility(
     @Args('input')

@@ -15,6 +15,9 @@ export class MedicalStaffService {
   async getAllMedicalStaff(): Promise<MedicalStaff[]> {
     return await this.model.find();
   }
+  async findById(id: String): Promise<MedicalStaff> {
+    return await this.model.findById(id).exec();
+  }
   async createMedicalStaff(
     input: CreateMedicalStaffInput,
   ): Promise<MedicalStaff> {

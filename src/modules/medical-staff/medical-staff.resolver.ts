@@ -13,6 +13,13 @@ export class MedicalStaffResolver {
     return await this.medicalStaffService.getAllMedicalStaff();
   }
 
+  @Query(() => [MedicalStaff], { name: 'getMedicalStaffByFacilityId' })
+  async getMedicalStaffByFacilityId(
+    @Args('input') id: String,
+  ): Promise<MedicalStaff[]> {
+    return await this.medicalStaffService.findByMedicalFacilityId(id);
+  }
+
   @Mutation(() => MedicalStaff, { name: 'createMedicalStaff' })
   async createMedicalStaff(
     @Args('input') input: CreateMedicalStaffInput,

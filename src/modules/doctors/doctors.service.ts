@@ -39,6 +39,31 @@ export class DoctorsService {
   async findAll() {
     return await this.doctorModel.find();
   }
+  async getAllDoctorPagination(
+    search: string,
+    page: number,
+    limit: number,
+    sortField: string,
+    sortOrder: string,
+  ): Promise<Doctor[]> {
+    const query = search ? { name: { $regex: search, $options: 'i' } } : {};
+    const sortOptions: { [key: string]: 'asc' | 'desc' } = {};
+    sortOptions[sortField] = sortOrder === 'asc' ? 'asc' : 'desc';
+    const skip = (page - 1) * limit;
+    return this.doctorModel
+      .find({ ...query })
+      .limit(limit)
+      .skip(skip)
+      .sort(sortOptions);
+  }
+
+  async getTotalDoctorsCount(search: string): Promise<number> {
+    const query = search
+      ? { username: { $regex: new RegExp(search, 'i') } }
+      : {};
+    const count = await this.doctorModel.countDocuments(query);
+    return count;
+  }
   async findOneById(id: String) {
     let currDoctor = await this.doctorModel.findById(id);
     const dateOffs: [Date] = currDoctor.workSchedule.dayOff;

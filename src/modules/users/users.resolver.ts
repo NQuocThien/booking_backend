@@ -147,7 +147,6 @@ export class UsersResolver {
   async updateUserWithPass(
     @Args('updateUserInput') updateUserInput: UpdateUserWithPassInput,
   ): Promise<User> {
-    console.log(' updating user');
     const user = await this.usersService.findOne(updateUserInput.username);
     const valid = await bcrypt.compare(updateUserInput.password, user.password);
     console.log(
@@ -183,7 +182,6 @@ export class UsersResolver {
 
   @Mutation(() => User, { name: 'deleteUser' })
   async deleteUser(@Args('id') id: string): Promise<User> {
-    // log('update user: ', updateUserInput)
     return this.usersService.deleteUserById(id);
   }
 
@@ -191,17 +189,14 @@ export class UsersResolver {
   async updateRoles(
     @Args('updateRolesInput') req: UpdateRolesInput,
   ): Promise<User> {
-    // log('update user: ', updateUserInput)
     return this.usersService.updateRoles(req.id, req.roles);
   }
   @Mutation(() => User, { name: 'activeUser' })
   async activeUser(@Args('id') id: string): Promise<User> {
-    // log('update user: ', updateUserInput)
     return this.usersService.activeUserById(id);
   }
 
   @Query(() => User, { name: 'getUser' })
-  // @UseGuards(JWtAuthGuard)
   async findOne(@Args('username') username: string) {
     return await this.usersService.findOne(username);
   }
