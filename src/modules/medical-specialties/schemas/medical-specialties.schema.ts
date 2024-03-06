@@ -15,7 +15,7 @@ export class MedicalSpecialties {
   discription: string;
 
   @Prop({ type: Object, default: null })
-  workSchedule: WorkSchedule;
+  workSchedule?: WorkSchedule;
 }
 export const MedicalSpecialtiesSchema =
   SchemaFactory.createForClass(MedicalSpecialties);

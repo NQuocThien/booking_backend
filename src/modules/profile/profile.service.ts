@@ -17,6 +17,11 @@ export class ProfileService {
   async findById(id: String): Promise<Profile> {
     return this.model.findById(id);
   }
+  async findAll(): Promise<Profile[]> {
+    const result = await this.model.find();
+    // console.log('---> result: ', result.length);
+    return result;
+  }
   async delete(id: String): Promise<Profile> {
     return this.model.findByIdAndRemove(id);
   }
@@ -24,17 +29,12 @@ export class ProfileService {
     try {
       const existingDoc = await this.model.findById(data.id);
       if (!existingDoc) {
-        // console.log('Document not found for ID:', data.id);
         return null;
       }
-      // Cập nhật dữ liệu từ input vào existingDoc
       Object.assign(existingDoc, data);
-      // Lưu tài liệu đã cập nhật
       const updatedDoc = await existingDoc.save();
-      // console.log('---> Updated document:', updatedDoc);
       return updatedDoc;
     } catch (error) {
-      // console.error('Error updating document:', error);
       return null;
     }
   }

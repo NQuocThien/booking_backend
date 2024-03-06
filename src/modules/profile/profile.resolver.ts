@@ -43,12 +43,22 @@ export class ProfileResolver {
     const result = await this.profileService.getProfileByCustomerId(id);
     return result;
   }
+  @Query(() => [Profile], { name: 'getAllProfile' })
+  async getAllProfile(): Promise<Profile[]> {
+    const result = await this.profileService.findAll();
+    return result;
+  }
   @ResolveField(() => [Register], { name: 'register' })
   async register(@Parent() profile: Profile): Promise<Register[]> {
     return this.regisService.getRegisterByProfileId(profile.id);
   }
   @ResolveField(() => Customer, { name: 'customer' })
-  async customer(@Parent() profile: Profile): Promise<Customer> {
-    return this.customerSvr.findById(profile.customerId);
+  async customer(@Parent() profile: Profile): Promise<Customer | null> {
+    if (profile.customerId) {
+      const customer = await this.customerSvr.findById(profile.customerId);
+      // console.log('---> customer: ', customer);
+      return customer || null;
+    }
+    return null;
   }
 }

@@ -29,7 +29,4 @@ export class Customer {
 
   @Field()
   ethnic: String;
-
-  // @Field(() => [Profile], { nullable: true })
-  // profile: Profile[];
 }

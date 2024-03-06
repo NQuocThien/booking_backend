@@ -86,4 +86,10 @@ export class MedicalSpecialtiesService {
       medicalFactilityId: medicalFactilityId,
     });
   }
+  async getAllByIds(ids: String[]): Promise<MedicalSpecialties[]> {
+    const result = await this.medicalSpecialtiesModel.find({
+      _id: { $in: ids },
+    });
+    return result;
+  }
 }

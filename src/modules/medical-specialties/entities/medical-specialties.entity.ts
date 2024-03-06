@@ -18,6 +18,6 @@ export class MedicalSpecialties {
   @Field()
   discription: string;
 
-  @Field(() => WorkSchedule)
+  @Field(() => WorkSchedule, { nullable: true })
   workSchedule: WorkSchedule;
 }

@@ -14,6 +14,6 @@ export class CreateMedicalSpecialtyInput {
   @Field()
   discription: string;
 
-  @Field(() => WorkScheduleInput)
+  @Field(() => WorkScheduleInput, { nullable: true })
   workSchedule: WorkScheduleInput;
 }

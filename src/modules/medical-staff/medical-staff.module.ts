@@ -4,6 +4,7 @@ import { MedicalStaffService } from './medical-staff.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MedicalStaff } from './entities/medical-staff.entity';
 import { MedicalStaffSchema } from './schema/medical-staff.schema';
+import { MedicalSpecialtiesModule } from '../medical-specialties/medical-specialties.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { MedicalStaffSchema } from './schema/medical-staff.schema';
         schema: MedicalStaffSchema,
       },
     ]),
+    MedicalSpecialtiesModule,
   ],
   providers: [MedicalStaffResolver, MedicalStaffService],
   exports: [MedicalStaffService],

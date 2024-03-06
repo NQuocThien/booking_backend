@@ -16,7 +16,7 @@ export class MedicalStaffService {
     return await this.model.find();
   }
   async findById(id: String): Promise<MedicalStaff> {
-    return await this.model.findById(id).exec();
+    return await this.model.findById(id);
   }
   async createMedicalStaff(
     input: CreateMedicalStaffInput,
@@ -50,5 +50,28 @@ export class MedicalStaffService {
     medicalFacilityId: String,
   ): Promise<MedicalStaff[]> {
     return await this.model.find({ medicalFacilityId: medicalFacilityId });
+  }
+  async getAllStaffPagination(
+    search: string,
+    page: number,
+    limit: number,
+    sortField: string,
+    sortOrder: string,
+  ): Promise<MedicalStaff[]> {
+    const query = search ? { name: { $regex: search, $options: 'i' } } : {};
+    const sortOptions: { [key: string]: 'asc' | 'desc' } = {};
+    sortOptions[sortField] = sortOrder === 'asc' ? 'asc' : 'desc';
+    const skip = (page - 1) * limit;
+    return this.model
+      .find({ ...query })
+      .limit(limit)
+      .skip(skip)
+      .sort(sortOptions);
+  }
+
+  async getTotalStaffCount(search: string): Promise<number> {
+    const query = search ? { name: { $regex: new RegExp(search, 'i') } } : {};
+    const count = await this.model.countDocuments(query);
+    return count;
   }
 }
