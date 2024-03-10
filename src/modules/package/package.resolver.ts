@@ -54,7 +54,7 @@ export class PackageResolver {
   }
 
   @Mutation(() => Package, { name: 'deletePackage' })
-  async deletePackage(@Args('input') input: String): Promise<Package> {
+  async deletePackage(@Args('input') input: string): Promise<Package> {
     const currDocs = await this.packageService.findById(input);
     try {
       deleteImage(currDocs.image, 'packages');

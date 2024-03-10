@@ -92,4 +92,10 @@ export class MedicalSpecialtiesService {
     });
     return result;
   }
+  async getTotalPackagesCountByFacilityId(facilityId: string): Promise<number> {
+    const count = await this.medicalSpecialtiesModel.countDocuments({
+      medicalFactilityId: facilityId,
+    });
+    return count;
+  }
 }

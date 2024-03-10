@@ -9,7 +9,7 @@ import { Vaccination } from 'src/modules/vaccination/entities/Vaccination.entity
 @ObjectType()
 export class MedicalFacilities {
   @Field((type) => ID)
-  id: String;
+  id: string;
 
   @Field()
   userId: string;
@@ -76,4 +76,16 @@ export class MedicalFacilities {
 
   @Field(() => [MedicalStaff], { nullable: true })
   medicalStaffs: MedicalStaff[];
+
+  @Field(() => Number, { nullable: true })
+  totalDoctors: number;
+
+  @Field(() => Number, { nullable: true })
+  totalSpecialties: number;
+
+  @Field(() => Number, { nullable: true })
+  totalVaccinations: number;
+
+  @Field(() => Number, { nullable: true })
+  totalPackages: number;
 }

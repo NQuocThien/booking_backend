@@ -16,12 +16,44 @@ import { UpdateCustomerInput } from './entities/dto/update-customer.input';
 export class CustomerResolver {
   constructor(
     private readonly customerService: CustomerService,
-  ) // private readonly profileSv: ProfileService,
-  {}
+    private readonly profileSv: ProfileService,
+  ) {}
 
   @Query(() => [Customer], { name: 'getAllCustomer' })
   async getAllCustomer() {
     return this.customerService.getCustomer();
+  }
+
+  @Query(() => Number, { name: 'getTotalCustomersCount' })
+  async getTotalCustomersCount(
+    @Args('search', { nullable: true }) search?: string,
+  ): Promise<number> {
+    const count = await this.customerService.getTotalCustomersCount(
+      search || '',
+    );
+    return count;
+  }
+
+  @Query(() => [Customer], { name: 'getAllCustomerPagination' })
+  // @UseGuards(JWtAuthGuard)
+  async getAllCustomerPagination(
+    @Args('search', { nullable: true }) search: string,
+    @Args('page', { defaultValue: 1 }) page: number,
+    @Args('limit', { defaultValue: 10 }) limit: number,
+    @Args('sortField', { nullable: true, defaultValue: 'name' })
+    sortField: string,
+    @Args('sortOrder', { nullable: true }) sortOrder: string,
+  ): Promise<Customer[]> {
+    {
+      const user = await this.customerService.getAllCustomerPagination(
+        search,
+        page,
+        limit,
+        sortField,
+        sortOrder,
+      );
+      return user;
+    }
   }
 
   @Mutation(() => Customer, { name: 'createcustomer' })
@@ -33,8 +65,9 @@ export class CustomerResolver {
     return this.customerService.updateCustomer(input);
   }
 
-  // @ResolveField(() => [Profile], { name: 'profile' })
-  // async profile(@Parent() cus: Customer): Promise<Profile[]> {
-  //   return this.profileSv.getProfileByCustomerId(cus.id);
-  // }
+  @ResolveField(() => [Profile], { name: 'profiles' })
+  async profiles(@Parent() cus: Customer): Promise<Profile[]> {
+    // console.log('=> Customer: ', cus.name);
+    return this.profileSv.getProfileByCustomerId(cus.id);
+  }
 }

@@ -13,12 +13,14 @@ import { UpdateDoctorInput } from './entities/dtos/update-doctor.input';
 import deleteImage from 'src/utils/delete_image';
 import { MedicalSpecialtiesService } from '../medical-specialties/medical-specialties.service';
 import { MedicalSpecialties } from '../medical-specialties/entities/medical-specialties.entity';
+import { MedicalFacilitiesService } from '../medical-facilities/medical-facilities.service';
 
 @Resolver(() => Doctor)
 export class DoctorsResolver {
   constructor(
     private readonly doctorService: DoctorsService,
     private readonly specialtySvr: MedicalSpecialtiesService,
+    private readonly facilitySvr: MedicalFacilitiesService,
   ) {}
 
   @Query(() => [Doctor], { name: 'getAllDoctor' })
@@ -29,9 +31,22 @@ export class DoctorsResolver {
   @Query(() => Number, { name: 'getTotalDoctorsCount' })
   async getTotalDoctorsCount(
     @Args('search', { nullable: true }) search?: string,
+    @Args('userId', { nullable: true, defaultValue: '' }) userId?: string,
   ): Promise<number> {
-    const count = await this.doctorService.getTotalDoctorsCount(search || '');
-    return count;
+    if (userId === '') {
+      const count = await this.doctorService.getTotalDoctorsCount(search || '');
+      return count;
+    } else {
+      const facility = await this.facilitySvr.findOneByUserId(userId);
+      if (facility) {
+        const count = await this.doctorService.getTotalDoctorsCountOfFacility(
+          search || '',
+          facility.id,
+        );
+        return count;
+      }
+      return null;
+    }
   }
 
   @Query(() => [Doctor], { name: 'getAllDoctorPagination' })
@@ -53,6 +68,32 @@ export class DoctorsResolver {
         sortOrder,
       );
       return user;
+    }
+  }
+  @Query(() => [Doctor], { name: 'getAllDoctorPaginationOfFacility' })
+  // @UseGuards(JWtAuthGuard)
+  async getAllDoctorPaginationOfFacility(
+    @Args('search', { nullable: true }) search: string,
+    @Args('page', { defaultValue: 1 }) page: number,
+    @Args('limit', { defaultValue: 10 }) limit: number,
+    @Args('sortField', { nullable: true, defaultValue: 'name' })
+    sortField: string,
+    @Args('sortOrder', { nullable: true }) sortOrder: string,
+    @Args('userId', { nullable: true }) userId: string,
+  ): Promise<Doctor[]> {
+    {
+      const facility = await this.facilitySvr.findOneByUserId(userId);
+      if (facility) {
+        const docs = await this.doctorService.getAllDoctorPaginationOfFacility(
+          search,
+          page,
+          limit,
+          sortField,
+          sortOrder,
+          facility.id,
+        );
+        return docs;
+      } else return null;
     }
   }
 

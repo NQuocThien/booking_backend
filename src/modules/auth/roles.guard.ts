@@ -13,7 +13,6 @@ export class RolesGuard implements CanActivate {
     ]); // lấy mãng các role đã ràn bộc ở resolver
     console.log('=> Role');
     if (!requiredRoles) {
-      // nếu ko có ràn buộc quyền return true
       console.log('\t-> Ko có role');
       return true;
     }

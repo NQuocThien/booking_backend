@@ -1,4 +1,5 @@
 import { ObjectType, Field, Int } from '@nestjs/graphql';
+import { Role } from 'src/modules/auth/entities/role.enum';
 @ObjectType()
 export class CreateUserInput {
   @Field()
@@ -11,7 +12,7 @@ export class CreateUserInput {
   password: string;
 
   @Field(() => [String], { nullable: true })
-  roles?: string[];
+  roles?: Role[];
 
   @Field()
   active: boolean;

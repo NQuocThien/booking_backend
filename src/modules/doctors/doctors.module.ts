@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Doctor } from './entities/doctor.entity';
 import { DoctorSchema } from './schema/doctor.schema';
 import { MedicalSpecialtiesModule } from '../medical-specialties/medical-specialties.module';
+import { MedicalFacilitiesModule } from '../medical-facilities/medical-facilities.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { MedicalSpecialtiesModule } from '../medical-specialties/medical-special
       },
     ]),
     MedicalSpecialtiesModule,
+    forwardRef(() => MedicalFacilitiesModule),
   ],
   providers: [DoctorsResolver, DoctorsService],
   exports: [DoctorsService],

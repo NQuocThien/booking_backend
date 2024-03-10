@@ -39,7 +39,7 @@ export class ProfileResolver {
     return this.profileService.delete(id);
   }
   @Query(() => [Profile], { name: 'getProfileByCustomerId' })
-  async getProfileByCustomerId(@Args('id') id: String): Promise<Profile[]> {
+  async getProfileByCustomerId(@Args('id') id: string): Promise<Profile[]> {
     const result = await this.profileService.getProfileByCustomerId(id);
     return result;
   }
@@ -56,7 +56,6 @@ export class ProfileResolver {
   async customer(@Parent() profile: Profile): Promise<Customer | null> {
     if (profile.customerId) {
       const customer = await this.customerSvr.findById(profile.customerId);
-      // console.log('---> customer: ', customer);
       return customer || null;
     }
     return null;

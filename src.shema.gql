@@ -177,6 +177,7 @@ type Customer {
   id: ID!
   name: String!
   numberPhone: String!
+  profiles: [Profile!]
   userId: String!
 }
 
@@ -301,13 +302,6 @@ input GetRegisterByOptionInput {
   vaccineId: String
 }
 
-enum IRole {
-  Admin
-  Clinic
-  Customer
-  User
-}
-
 type LinkImage {
   filename: String!
   type: String!
@@ -356,6 +350,10 @@ type MedicalFacilities {
   schedule: String!
   status: String!
   taxCode: String!
+  totalDoctors: Float
+  totalPackages: Float
+  totalSpecialties: Float
+  totalVaccinations: Float
   userId: String!
   vaccinations: [Vaccination!]
 }
@@ -471,9 +469,11 @@ type Profile {
 type Query {
   checklogin: User!
   getAllCustomer: [Customer!]!
+  getAllCustomerPagination(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "name", sortOrder: String): [Customer!]!
   getAllDoctor: [Doctor!]!
   getAllDoctorByFacilityId(input: String!): [Doctor!]!
   getAllDoctorPagination(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "name", sortOrder: String): [Doctor!]!
+  getAllDoctorPaginationOfFacility(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "name", sortOrder: String, userId: String): [Doctor!]!
   getAllDoctorPending: [Doctor!]!
   getAllEvaluate: [Evaluate!]!
   getAllMecialSpecialty: [MedicalSpecialties!]!
@@ -505,11 +505,13 @@ type Query {
   getPackageById(input: String!): Package!
   getProfileByCustomerId(id: String!): [Profile!]!
   getSetting: Setting!
-  getTotalDoctorsCount(search: String): Float!
+  getTotalCustomersCount(search: String): Float!
+  getTotalDoctorsCount(search: String, userId: String = ""): Float!
   getTotalFacilitiesCount(search: String): Float!
   getUser(username: String!): User!
   getUserDoctorPending: [User!]!
   getUserDoctorPendingUpdate(input: String!): [User!]!
+  getUserFacilitySelect(input: String!): [User!]!
   getUserMedicalNon: [User!]!
   getUserSelect(roleInput: UserSelectInput!): [User!]!
   getUserSelected(id: String!): User!
@@ -533,6 +535,15 @@ type Register {
   state: String!
   typeOfService: String!
   vaccineId: String
+}
+
+enum Role {
+  Admin
+  Customer
+  Doctor
+  Facility
+  Staff
+  User
 }
 
 type Schedule {
@@ -678,7 +689,7 @@ input UpdateRegisterInput {
 
 input UpdateRolesInput {
   id: String!
-  roles: [String!]!
+  roles: [Role!]!
 }
 
 input UpdateSettingInput {
@@ -731,7 +742,7 @@ type User {
 }
 
 input UserSelectInput {
-  role: IRole!
+  role: Role!
 }
 
 type Vaccination {

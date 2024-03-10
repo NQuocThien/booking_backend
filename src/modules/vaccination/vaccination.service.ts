@@ -60,4 +60,10 @@ export class VaccinationService {
   async delete(id: String): Promise<Vaccination> {
     return this.model.findByIdAndDelete(id);
   }
+  async getTotalPackagesCountByFacilityId(facilityId: string): Promise<number> {
+    const count = await this.model.countDocuments({
+      medicalFactilitiesId: facilityId,
+    });
+    return count;
+  }
 }

@@ -4,29 +4,32 @@ import { Profile } from 'src/modules/profile/entity/profile.entity';
 @ObjectType()
 export class Customer {
   @Field(() => ID)
-  id: String;
+  id: string;
 
   @Field()
   userId: string;
 
   @Field()
-  name: String;
+  name: string;
 
   @Field(() => String)
   gender: EGender;
 
   @Field()
-  numberPhone: String;
+  numberPhone: string;
 
   @Field()
-  email: String;
+  email: string;
 
   @Field()
-  address: String;
+  address: string;
 
   @Field()
   dateOfBirth: Date;
 
   @Field()
-  ethnic: String;
+  ethnic: string;
+
+  @Field(() => [Profile], { nullable: true })
+  profiles: Profile[];
 }

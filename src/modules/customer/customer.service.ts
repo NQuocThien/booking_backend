@@ -20,6 +20,7 @@ export class CustomerService {
     const customerMap = new Map<string, Customer>(
       allCustomers.map((customer) => [customer.id.toString(), customer]),
     );
+
     this.customerLoader = new DataLoader<string, Customer>(
       async (customerIds) =>
         customerIds.map((customerId) => customerMap.get(customerId) || null),
@@ -28,6 +29,31 @@ export class CustomerService {
 
   async getCustomer() {
     return await this.customerModel.find();
+  }
+  async getAllCustomerPagination(
+    search: string,
+    page: number,
+    limit: number,
+    sortField: string,
+    sortOrder: string,
+  ): Promise<Customer[]> {
+    const query = search ? { name: { $regex: search, $options: 'i' } } : {};
+    const sortOptions: { [key: string]: 'asc' | 'desc' } = {};
+    sortOptions[sortField] = sortOrder === 'asc' ? 'asc' : 'desc';
+    const skip = (page - 1) * limit;
+    return this.customerModel
+      .find({ ...query })
+      .limit(limit)
+      .skip(skip)
+      .sort(sortOptions);
+  }
+
+  async getTotalCustomersCount(search: string): Promise<number> {
+    const query = search
+      ? { username: { $regex: new RegExp(search, 'i') } }
+      : {};
+    const count = await this.customerModel.countDocuments(query);
+    return count;
   }
   async findByUserId(userId: String) {
     const res = await this.customerModel.findOne({ userId: userId });

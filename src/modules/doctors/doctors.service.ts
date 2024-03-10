@@ -56,11 +56,50 @@ export class DoctorsService {
       .skip(skip)
       .sort(sortOptions);
   }
+  async getAllDoctorPaginationOfFacility(
+    search: string,
+    page: number,
+    limit: number,
+    sortField: string,
+    sortOrder: string,
+    facilityId: string,
+  ): Promise<Doctor[]> {
+    const query = search
+      ? {
+          name: { $regex: search, $options: 'i' },
+          medicalFactilitiesId: facilityId,
+        }
+      : { medicalFactilitiesId: facilityId };
+    const sortOptions: { [key: string]: 'asc' | 'desc' } = {};
+    sortOptions[sortField] = sortOrder === 'asc' ? 'asc' : 'desc';
+    const skip = (page - 1) * limit;
+    return this.doctorModel
+      .find({ ...query })
+      .limit(limit)
+      .skip(skip)
+      .sort(sortOptions)
+      .exec();
+  }
 
   async getTotalDoctorsCount(search: string): Promise<number> {
     const query = search
       ? { username: { $regex: new RegExp(search, 'i') } }
       : {};
+    const count = await this.doctorModel.countDocuments(query);
+    return count;
+  }
+  async getTotalDoctorsCountOfFacility(
+    search: string,
+    facilityId: string,
+  ): Promise<number> {
+    const query = search
+      ? {
+          username: {
+            $regex: new RegExp(search, 'i'),
+            medicalFactilitiesId: facilityId,
+          },
+        }
+      : { medicalFactilitiesId: facilityId };
     const count = await this.doctorModel.countDocuments(query);
     return count;
   }
@@ -87,5 +126,11 @@ export class DoctorsService {
   }
   async findByFacilitiesId(id: String): Promise<Doctor[]> {
     return await this.doctorModel.find({ medicalFactilitiesId: id });
+  }
+  async getTotalPackagesCountByFacilityId(facilityId: string): Promise<number> {
+    const count = await this.doctorModel.countDocuments({
+      medicalFactilitiesId: facilityId,
+    });
+    return count;
   }
 }

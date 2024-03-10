@@ -22,7 +22,7 @@ import { MedicalStaffModule } from '../medical-staff/medical-staff.module';
       },
     ]),
     VaccinationModule,
-    DoctorsModule,
+    forwardRef(() => DoctorsModule),
     PackageModule,
     MedicalSpecialtiesModule,
     MedicalStaffModule,

@@ -8,6 +8,7 @@ import { CreateUserInput } from './dto/create-user.input';
 import { LogoutUser } from './dto/logout-user';
 import { CustomerService } from '../customer/customer.service';
 import { CreateUserByAdminInput } from './dto/create-user-by-admin.input';
+import { Role } from './entities/role.enum';
 @Injectable()
 export class AuthService {
   constructor(
@@ -41,7 +42,7 @@ export class AuthService {
     if (user)
       throw new Error(`User ${loginUserInput.username} already exists ! `);
     const password = await bcrypt.hash(loginUserInput.password, 10);
-    const roles = ['user'];
+    const roles: Role[] = [Role.User];
     // tạo thông tin người dùng
     // this.cusSv.createCustomer
     const { fullname, ...createUser } = loginUserInput;
@@ -61,7 +62,7 @@ export class AuthService {
     if (user)
       throw new Error(`User ${loginUserInput.username} already exists ! `);
     const password = await bcrypt.hash(loginUserInput.password, 10);
-    const roles = [''];
+    const roles: Role[] = [];
     return this.userService.createByAdmin({
       username: loginUserInput.username,
       active: true,

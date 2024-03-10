@@ -32,7 +32,7 @@ export class UsersResolver {
   constructor(
     private readonly usersService: UsersService,
     private readonly customerService: CustomerService, // private readonly profileService: ProfileService,
-    private readonly medicalService: MedicalFacilitiesService,
+    private readonly medicalFacility: MedicalFacilitiesService,
     private readonly doctorService: DoctorsService,
     private readonly medicalStaff: MedicalStaffService,
   ) {}
@@ -52,7 +52,7 @@ export class UsersResolver {
   async getUserMedicalNon(@Context() context): Promise<User[]> {
     const users = await this.usersService.findAll();
     const usersClinic = users.filter((user) =>
-      user.roles.includes(Role.Clinic),
+      user.roles.includes(Role.Facility),
     );
     return usersClinic;
   }
@@ -110,6 +110,21 @@ export class UsersResolver {
     );
     const userStaffPending = userPending.filter((user) =>
       user.roles.includes(Role.Staff),
+    );
+    return userStaffPending;
+  }
+  @Query(() => [User], { name: 'getUserFacilitySelect' })
+  async getUserFacilitySelect(
+    @Args('input') idFacility: String,
+  ): Promise<User[]> {
+    const users = await this.usersService.findAll();
+    const facilities = await this.medicalFacility.findAll();
+    const userPending = users.filter(
+      (user) =>
+        !facilities.find((st) => st.id !== idFacility && st.userId === user.id),
+    );
+    const userStaffPending = userPending.filter((user) =>
+      user.roles.includes(Role.Facility),
     );
     return userStaffPending;
   }
@@ -244,7 +259,7 @@ export class UsersResolver {
   }
   @ResolveField(() => [MedicalFacilities])
   async medicalFacilities(@Parent() user: User) {
-    return await this.medicalService.findMedicalFacilitiesByUserId(user.id);
+    return await this.medicalFacility.findMedicalFacilitiesByUserId(user.id);
   }
   @ResolveField(() => [Doctor])
   async doctor(@Parent() user: User) {

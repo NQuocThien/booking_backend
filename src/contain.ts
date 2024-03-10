@@ -46,13 +46,6 @@ export enum ETypeOfNotification {
   NotSeen = 'Chưa xem',
 }
 
-export enum ERole {
-  User = 'user',
-  Admin = 'admin',
-  Customer = 'customer',
-  Clinic = 'clinic',
-}
-
 export enum EDayOfWeed {
   Monday = '2',
   Tuesday = '3',
@@ -77,9 +70,9 @@ registerEnumType(EPermission, {
 registerEnumType(EDayOfWeed, {
   name: 'EDayOfWeed',
 });
-registerEnumType(ERole, {
-  name: 'IRole',
-});
+// registerEnumType(ERole, {
+//   name: 'IRole',
+// });
 registerEnumType(EStatusService, {
   name: 'EStatusService',
 });

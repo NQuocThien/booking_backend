@@ -58,7 +58,13 @@ export class PackageService {
       return null;
     }
   }
-  async delete(id: String): Promise<Package> {
+  async getTotalPackagesCountByFacilityId(facilityId: string): Promise<number> {
+    const count = await this.model.countDocuments({
+      medicalFactilitiesId: facilityId,
+    });
+    return count;
+  }
+  async delete(id: string): Promise<Package> {
     return this.model.findByIdAndDelete(id);
   }
 }

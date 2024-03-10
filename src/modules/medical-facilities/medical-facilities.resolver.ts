@@ -44,7 +44,7 @@ export class MedicalFacilitiesResolver {
   }
 
   @UseGuards(JWtAuthGuard, RolesGuard)
-  @Roles(Role.Clinic)
+  @Roles(Role.Facility)
   @Query(() => MedicalFacilities, { name: 'getMedicalFacilityByUserId' })
   async getMedicalFacilityByUserId(
     @Args('id') id: String,
@@ -171,5 +171,25 @@ export class MedicalFacilitiesResolver {
     @Parent() mf: MedicalFacilities,
   ): Promise<MedicalStaff[]> {
     return await this.staffSvr.findByMedicalFacilityId(mf.id);
+  }
+
+  @ResolveField(() => Number, { name: 'totalPackages' })
+  async totalPackages(@Parent() mf: MedicalFacilities): Promise<number> {
+    return await this.packageSrv.getTotalPackagesCountByFacilityId(mf.id);
+  }
+
+  @ResolveField(() => Number, { name: 'totalDoctors' })
+  async totalDoctors(@Parent() mf: MedicalFacilities): Promise<number> {
+    return await this.doctorService.getTotalPackagesCountByFacilityId(mf.id);
+  }
+
+  @ResolveField(() => Number, { name: 'totalSpecialties' })
+  async totalSpecialties(@Parent() mf: MedicalFacilities): Promise<number> {
+    return await this.specialtySrv.getTotalPackagesCountByFacilityId(mf.id);
+  }
+
+  @ResolveField(() => Number, { name: 'totalVaccinations' })
+  async totalVaccinations(@Parent() mf: MedicalFacilities): Promise<number> {
+    return await this.vaccineSvr.getTotalPackagesCountByFacilityId(mf.id);
   }
 }
