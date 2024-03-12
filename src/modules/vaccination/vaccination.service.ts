@@ -16,6 +16,52 @@ export class VaccinationService {
     return await this.model.find();
   }
 
+  async getAllVaccinationPaginationOfFacility(
+    search: string,
+    page: number,
+    limit: number,
+    sortField: string,
+    sortOrder: string,
+    facilityId: string,
+  ): Promise<Vaccination[]> {
+    const query = search
+      ? {
+          name: { $regex: search, $options: 'i' },
+          medicalFactilitiesId: facilityId,
+        }
+      : { medicalFactilitiesId: facilityId };
+    const sortOptions: { [key: string]: 'asc' | 'desc' } = {};
+    sortOptions[sortField] = sortOrder === 'asc' ? 'asc' : 'desc';
+    const skip = (page - 1) * limit;
+    return this.model
+      .find({ ...query })
+      .limit(limit)
+      .skip(skip)
+      .sort(sortOptions)
+      .exec();
+  }
+  async getTotalVaccinationsCount(search: string): Promise<number> {
+    const query = search
+      ? { packageName: { $regex: new RegExp(search, 'i') } }
+      : {};
+    const count = await this.model.countDocuments(query);
+    return count;
+  }
+  async getTotalVaccinationsCountOfFacility(
+    search: string,
+    facilityId: string,
+  ): Promise<number> {
+    const query = search
+      ? {
+          packageName: {
+            $regex: new RegExp(search, 'i'),
+            medicalFactilitiesId: facilityId,
+          },
+        }
+      : { medicalFactilitiesId: facilityId };
+    const count = await this.model.countDocuments(query);
+    return count;
+  }
   async findById(id: String): Promise<Vaccination> {
     let currVaccine = await this.model.findById(id);
     const dateOffs: [Date] = currVaccine.workSchedule.dayOff;

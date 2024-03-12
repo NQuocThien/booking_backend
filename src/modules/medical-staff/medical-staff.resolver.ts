@@ -12,12 +12,14 @@ import { CreateMedicalStaffInput } from './entities/dto/create-medical-staff.inp
 import { UpdateMedicalStaffInput } from './entities/dto/update-medical-staff.input';
 import { MedicalSpecialties } from '../medical-specialties/entities/medical-specialties.entity';
 import { MedicalSpecialtiesService } from '../medical-specialties/medical-specialties.service';
+import { MedicalFacilitiesService } from '../medical-facilities/medical-facilities.service';
 
 @Resolver(() => MedicalStaff)
 export class MedicalStaffResolver {
   constructor(
     private readonly medicalStaffService: MedicalStaffService,
     private readonly specialtySrv: MedicalSpecialtiesService,
+    private readonly facilitySvr: MedicalFacilitiesService,
   ) {}
 
   @Query(() => [MedicalStaff], { name: 'getAllMedicalStaff' })
@@ -39,15 +41,15 @@ export class MedicalStaffResolver {
     return await this.medicalStaffService.findByMedicalFacilityId(id);
   }
 
-  @Query(() => Number, { name: 'totalStaffsCount' })
-  async totalStaffsCount(
-    @Args('search', { nullable: true }) search?: string,
-  ): Promise<number> {
-    const count = await this.medicalStaffService.getTotalStaffCount(
-      search || '',
-    );
-    return count;
-  }
+  // @Query(() => Number, { name: 'totalStaffsCount' })
+  // async totalStaffsCount(
+  //   @Args('search', { nullable: true }) search?: string,
+  // ): Promise<number> {
+  //   const count = await this.medicalStaffService.getTotalStaffCount(
+  //     search || '',
+  //   );
+  //   return count;
+  // }
 
   @Query(() => [MedicalStaff], { name: 'getAllStaffPagination' })
   // @UseGuards(JWtAuthGuard)
@@ -88,6 +90,60 @@ export class MedicalStaffResolver {
   @Mutation(() => MedicalStaff, { name: 'deleteMedicalStaff' })
   async deleteMedicalStaff(@Args('input') id: String): Promise<MedicalStaff> {
     return await this.medicalStaffService.deleteMedicalStaff(id);
+  }
+
+  @Query(() => [MedicalStaff], {
+    name: 'getAllMedicalStaffPaginationOfFacility',
+  })
+  // @UseGuards(JWtAuthGuard)
+  async getAllMedicalStaffPaginationOfFacility(
+    @Args('search', { nullable: true }) search: string,
+    @Args('page', { defaultValue: 1 }) page: number,
+    @Args('limit', { defaultValue: 10 }) limit: number,
+    @Args('sortField', { nullable: true, defaultValue: 'name' })
+    sortField: string,
+    @Args('sortOrder', { nullable: true }) sortOrder: string,
+    @Args('userId', { nullable: true }) userId: string,
+  ): Promise<MedicalStaff[]> {
+    {
+      const facility = await this.facilitySvr.findOneByUserId(userId);
+      if (facility) {
+        const docs =
+          await this.medicalStaffService.getAllMedicalStaffPaginationOfFacility(
+            search,
+            page,
+            limit,
+            sortField,
+            sortOrder,
+            facility.id,
+          );
+        return docs;
+      } else return null;
+    }
+  }
+
+  @Query(() => Number, { name: 'totalStaffsCount' })
+  async totalStaffsCount(
+    @Args('search', { nullable: true }) search?: string,
+    @Args('userId', { nullable: true, defaultValue: '' }) userId?: string,
+  ): Promise<number> {
+    if (userId === '') {
+      const count = await this.medicalStaffService.getTotalStaffCount(
+        search || '',
+      );
+      return count;
+    } else {
+      const facility = await this.facilitySvr.findOneByUserId(userId);
+      if (facility) {
+        const count =
+          await this.medicalStaffService.getTotalStaffCountOfFacility(
+            search || '',
+            facility.id,
+          );
+        return count;
+      }
+      return null;
+    }
   }
 
   @ResolveField(() => [MedicalSpecialties], { name: 'specialties' })

@@ -5,6 +5,9 @@ import { Doctor } from './entities/doctor.entity';
 import { CreateDoctorInput } from './entities/dtos/create-doctor.input';
 import { UpdateDoctorInput } from './entities/dtos/update-doctor.input';
 import { deleteDatePast } from 'src/utils/contain';
+import { EAcademicTitle, EDegree, EGender } from 'src/contain';
+import { Filter } from 'typeorm';
+import { FilterDoctorInput } from './entities/dtos/filter-doctor.input';
 
 @Injectable()
 export class DoctorsService {
@@ -57,19 +60,14 @@ export class DoctorsService {
       .sort(sortOptions);
   }
   async getAllDoctorPaginationOfFacility(
-    search: string,
+    filter: FilterDoctorInput,
     page: number,
     limit: number,
     sortField: string,
     sortOrder: string,
     facilityId: string,
   ): Promise<Doctor[]> {
-    const query = search
-      ? {
-          name: { $regex: search, $options: 'i' },
-          medicalFactilitiesId: facilityId,
-        }
-      : { medicalFactilitiesId: facilityId };
+    const query = this.renderQuery(filter, facilityId);
     const sortOptions: { [key: string]: 'asc' | 'desc' } = {};
     sortOptions[sortField] = sortOrder === 'asc' ? 'asc' : 'desc';
     const skip = (page - 1) * limit;
@@ -81,25 +79,16 @@ export class DoctorsService {
       .exec();
   }
 
-  async getTotalDoctorsCount(search: string): Promise<number> {
-    const query = search
-      ? { username: { $regex: new RegExp(search, 'i') } }
-      : {};
+  async getTotalDoctorsCount(filter: FilterDoctorInput): Promise<number> {
+    const query = this.renderQuery(filter);
     const count = await this.doctorModel.countDocuments(query);
     return count;
   }
   async getTotalDoctorsCountOfFacility(
-    search: string,
+    filter: FilterDoctorInput,
     facilityId: string,
   ): Promise<number> {
-    const query = search
-      ? {
-          username: {
-            $regex: new RegExp(search, 'i'),
-            medicalFactilitiesId: facilityId,
-          },
-        }
-      : { medicalFactilitiesId: facilityId };
+    const query = this.renderQuery(filter, facilityId);
     const count = await this.doctorModel.countDocuments(query);
     return count;
   }
@@ -116,7 +105,6 @@ export class DoctorsService {
       return currDoctor;
     }
     return currDoctor;
-    return await this.doctorModel.findById(id);
   }
   async findOneByUserId(userId: String) {
     return await this.doctorModel.findOne({ userId: userId });
@@ -132,5 +120,28 @@ export class DoctorsService {
       medicalFactilitiesId: facilityId,
     });
     return count;
+  }
+  renderQuery(filter: FilterDoctorInput, facilityId: string = undefined): any {
+    const query: any = {};
+
+    if (facilityId) {
+      query.medicalFactilitiesId = facilityId;
+    }
+    if (filter?.name) {
+      query.name = { $regex: filter.name, $options: 'i' };
+    }
+
+    if (filter?.degree) {
+      query.degree = filter.degree;
+    }
+
+    if (filter?.academicTitle) {
+      query.academicTitle = filter.academicTitle;
+    }
+
+    if (filter?.gender) {
+      query.gender = filter.gender;
+    }
+    return query;
   }
 }

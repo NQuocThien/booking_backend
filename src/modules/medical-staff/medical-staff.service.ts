@@ -70,7 +70,47 @@ export class MedicalStaffService {
   }
 
   async getTotalStaffCount(search: string): Promise<number> {
-    const query = search ? { name: { $regex: new RegExp(search, 'i') } } : {};
+    const query = search ? { name: { $regex: new RegExp(search, 'ui') } } : {};
+    const count = await this.model.countDocuments(query);
+    return count;
+  }
+
+  async getAllMedicalStaffPaginationOfFacility(
+    search: string,
+    page: number,
+    limit: number,
+    sortField: string,
+    sortOrder: string,
+    facilityId: string,
+  ): Promise<MedicalStaff[]> {
+    const query = search
+      ? {
+          name: { $regex: search, $options: 'i' },
+          medicalFacilityId: facilityId,
+        }
+      : { medicalFacilityId: facilityId };
+    const sortOptions: { [key: string]: 'asc' | 'desc' } = {};
+    sortOptions[sortField] = sortOrder === 'asc' ? 'asc' : 'desc';
+    const skip = (page - 1) * limit;
+    return this.model
+      .find({ ...query })
+      .limit(limit)
+      .skip(skip)
+      .sort(sortOptions)
+      .exec();
+  }
+  async getTotalStaffCountOfFacility(
+    search: string,
+    facilityId: string,
+  ): Promise<number> {
+    const query = search
+      ? {
+          packageName: {
+            $regex: new RegExp(search, 'i'),
+            medicalFacilityId: facilityId,
+          },
+        }
+      : { medicalFactilitiesId: facilityId };
     const count = await this.model.countDocuments(query);
     return count;
   }

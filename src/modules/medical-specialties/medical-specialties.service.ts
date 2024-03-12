@@ -92,10 +92,58 @@ export class MedicalSpecialtiesService {
     });
     return result;
   }
-  async getTotalPackagesCountByFacilityId(facilityId: string): Promise<number> {
+  async getTotalSpacialtyCountByFacilityId(
+    facilityId: string,
+  ): Promise<number> {
     const count = await this.medicalSpecialtiesModel.countDocuments({
       medicalFactilityId: facilityId,
     });
+    return count;
+  }
+
+  async getAllMedicalSpcialtyPaginationOfFacility(
+    search: string,
+    page: number,
+    limit: number,
+    sortField: string,
+    sortOrder: string,
+    facilityId: string,
+  ): Promise<MedicalSpecialties[]> {
+    const query = search
+      ? {
+          name: { $regex: search, $options: 'i' },
+          medicalFactilityId: facilityId,
+        }
+      : { medicalFactilityId: facilityId };
+    const sortOptions: { [key: string]: 'asc' | 'desc' } = {};
+    sortOptions[sortField] = sortOrder === 'asc' ? 'asc' : 'desc';
+    const skip = (page - 1) * limit;
+
+    return this.medicalSpecialtiesModel
+      .find({ ...query })
+      .limit(limit)
+      .skip(skip)
+      .sort(sortOptions)
+      .exec();
+  }
+  async getTotalMedicalSpecialtyCount(search: string): Promise<number> {
+    const query = search ? { name: { $regex: new RegExp(search, 'i') } } : {};
+    const count = await this.medicalSpecialtiesModel.countDocuments(query);
+    return count;
+  }
+  async getTotalMedialSpecialtyCountOfFacility(
+    search: string,
+    facilityId: string,
+  ): Promise<number> {
+    const query = search
+      ? {
+          packageName: {
+            $regex: new RegExp(search, 'i'),
+            medicalFactilityId: facilityId,
+          },
+        }
+      : { medicalFactilityId: facilityId };
+    const count = await this.medicalSpecialtiesModel.countDocuments(query);
     return count;
   }
 }

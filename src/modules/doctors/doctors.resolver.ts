@@ -14,6 +14,9 @@ import deleteImage from 'src/utils/delete_image';
 import { MedicalSpecialtiesService } from '../medical-specialties/medical-specialties.service';
 import { MedicalSpecialties } from '../medical-specialties/entities/medical-specialties.entity';
 import { MedicalFacilitiesService } from '../medical-facilities/medical-facilities.service';
+import { generate } from 'rxjs';
+import { EAcademicTitle, EDegree, EGender } from 'src/contain';
+import { FilterDoctorInput } from './entities/dtos/filter-doctor.input';
 
 @Resolver(() => Doctor)
 export class DoctorsResolver {
@@ -30,17 +33,17 @@ export class DoctorsResolver {
 
   @Query(() => Number, { name: 'getTotalDoctorsCount' })
   async getTotalDoctorsCount(
-    @Args('search', { nullable: true }) search?: string,
+    @Args('filter', { nullable: true }) filter: FilterDoctorInput,
     @Args('userId', { nullable: true, defaultValue: '' }) userId?: string,
   ): Promise<number> {
     if (userId === '') {
-      const count = await this.doctorService.getTotalDoctorsCount(search || '');
+      const count = await this.doctorService.getTotalDoctorsCount(filter);
       return count;
     } else {
       const facility = await this.facilitySvr.findOneByUserId(userId);
       if (facility) {
         const count = await this.doctorService.getTotalDoctorsCountOfFacility(
-          search || '',
+          filter,
           facility.id,
         );
         return count;
@@ -73,7 +76,7 @@ export class DoctorsResolver {
   @Query(() => [Doctor], { name: 'getAllDoctorPaginationOfFacility' })
   // @UseGuards(JWtAuthGuard)
   async getAllDoctorPaginationOfFacility(
-    @Args('search', { nullable: true }) search: string,
+    @Args('filter', { nullable: true }) filter: FilterDoctorInput,
     @Args('page', { defaultValue: 1 }) page: number,
     @Args('limit', { defaultValue: 10 }) limit: number,
     @Args('sortField', { nullable: true, defaultValue: 'name' })
@@ -85,7 +88,7 @@ export class DoctorsResolver {
       const facility = await this.facilitySvr.findOneByUserId(userId);
       if (facility) {
         const docs = await this.doctorService.getAllDoctorPaginationOfFacility(
-          search,
+          filter,
           page,
           limit,
           sortField,

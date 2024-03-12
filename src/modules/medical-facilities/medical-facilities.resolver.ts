@@ -185,7 +185,7 @@ export class MedicalFacilitiesResolver {
 
   @ResolveField(() => Number, { name: 'totalSpecialties' })
   async totalSpecialties(@Parent() mf: MedicalFacilities): Promise<number> {
-    return await this.specialtySrv.getTotalPackagesCountByFacilityId(mf.id);
+    return await this.specialtySrv.getTotalSpacialtyCountByFacilityId(mf.id);
   }
 
   @ResolveField(() => Number, { name: 'totalVaccinations' })

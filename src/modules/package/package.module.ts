@@ -1,9 +1,10 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { PackageResolver } from './package.resolver';
 import { PackageService } from './package.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Package } from './entities/package.entity';
 import { PackageSchema } from './schema/package.schema';
+import { MedicalFacilitiesModule } from '../medical-facilities/medical-facilities.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { PackageSchema } from './schema/package.schema';
         schema: PackageSchema,
       },
     ]),
+    forwardRef(() => MedicalFacilitiesModule),
   ],
   providers: [PackageResolver, PackageService],
   exports: [PackageService],
