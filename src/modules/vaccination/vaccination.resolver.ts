@@ -4,12 +4,16 @@ import { VaccinationService } from './vaccination.service';
 import { CreateVaccineInput } from './entities/dto/create-vaccination.input';
 import { UpdateVaccineInput } from './entities/dto/update-vaccination.input';
 import { MedicalFacilitiesService } from '../medical-facilities/medical-facilities.service';
+import { MedicalStaffService } from '../medical-staff/medical-staff.service';
+import { EPermission } from 'src/contain';
+import { UnauthorizedException } from '@nestjs/common';
 
 @Resolver(() => Vaccination)
 export class VaccinationResolver {
   constructor(
     private readonly vaccinationService: VaccinationService,
     private readonly facilitySvr: MedicalFacilitiesService,
+    private readonly staffSvr: MedicalStaffService,
   ) {}
 
   @Query(() => [Vaccination], { name: 'getAllVacation' })
@@ -42,14 +46,60 @@ export class VaccinationResolver {
     @Args('search', { nullable: true }) search: string,
     @Args('page', { defaultValue: 1 }) page: number,
     @Args('limit', { defaultValue: 10 }) limit: number,
+    @Args('sortField', { nullable: true, defaultValue: 'vaccineName' })
+    sortField: string,
+    @Args('sortOrder', { nullable: true }) sortOrder: string,
+    @Args('userId', { nullable: true, defaultValue: '' }) userId: string,
+    @Args('staffId', { nullable: true, defaultValue: '' }) staffId: string,
+  ): Promise<Vaccination[]> {
+    {
+      if (userId !== '') {
+        const facility = await this.facilitySvr.findOneByUserId(userId);
+        if (facility) {
+          const docs =
+            await this.vaccinationService.getAllVaccinationPaginationOfFacility(
+              search,
+              page,
+              limit,
+              sortField,
+              sortOrder,
+              facility.id,
+            );
+          return docs;
+        } else return null;
+      } else {
+        if (staffId !== '') {
+          const staff = await this.staffSvr.findById(staffId);
+          if (staff) {
+            const docs =
+              await this.vaccinationService.getAllVaccinationPaginationOfFacility(
+                search,
+                page,
+                limit,
+                sortField,
+                sortOrder,
+                staff.medicalFacilityId,
+              );
+            return docs;
+          } else return null;
+        }
+      }
+    }
+  }
+  @Query(() => [Vaccination], { name: 'getAllVaccinationPaginationByStaff' })
+  // @UseGuards(JWtAuthGuard)
+  async getAllVaccinationPaginationByStaff(
+    @Args('search', { nullable: true }) search: string,
+    @Args('page', { defaultValue: 1 }) page: number,
+    @Args('limit', { defaultValue: 10 }) limit: number,
     @Args('sortField', { nullable: true, defaultValue: 'name' })
     sortField: string,
     @Args('sortOrder', { nullable: true }) sortOrder: string,
-    @Args('userId', { nullable: true }) userId: string,
+    @Args('staffId', { nullable: true }) staffId: string,
   ): Promise<Vaccination[]> {
     {
-      const facility = await this.facilitySvr.findOneByUserId(userId);
-      if (facility) {
+      const staff = await this.staffSvr.findById(staffId);
+      if (staff && staff.permissions.includes(EPermission.MagagerVaccine)) {
         const docs =
           await this.vaccinationService.getAllVaccinationPaginationOfFacility(
             search,
@@ -57,10 +107,10 @@ export class VaccinationResolver {
             limit,
             sortField,
             sortOrder,
-            facility.id,
+            staff.medicalFacilityId,
           );
         return docs;
-      } else return null;
+      } else throw new UnauthorizedException();
     }
   }
 
@@ -68,12 +118,29 @@ export class VaccinationResolver {
   async getTotalVaccinationsCount(
     @Args('search', { nullable: true }) search?: string,
     @Args('userId', { nullable: true, defaultValue: '' }) userId?: string,
+    @Args('staffId', { nullable: true, defaultValue: '' }) staffId?: string,
   ): Promise<number> {
     if (userId === '') {
-      const count = await this.vaccinationService.getTotalVaccinationsCount(
-        search || '',
-      );
-      return count;
+      if (staffId !== '') {
+        const staff = await this.staffSvr.findById(staffId);
+        if (
+          staff &&
+          (staff.permissions.includes(EPermission.MagagerVaccine) ||
+            staff.permissions.includes(EPermission.Magager))
+        ) {
+          const count =
+            await this.vaccinationService.getTotalVaccinationsCountOfFacility(
+              search || '',
+              staff.medicalFacilityId,
+            );
+          return count;
+        } else throw new UnauthorizedException();
+      } else {
+        const count = await this.vaccinationService.getTotalVaccinationsCount(
+          search || '',
+        );
+        return count;
+      }
     } else {
       const facility = await this.facilitySvr.findOneByUserId(userId);
       if (facility) {

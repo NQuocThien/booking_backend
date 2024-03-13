@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Package } from './entities/package.entity';
 import { PackageSchema } from './schema/package.schema';
 import { MedicalFacilitiesModule } from '../medical-facilities/medical-facilities.module';
+import { MedicalStaffModule } from '../medical-staff/medical-staff.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { MedicalFacilitiesModule } from '../medical-facilities/medical-facilitie
       },
     ]),
     forwardRef(() => MedicalFacilitiesModule),
+    MedicalStaffModule,
   ],
   providers: [PackageResolver, PackageService],
   exports: [PackageService],

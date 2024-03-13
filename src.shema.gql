@@ -481,19 +481,21 @@ type Query {
   getAllDoctor: [Doctor!]!
   getAllDoctorByFacilityId(input: String!): [Doctor!]!
   getAllDoctorPagination(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "name", sortOrder: String): [Doctor!]!
-  getAllDoctorPaginationOfFacility(filter: FilterDoctorInput, limit: Float! = 10, page: Float! = 1, sortField: String = "name", sortOrder: String, userId: String): [Doctor!]!
+  getAllDoctorPaginationOfFacility(filter: FilterDoctorInput, limit: Float! = 10, page: Float! = 1, sortField: String = "name", sortOrder: String, staffId: String = "", userId: String = ""): [Doctor!]!
   getAllDoctorPending: [Doctor!]!
   getAllEvaluate: [Evaluate!]!
   getAllMecialSpecialty: [MedicalSpecialties!]!
   getAllMedicalFacility: [MedicalFacilities!]!
   getAllMedicalFacilityPagination(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "medicalFacilityName", sortOrder: String): [MedicalFacilities!]!
-  getAllMedicalSpecialtiesPaginationOfFacility(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "name", sortOrder: String, userId: String): [MedicalSpecialties!]!
+  getAllMedicalSpecialtiesPaginationByStaff(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "name", sortOrder: String, staffId: String!): [MedicalSpecialties!]!
+  getAllMedicalSpecialtiesPaginationOfFacility(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "name", sortOrder: String, staffId: String = "", userId: String = ""): [MedicalSpecialties!]!
   getAllMedicalStaff: [MedicalStaff!]!
   getAllMedicalStaffPaginationOfFacility(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "name", sortOrder: String, userId: String): [MedicalStaff!]!
   getAllNotification: [Notification!]!
   getAllPackage: [Package!]!
   getAllPackageByFacilityId(input: String!): [Package!]!
-  getAllPackagePaginationOfFacility(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "name", sortOrder: String, userId: String): [Package!]!
+  getAllPackagePaginationByStaff(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "packageName", sortOrder: String, staffId: String): [Package!]!
+  getAllPackagePaginationOfFacility(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "packageName", sortOrder: String, staffId: String = "", userId: String = ""): [Package!]!
   getAllPackageSelect(input: String!): [Package!]!
   getAllProfile: [Profile!]!
   getAllRegisterByOption(input: GetRegisterByOptionInput!): [Register!]!
@@ -501,28 +503,30 @@ type Query {
   getAllUsersPagination(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "username", sortOrder: String): [User!]!
   getAllVacation: [Vaccination!]!
   getAllVaccinationByFacilityId(input: String!): [Vaccination!]!
-  getAllVaccinationPaginationOfFacility(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "name", sortOrder: String, userId: String): [Vaccination!]!
+  getAllVaccinationPaginationByStaff(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "name", sortOrder: String, staffId: String): [Vaccination!]!
+  getAllVaccinationPaginationOfFacility(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "vaccineName", sortOrder: String, staffId: String = "", userId: String = ""): [Vaccination!]!
   getAllVaccinationSelect(input: String!): [Vaccination!]!
   getDoctorbyId(id: String!): Doctor!
   getDoctorbyUserId(id: String!): Doctor!
   getEvaluateById(id: String!): Evaluate!
   getGeneralInfor: GeneralInfor!
   getMedicalFacilityById(id: String!): MedicalFacilities!
-  getMedicalFacilityByUserId(id: String!): MedicalFacilities!
+  getMedicalFacilityInfo(staffId: String = "", userId: String = ""): MedicalFacilities!
   getMedicalSpecialtiesByMedicalFacilityId(input: String!): [MedicalSpecialties!]!
   getMedicalSpecialtyById(input: String!): MedicalSpecialties!
   getMedicalSpecialtySelect(input: String!): [MedicalSpecialties!]!
   getMedicalStaffByFacilityId(input: String!): [MedicalStaff!]!
   getMedicalStaffById(input: String!): MedicalStaff!
+  getMedicalStaffByUserId(input: String!): MedicalStaff!
   getPackageById(input: String!): Package!
   getProfileByCustomerId(id: String!): [Profile!]!
   getSetting: Setting!
   getTotalCustomersCount(search: String): Float!
-  getTotalDoctorsCount(filter: FilterDoctorInput, userId: String = ""): Float!
+  getTotalDoctorsCount(filter: FilterDoctorInput, staffId: String = "", userId: String = ""): Float!
   getTotalFacilitiesCount(search: String): Float!
-  getTotalMedicalSpecialtiesCount(search: String, userId: String = ""): Float!
-  getTotalPackagesCount(search: String, userId: String = ""): Float!
-  getTotalVaccinationsCount(search: String, userId: String = ""): Float!
+  getTotalMedicalSpecialtiesCount(search: String, staffId: String = "", userId: String = ""): Float!
+  getTotalPackagesCount(search: String, staffId: String = "", userId: String = ""): Float!
+  getTotalVaccinationsCount(search: String, staffId: String = "", userId: String = ""): Float!
   getUser(username: String!): User!
   getUserDoctorPending: [User!]!
   getUserDoctorPendingUpdate(input: String!): [User!]!

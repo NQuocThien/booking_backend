@@ -4,12 +4,15 @@ import { MedicalSpecialties } from './entities/medical-specialties.entity';
 import { CreateMedicalSpecialtyInput } from './entities/dtos/create-medical-specialties.input';
 import { UpdateMedicalSpecialtyInput } from './entities/dtos/update-medical-specialties.input';
 import { MedicalFacilitiesService } from '../medical-facilities/medical-facilities.service';
+import { MedicalStaffService } from '../medical-staff/medical-staff.service';
+import { EPermission } from 'src/contain';
 
 @Resolver()
 export class MedicalSpecialtiesResolver {
   constructor(
     private readonly medicalSpecialtiesService: MedicalSpecialtiesService,
     private readonly facilitySvr: MedicalFacilitiesService,
+    private readonly staffSvr: MedicalStaffService,
   ) {}
 
   @Mutation(() => MedicalSpecialties, { name: 'createMedicalSpecialty' })
@@ -64,21 +67,79 @@ export class MedicalSpecialtiesResolver {
     @Args('sortField', { nullable: true, defaultValue: 'name' })
     sortField: string,
     @Args('sortOrder', { nullable: true }) sortOrder: string,
-    @Args('userId', { nullable: true }) userId: string,
+    @Args('userId', { nullable: true, defaultValue: '' }) userId: string,
+    @Args('staffId', { nullable: true, defaultValue: '' }) staffId: string,
   ): Promise<MedicalSpecialties[]> {
     {
-      const facility = await this.facilitySvr.findOneByUserId(userId);
-      if (facility) {
-        const docs =
+      if (userId !== '') {
+        const facility = await this.facilitySvr.findOneByUserId(userId);
+        if (facility) {
+          const docs =
+            await this.medicalSpecialtiesService.getAllMedicalSpcialtyPaginationOfFacility(
+              search,
+              page,
+              limit,
+              sortField,
+              sortOrder,
+              facility.id,
+            );
+          return docs;
+        } else return null;
+      } else {
+        if (staffId !== '') {
+          const staff = await this.staffSvr.findById(staffId);
+          if (staff) {
+            const docs =
+              await this.medicalSpecialtiesService.getAllMedicalSpcialtyPaginationOfFacility(
+                search,
+                page,
+                limit,
+                sortField,
+                sortOrder,
+                staff.medicalFacilityId,
+              );
+            return docs;
+          } else return null;
+        }
+      }
+    }
+  }
+
+  @Query(() => [MedicalSpecialties], {
+    name: 'getAllMedicalSpecialtiesPaginationByStaff',
+  })
+  // @UseGuards(JWtAuthGuard)
+  async getAllMedicalSpecialtiesPaginationByStaff(
+    @Args('search', { nullable: true }) search: string,
+    @Args('page', { defaultValue: 1 }) page: number,
+    @Args('limit', { defaultValue: 10 }) limit: number,
+    @Args('sortField', { nullable: true, defaultValue: 'name' })
+    sortField: string,
+    @Args('sortOrder', { nullable: true }) sortOrder: string,
+    @Args('staffId') staffId: string,
+  ): Promise<MedicalSpecialties[]> {
+    {
+      console.log('---> input staffId: ', staffId);
+      const staff = await this.staffSvr.findById(staffId);
+
+      if (
+        staff &&
+        staff.permissions.includes(EPermission.ManagerSpecialty) &&
+        staff.specialtyId.length > 0
+      ) {
+        const specialties =
           await this.medicalSpecialtiesService.getAllMedicalSpcialtyPaginationOfFacility(
             search,
             page,
             limit,
             sortField,
             sortOrder,
-            facility.id,
+            staff.medicalFacilityId,
           );
-        return docs;
+        const specialtiesOfStaff = specialties.filter((specialty) =>
+          staff.specialtyId.includes(specialty.id),
+        );
+        return specialtiesOfStaff;
       } else return null;
     }
   }
@@ -87,6 +148,7 @@ export class MedicalSpecialtiesResolver {
   async getTotalMedicalSpecialtiesCount(
     @Args('search', { nullable: true }) search?: string,
     @Args('userId', { nullable: true, defaultValue: '' }) userId?: string,
+    @Args('staffId', { nullable: true, defaultValue: '' }) staffId?: string,
   ): Promise<number> {
     if (userId === '') {
       const count =
@@ -95,14 +157,26 @@ export class MedicalSpecialtiesResolver {
         );
       return count;
     } else {
-      const facility = await this.facilitySvr.findOneByUserId(userId);
-      if (facility) {
-        const count =
-          await this.medicalSpecialtiesService.getTotalMedialSpecialtyCountOfFacility(
-            search || '',
-            facility.id,
-          );
-        return count;
+      if (staffId !== '') {
+        const staff = await this.staffSvr.findById(staffId);
+        if (staff) {
+          const count =
+            await this.medicalSpecialtiesService.getTotalMedialSpecialtyCountOfFacility(
+              search || '',
+              staff.medicalFacilityId,
+            );
+          return count;
+        } else return null;
+      } else {
+        const facility = await this.facilitySvr.findOneByUserId(userId);
+        if (facility) {
+          const count =
+            await this.medicalSpecialtiesService.getTotalMedialSpecialtyCountOfFacility(
+              search || '',
+              facility.id,
+            );
+          return count;
+        }
       }
       return null;
     }

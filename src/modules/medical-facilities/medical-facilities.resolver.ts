@@ -26,6 +26,7 @@ import { MedicalSpecialties } from '../medical-specialties/entities/medical-spec
 import { MedicalSpecialtiesService } from '../medical-specialties/medical-specialties.service';
 import { MedicalStaffService } from '../medical-staff/medical-staff.service';
 import { MedicalStaff } from '../medical-staff/entities/medical-staff.entity';
+import { EPermission } from 'src/contain';
 
 @Resolver(() => MedicalFacilities)
 export class MedicalFacilitiesResolver {
@@ -45,12 +46,26 @@ export class MedicalFacilitiesResolver {
 
   @UseGuards(JWtAuthGuard, RolesGuard)
   @Roles(Role.Facility)
-  @Query(() => MedicalFacilities, { name: 'getMedicalFacilityByUserId' })
-  async getMedicalFacilityByUserId(
-    @Args('id') id: String,
+  @Roles(Role.Staff)
+  @Query(() => MedicalFacilities, { name: 'getMedicalFacilityInfo' })
+  async getMedicalFacilityInfo(
+    @Args('userId', { nullable: true, defaultValue: '' }) userId: String,
+    @Args('staffId', { nullable: true, defaultValue: '' }) staffId: String,
   ): Promise<MedicalFacilities> {
-    const result = await this.medicalService.findOneByUserId(id);
-    return result;
+    if (userId !== '') {
+      const result = await this.medicalService.findOneByUserId(userId);
+      return result;
+    } else {
+      if (staffId !== '') {
+        const staff = await this.staffSvr.findById(staffId);
+        if (staff.permissions.includes(EPermission.Magager)) {
+          const result = await this.medicalService.findById(
+            staff.medicalFacilityId,
+          );
+          return result;
+        }
+      }
+    }
   }
 
   @Query(() => MedicalFacilities, { name: 'getMedicalFacilityById' })

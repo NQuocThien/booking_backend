@@ -4,13 +4,13 @@ import { MedicalSpecialties } from 'src/modules/medical-specialties/entities/med
 @ObjectType()
 export class MedicalStaff {
   @Field(() => ID)
-  id: String;
+  id: string;
 
   @Field()
   userId: String;
 
   @Field()
-  medicalFacilityId: String;
+  medicalFacilityId: string;
 
   @Field()
   name: string;

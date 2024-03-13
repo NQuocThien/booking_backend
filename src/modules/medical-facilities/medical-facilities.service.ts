@@ -56,6 +56,7 @@ export class MedicalFacilitiesService {
   async findOneByUserId(id: String): Promise<MedicalFacilities> {
     return this.medicalModel.findOne({ userId: id });
   }
+
   async createMedicalFacility(
     data: CreateMedicalFacilityInput,
   ): Promise<MedicalFacilities> {

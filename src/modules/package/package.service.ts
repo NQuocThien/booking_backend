@@ -77,7 +77,7 @@ export class PackageService {
   ): Promise<Package[]> {
     const query = search
       ? {
-          name: { $regex: search, $options: 'i' },
+          packageName: { $regex: search, $options: 'i' },
           medicalFactilitiesId: facilityId,
         }
       : { medicalFactilitiesId: facilityId };

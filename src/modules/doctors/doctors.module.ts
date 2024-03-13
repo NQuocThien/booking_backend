@@ -6,6 +6,7 @@ import { Doctor } from './entities/doctor.entity';
 import { DoctorSchema } from './schema/doctor.schema';
 import { MedicalSpecialtiesModule } from '../medical-specialties/medical-specialties.module';
 import { MedicalFacilitiesModule } from '../medical-facilities/medical-facilities.module';
+import { MedicalStaffModule } from '../medical-staff/medical-staff.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { MedicalFacilitiesModule } from '../medical-facilities/medical-facilitie
     ]),
     MedicalSpecialtiesModule,
     forwardRef(() => MedicalFacilitiesModule),
+    MedicalStaffModule,
   ],
   providers: [DoctorsResolver, DoctorsService],
   exports: [DoctorsService],

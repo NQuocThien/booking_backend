@@ -16,7 +16,7 @@ import { MedicalFacilitiesModule } from '../medical-facilities/medical-facilitie
       },
     ]),
     forwardRef(() => MedicalFacilitiesModule),
-    MedicalSpecialtiesModule,
+    forwardRef(() => MedicalSpecialtiesModule),
   ],
   providers: [MedicalStaffResolver, MedicalStaffService],
   exports: [MedicalStaffService],

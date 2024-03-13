@@ -26,11 +26,12 @@ export class VaccinationService {
   ): Promise<Vaccination[]> {
     const query = search
       ? {
-          name: { $regex: search, $options: 'i' },
+          vaccineName: { $regex: search, $options: 'i' },
           medicalFactilitiesId: facilityId,
         }
       : { medicalFactilitiesId: facilityId };
     const sortOptions: { [key: string]: 'asc' | 'desc' } = {};
+    console.log('sort: ', sortField);
     sortOptions[sortField] = sortOrder === 'asc' ? 'asc' : 'desc';
     const skip = (page - 1) * limit;
     return this.model
@@ -42,7 +43,7 @@ export class VaccinationService {
   }
   async getTotalVaccinationsCount(search: string): Promise<number> {
     const query = search
-      ? { packageName: { $regex: new RegExp(search, 'i') } }
+      ? { vaccineName: { $regex: new RegExp(search, 'i') } }
       : {};
     const count = await this.model.countDocuments(query);
     return count;
@@ -53,7 +54,7 @@ export class VaccinationService {
   ): Promise<number> {
     const query = search
       ? {
-          packageName: {
+          vaccineName: {
             $regex: new RegExp(search, 'i'),
             medicalFactilitiesId: facilityId,
           },

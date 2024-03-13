@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Vaccination } from './entities/Vaccination.entity';
 import { VaccinationSchema } from './schema/vaccination.schema';
 import { MedicalFacilitiesModule } from '../medical-facilities/medical-facilities.module';
+import { MedicalStaffModule } from '../medical-staff/medical-staff.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { MedicalFacilitiesModule } from '../medical-facilities/medical-facilitie
       },
     ]),
     forwardRef(() => MedicalFacilitiesModule),
+    MedicalStaffModule,
   ],
   providers: [VaccinationResolver, VaccinationService],
   exports: [VaccinationService],

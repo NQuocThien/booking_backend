@@ -5,12 +5,16 @@ import { UpdatePackageInput } from './entities/dto/update-package.input';
 import { PackageService } from './package.service';
 import deleteImage from 'src/utils/delete_image';
 import { MedicalFacilitiesService } from '../medical-facilities/medical-facilities.service';
+import { MedicalStaffService } from '../medical-staff/medical-staff.service';
+import { EPermission } from 'src/contain';
+import { UnauthorizedException } from '@nestjs/common';
 
 @Resolver(() => Package)
 export class PackageResolver {
   constructor(
     private readonly packageService: PackageService,
     private readonly facilitySvr: MedicalFacilitiesService,
+    private readonly staffSvr: MedicalStaffService,
   ) {}
 
   @Query(() => [Package], { name: 'getAllPackage' })
@@ -63,14 +67,65 @@ export class PackageResolver {
     @Args('search', { nullable: true }) search: string,
     @Args('page', { defaultValue: 1 }) page: number,
     @Args('limit', { defaultValue: 10 }) limit: number,
-    @Args('sortField', { nullable: true, defaultValue: 'name' })
+    @Args('sortField', { nullable: true, defaultValue: 'packageName' })
     sortField: string,
     @Args('sortOrder', { nullable: true }) sortOrder: string,
-    @Args('userId', { nullable: true }) userId: string,
+    @Args('userId', { nullable: true, defaultValue: '' }) userId: string,
+    @Args('staffId', { nullable: true, defaultValue: '' }) staffId: string,
   ): Promise<Package[]> {
     {
-      const facility = await this.facilitySvr.findOneByUserId(userId);
-      if (facility) {
+      if (userId !== '') {
+        const facility = await this.facilitySvr.findOneByUserId(userId);
+        if (facility) {
+          const docs =
+            await this.packageService.getAllPackagePaginationOfFacility(
+              search,
+              page,
+              limit,
+              sortField,
+              sortOrder,
+              facility.id,
+            );
+          return docs;
+        } else return null;
+      } else {
+        if (staffId !== '') {
+          const staff = await this.staffSvr.findById(staffId);
+          if (staff) {
+            const docs =
+              await this.packageService.getAllPackagePaginationOfFacility(
+                search,
+                page,
+                limit,
+                sortField,
+                sortOrder,
+                staff.medicalFacilityId,
+              );
+            return docs;
+          } else return null;
+        } else return null;
+      }
+    }
+  }
+
+  @Query(() => [Package], { name: 'getAllPackagePaginationByStaff' })
+  // @UseGuards(JWtAuthGuard)
+  async getAllPackagePaginationByStaff(
+    @Args('search', { nullable: true }) search: string,
+    @Args('page', { defaultValue: 1 }) page: number,
+    @Args('limit', { defaultValue: 10 }) limit: number,
+    @Args('sortField', { nullable: true, defaultValue: 'packageName' })
+    sortField: string,
+    @Args('sortOrder', { nullable: true }) sortOrder: string,
+    @Args('staffId', { nullable: true }) staffId: string,
+  ): Promise<Package[]> {
+    {
+      const staff = await this.staffSvr.findById(staffId);
+      // nếu nhân viên là maanger hoặc có quyền quản lý gói khám thì trả tổng số gói
+      if (
+        (staff && staff.permissions.includes(EPermission.MagagerPackage)) ||
+        staff.permissions.includes(EPermission.Magager)
+      ) {
         const docs =
           await this.packageService.getAllPackagePaginationOfFacility(
             search,
@@ -78,10 +133,10 @@ export class PackageResolver {
             limit,
             sortField,
             sortOrder,
-            facility.id,
+            staff.medicalFacilityId,
           );
         return docs;
-      } else return null;
+      } else throw new UnauthorizedException();
     }
   }
 
@@ -89,12 +144,25 @@ export class PackageResolver {
   async getTotalPackagesCount(
     @Args('search', { nullable: true }) search?: string,
     @Args('userId', { nullable: true, defaultValue: '' }) userId?: string,
+    @Args('staffId', { nullable: true, defaultValue: '' }) staffId?: string,
   ): Promise<number> {
     if (userId === '') {
-      const count = await this.packageService.getTotalPackagesCount(
-        search || '',
-      );
-      return count;
+      if (staffId !== '') {
+        const staff = await this.staffSvr.findById(staffId);
+        if (staff && staff.permissions.includes(EPermission.MagagerPackage)) {
+          const count =
+            await this.packageService.getTotalPackagesCountOfFacility(
+              search || '',
+              staff.medicalFacilityId,
+            );
+          return count;
+        } else throw new UnauthorizedException();
+      } else {
+        const count = await this.packageService.getTotalPackagesCount(
+          search || '',
+        );
+        return count;
+      }
     } else {
       const facility = await this.facilitySvr.findOneByUserId(userId);
       if (facility) {

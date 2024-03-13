@@ -18,6 +18,9 @@ export class MedicalStaffService {
   async findById(id: String): Promise<MedicalStaff> {
     return await this.model.findById(id);
   }
+  async findByUserId(id: String): Promise<MedicalStaff> {
+    return await this.model.findOne({ userId: id });
+  }
   async createMedicalStaff(
     input: CreateMedicalStaffInput,
   ): Promise<MedicalStaff> {

@@ -17,6 +17,7 @@ import { MedicalFacilitiesService } from '../medical-facilities/medical-faciliti
 import { generate } from 'rxjs';
 import { EAcademicTitle, EDegree, EGender } from 'src/contain';
 import { FilterDoctorInput } from './entities/dtos/filter-doctor.input';
+import { MedicalStaffService } from '../medical-staff/medical-staff.service';
 
 @Resolver(() => Doctor)
 export class DoctorsResolver {
@@ -24,6 +25,7 @@ export class DoctorsResolver {
     private readonly doctorService: DoctorsService,
     private readonly specialtySvr: MedicalSpecialtiesService,
     private readonly facilitySvr: MedicalFacilitiesService,
+    private readonly staffSvr: MedicalStaffService,
   ) {}
 
   @Query(() => [Doctor], { name: 'getAllDoctor' })
@@ -35,10 +37,22 @@ export class DoctorsResolver {
   async getTotalDoctorsCount(
     @Args('filter', { nullable: true }) filter: FilterDoctorInput,
     @Args('userId', { nullable: true, defaultValue: '' }) userId?: string,
+    @Args('staffId', { nullable: true, defaultValue: '' }) staffId?: string,
   ): Promise<number> {
     if (userId === '') {
-      const count = await this.doctorService.getTotalDoctorsCount(filter);
-      return count;
+      if (staffId !== '') {
+        const staff = await this.staffSvr.findById(staffId);
+        if (staff) {
+          const count = await this.doctorService.getTotalDoctorsCountOfFacility(
+            filter,
+            staff.medicalFacilityId,
+          );
+          return count;
+        } else return null;
+      } else {
+        const count = await this.doctorService.getTotalDoctorsCount(filter);
+        return count;
+      }
     } else {
       const facility = await this.facilitySvr.findOneByUserId(userId);
       if (facility) {
@@ -53,7 +67,6 @@ export class DoctorsResolver {
   }
 
   @Query(() => [Doctor], { name: 'getAllDoctorPagination' })
-  // @UseGuards(JWtAuthGuard)
   async getAllDoctorPagination(
     @Args('search', { nullable: true }) search: string,
     @Args('page', { defaultValue: 1 }) page: number,
@@ -82,21 +95,41 @@ export class DoctorsResolver {
     @Args('sortField', { nullable: true, defaultValue: 'name' })
     sortField: string,
     @Args('sortOrder', { nullable: true }) sortOrder: string,
-    @Args('userId', { nullable: true }) userId: string,
+    @Args('userId', { nullable: true, defaultValue: '' }) userId: string,
+    @Args('staffId', { nullable: true, defaultValue: '' }) staffId: string,
   ): Promise<Doctor[]> {
     {
-      const facility = await this.facilitySvr.findOneByUserId(userId);
-      if (facility) {
-        const docs = await this.doctorService.getAllDoctorPaginationOfFacility(
-          filter,
-          page,
-          limit,
-          sortField,
-          sortOrder,
-          facility.id,
-        );
-        return docs;
-      } else return null;
+      if (userId !== '') {
+        const facility = await this.facilitySvr.findOneByUserId(userId);
+        if (facility) {
+          const docs =
+            await this.doctorService.getAllDoctorPaginationOfFacility(
+              filter,
+              page,
+              limit,
+              sortField,
+              sortOrder,
+              facility.id,
+            );
+          return docs;
+        } else return null;
+      } else {
+        if (staffId !== '') {
+          const staff = await this.staffSvr.findById(staffId);
+          if (staff) {
+            const docs =
+              await this.doctorService.getAllDoctorPaginationOfFacility(
+                filter,
+                page,
+                limit,
+                sortField,
+                sortOrder,
+                staff.medicalFacilityId,
+              );
+            return docs;
+          } else return null;
+        }
+      }
     }
   }
 

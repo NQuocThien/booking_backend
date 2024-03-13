@@ -34,6 +34,14 @@ export class MedicalStaffResolver {
     return await this.medicalStaffService.findById(input);
   }
 
+  @Query(() => MedicalStaff, { name: 'getMedicalStaffByUserId' })
+  async getMedicalStaffByUserId(
+    @Args('input') input: String,
+  ): Promise<MedicalStaff> {
+    console.log('----> userid: ', input);
+    return await this.medicalStaffService.findByUserId(input);
+  }
+
   @Query(() => [MedicalStaff], { name: 'getMedicalStaffByFacilityId' })
   async getMedicalStaffByFacilityId(
     @Args('input') id: String,
