@@ -56,9 +56,14 @@ export class CustomerResolver {
     }
   }
 
-  @Mutation(() => Customer, { name: 'createcustomer' })
+  @Mutation(() => Customer, { name: 'createCustomer' })
   async createCustomer(@Args('input') input: CreateCustomerInput) {
-    return this.customerService.createCustomer(input);
+    const oldCustomer = await this.customerService.findByUserId(input.userId);
+    console.log(input);
+    if (!oldCustomer && input.userId !== '') {
+      return this.customerService.createCustomer(input);
+    }
+    return null;
   }
   @Mutation(() => Customer, { name: 'updateCustomer' })
   async updateCustomer(@Args('input') input: UpdateCustomerInput) {

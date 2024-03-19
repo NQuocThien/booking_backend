@@ -9,6 +9,7 @@ import { LogoutUser } from './dto/logout-user';
 import { CustomerService } from '../customer/customer.service';
 import { CreateUserByAdminInput } from './dto/create-user-by-admin.input';
 import { Role } from './entities/role.enum';
+import { ErrorMes } from './entities/mess.enum';
 @Injectable()
 export class AuthService {
   constructor(
@@ -18,14 +19,20 @@ export class AuthService {
   ) {}
   async validateUser(username: string, password: string): Promise<any> {
     const user = await this.userService.findOne(username);
-    const valid = await bcrypt.compare(password, user.password);
-    if (user && valid && user.active) {
-      var result: User = new User();
-      result = user;
-      result.password = '';
-      return result;
+    if (!user) {
+      throw new Error(ErrorMes.UserNotFound); // Nếu không tìm thấy người dùng, throw lỗi
     }
-    return null;
+    const valid = await bcrypt.compare(password, user.password);
+    if (!valid) {
+      throw new Error(ErrorMes.InvalidPassword); // Nếu mật khẩu không hợp lệ, throw lỗi
+    }
+    if (!user.active) {
+      throw new Error(ErrorMes.UserIsInactive); // Nếu tài khoản không hoạt động, throw lỗi
+    }
+    var result: User = new User();
+    result = user;
+    result.password = '';
+    return result;
   }
   async login(user: User) {
     // console.log('user login', user)

@@ -1,5 +1,5 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
-import { EStatusService } from 'src/contain';
+import { EStatusService, ETypeOfFacility } from 'src/contain';
 import { Doctor } from 'src/modules/doctors/entities/doctor.entity';
 import { MedicalSpecialties } from 'src/modules/medical-specialties/entities/medical-specialties.entity';
 import { MedicalStaff } from 'src/modules/medical-staff/entities/medical-staff.entity';
@@ -8,7 +8,7 @@ import { LinkImage } from 'src/modules/users/dto/image';
 import { Vaccination } from 'src/modules/vaccination/entities/Vaccination.entity';
 @ObjectType()
 export class MedicalFacilities {
-  @Field((type) => ID)
+  @Field(() => ID)
   id: string;
 
   @Field()
@@ -43,6 +43,9 @@ export class MedicalFacilities {
 
   @Field()
   introduce: string;
+
+  @Field(() => String)
+  typeOfFacility: ETypeOfFacility;
 
   @Field()
   operatingStatus: string; // trạng thái hoạt động

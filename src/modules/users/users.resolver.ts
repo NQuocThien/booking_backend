@@ -10,7 +10,8 @@ import {
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
 import { JWtAuthGuard } from '../auth/jwt-auth.guard';
-import { UseGuards } from '@nestjs/common';
+// import { UseGuards } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common/decorators/core/use-guards.decorator';
 import { UpdateUserInput } from './dto/update-user.input';
 import { Roles } from '../auth/roles.decorator';
 import { Role } from '../auth/entities/role.enum';
@@ -146,11 +147,13 @@ export class UsersResolver {
       const currentUser = await this.usersService.findOne(
         updateUserInput.username,
       );
-      const compare: boolean =
-        JSON.stringify(currentUser.linkImage) ===
-        JSON.stringify(updateUserInput.linkImage);
-      console.log('---> Delete old image: ' + compare);
-      if (compare) deleteImage(currentUser.linkImage, 'users');
+      if (updateUserInput.linkImage) {
+        const compare: boolean =
+          JSON.stringify(currentUser.linkImage) !==
+          JSON.stringify(updateUserInput.linkImage);
+        console.log('---> Delete old image: ' + compare);
+        if (compare) deleteImage(currentUser.linkImage, 'users');
+      }
     } catch (e) {
       console.log('Error Delete Image');
     }
@@ -177,11 +180,7 @@ export class UsersResolver {
     if (valid) {
       try {
         const currentUser = await this.findOne(updateUserInput.username);
-        const compare: boolean =
-          JSON.stringify(currentUser.linkImage) ===
-          JSON.stringify(updateUserInput.linkImage);
-        console.log('---> Delete old image: ' + compare);
-        if (compare) {
+        if (updateUserInput.linkImage) {
           deleteImage(currentUser.linkImage, 'users');
         }
       } catch (e) {
@@ -191,6 +190,9 @@ export class UsersResolver {
       const dataUserUpdate = { ...updateUserInput, password };
       return this.usersService.updateUserById(dataUserUpdate);
     } else {
+      if (updateUserInput.linkImage) {
+        deleteImage(updateUserInput.linkImage, 'users');
+      }
       throw new Error('Password Error');
     }
   }
@@ -221,6 +223,14 @@ export class UsersResolver {
   async checkLogin(@Context('req') req) {
     const user = await this.usersService.findOne(req?.user?.username);
     return user;
+  }
+
+  @Query(() => User, { name: 'checkloginCustomer' })
+  @UseGuards(JWtAuthGuard)
+  async checkloginCustomer(@Context('req') req) {
+    const user = await this.usersService.findOne(req?.user?.username);
+    if (user && user.roles.includes(Role.Customer)) return user;
+    return null;
   }
 
   @Query(() => Number, { name: 'totalUsersCount' })

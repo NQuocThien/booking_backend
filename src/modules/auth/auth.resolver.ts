@@ -17,7 +17,7 @@ export class AuthResolver {
     @Args('loginUserInput') loginUserInput: LoginUserInput,
     @Context() context,
   ) {
-    console.log('---> Login: ', context.user.username);
+    console.log('---> Login: ', context.user);
     return this.authService.login(context.user);
   }
 

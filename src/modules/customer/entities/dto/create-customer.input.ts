@@ -8,21 +8,21 @@ export class CreateCustomerInput {
   @Field()
   name: String;
 
-  @Field(() => EGender, { nullable: true })
+  @Field(() => EGender)
   gender: EGender;
 
-  @Field({ nullable: true })
+  @Field()
   numberPhone: String;
 
-  @Field({ nullable: true })
+  @Field()
   email: String;
 
-  @Field({ nullable: true })
+  @Field()
   address: String;
 
-  @Field({ nullable: true })
+  @Field()
   dateOfBirth: Date;
 
-  @Field({ nullable: true })
+  @Field()
   ethnic: String;
 }

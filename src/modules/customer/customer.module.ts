@@ -4,6 +4,7 @@ import { CustomerService } from './customer.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Customer, CustomerSchema } from './schema/customer.schema';
 import { ProfileModule } from '../profile/profile.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { ProfileModule } from '../profile/profile.module';
       },
     ]),
     forwardRef(() => ProfileModule),
+    // forwardRef(() => UsersModule),
   ],
   providers: [CustomerResolver, CustomerService],
   exports: [CustomerService],

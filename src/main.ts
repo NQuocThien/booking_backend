@@ -2,14 +2,19 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ImageNotFoundMiddleware } from './middleware/image-not-found.middleware';
 import * as dotenv from 'dotenv';
+import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   dotenv.config();
-  app.enableCors()
-  // app.useStaticAssets(join(__dirname, '../files'))
-  // console.log(process.env.hello)
-  // app.use(new ImageNotFoundMiddleware());
+
+  const corsOptions: CorsOptions = {
+    origin: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  };
+  app.enableCors(corsOptions);
+
   await app.listen(process.env.APP_PORT);
 }
 bootstrap();

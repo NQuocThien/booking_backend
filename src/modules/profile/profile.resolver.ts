@@ -19,7 +19,6 @@ import { Customer } from '../customer/entities/customer.entity';
 export class ProfileResolver {
   constructor(
     private readonly profileService: ProfileService,
-    // private readonly customerService: CustomerService,
     private readonly regisService: RegisterService,
     private readonly customerSvr: CustomerService,
   ) {}

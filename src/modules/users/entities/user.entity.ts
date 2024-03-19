@@ -25,7 +25,7 @@ export class User {
   @Field()
   password: string;
 
-  @Field(() => LinkImage, { nullable: true })
+  @Field(() => LinkImage)
   linkImage: LinkImage;
 
   @Field(() => Customer, { nullable: true })

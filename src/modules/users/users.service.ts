@@ -67,8 +67,6 @@ export class UsersService {
       userBody,
       { new: true },
     );
-    log('----> User input:', updateUserInput);
-    log('----> User Updated:', userUpdated);
 
     return userUpdated;
   }

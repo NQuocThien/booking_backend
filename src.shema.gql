@@ -8,13 +8,13 @@ input ConfirmRegisterInput {
 }
 
 input CreateCustomerInput {
-  address: String
-  dateOfBirth: DateTime
-  email: String
-  ethnic: String
-  gender: EGender
+  address: String!
+  dateOfBirth: DateTime!
+  email: String!
+  ethnic: String!
+  gender: EGender!
   name: String!
-  numberPhone: String
+  numberPhone: String!
   userId: String!
 }
 
@@ -58,6 +58,7 @@ input CreateMedicalFacilityInput {
   schedule: String!
   status: String!
   taxCode: String!
+  typeOfFacility: ETypeOfFacility!
   userId: String!
 }
 
@@ -256,6 +257,13 @@ enum EStatusService {
   Open
 }
 
+enum ETypeOfFacility {
+  clinic
+  privateHospital
+  publicHospital
+  vaccinationCenter
+}
+
 enum ETypeOfNotification {
   NotSeen
   Seen
@@ -362,6 +370,7 @@ type MedicalFacilities {
   totalPackages: Float
   totalSpecialties: Float
   totalVaccinations: Float
+  typeOfFacility: String!
   userId: String!
   vaccinations: [Vaccination!]
 }
@@ -391,6 +400,7 @@ type MedicalStaff {
 type Mutation {
   activeUser(id: String!): User!
   confirmRegister(input: ConfirmRegisterInput!): Register!
+  createCustomer(input: CreateCustomerInput!): Customer!
   createDoctor(createDoctorInput: CreateDoctorInput!): Doctor!
   createEvaluate(input: CreateEvaluateInput!): Evaluate!
   createMedicalFacility(input: CreateMedicalFacilityInput!): MedicalFacilities!
@@ -404,7 +414,6 @@ type Mutation {
   createRegisterSpecialty(input: CreateRegisterSpecialtyInput!): Register!
   createRegisterVaccine(input: CreateRegisterVaccineInput!): Register!
   createVaccination(input: CreateVaccineInput!): Vaccination!
-  createcustomer(input: CreateCustomerInput!): Customer!
   deleteDoctor(id: String!): Doctor!
   deleteEvaluate(id: String!): Evaluate!
   deleteMecialSpecialty(id: String!): MedicalSpecialties!
@@ -476,6 +485,7 @@ type Profile {
 
 type Query {
   checklogin: User!
+  checkloginCustomer: User!
   getAllCustomer: [Customer!]!
   getAllCustomerPagination(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "name", sortOrder: String): [Customer!]!
   getAllDoctor: [Doctor!]!
@@ -590,14 +600,14 @@ type Setting {
 }
 
 input UpdateCustomerInput {
-  address: String
-  dateOfBirth: DateTime
-  email: String
-  ethnic: String
-  gender: EGender
+  address: String!
+  dateOfBirth: DateTime!
+  email: String!
+  ethnic: String!
+  gender: EGender!
   id: String!
   name: String!
-  numberPhone: String
+  numberPhone: String!
 }
 
 input UpdateDoctorInput {
@@ -643,6 +653,7 @@ input UpdateMedicalFacilityInput {
   schedule: String!
   status: String!
   taxCode: String!
+  typeOfFacility: ETypeOfFacility!
   userId: String!
 }
 
@@ -729,7 +740,7 @@ input UpdateUserWithPassInput {
   active: Boolean
   email: String!
   id: String!
-  linkImage: LinkImageInput
+  linkImage: LinkImageInput!
   password: String!
   passwordNew: String!
   username: String!
@@ -753,7 +764,7 @@ type User {
   doctor: Doctor
   email: String!
   id: ID!
-  linkImage: LinkImage
+  linkImage: LinkImage!
   medicalFacilities: MedicalFacilities
   password: String!
   roles: [String!]

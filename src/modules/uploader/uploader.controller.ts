@@ -56,7 +56,6 @@ export class UploaderController {
   @UseInterceptors(
     FilesInterceptor('file', 10, {
       storage: diskStorage({
-        // destination: `${process.env.FILE_PATH || 'files'}/images`,
         destination: getDestination,
         filename: editFileName,
       }),
@@ -81,37 +80,6 @@ export class UploaderController {
       throw new Error('Can not Upload ');
     }
   }
-
-  // @Post('webbookingImagePackageUpload')
-  // // @Authenticated()
-  // @UseInterceptors(
-  //   FilesInterceptor('file', 10, {
-  //     storage: diskStorage({
-  //       destination: getDestination,
-  //       filename: editFileName,
-  //     }),
-  //     fileFilter: imageFilter,
-  //   }),
-  // )
-  // async uploadImagePackage(
-  //   @UploadedFiles() files: Express.Multer.File[],
-  // ): Promise<any> {
-  //   try {
-  //     console.log('--> Uploading image package');
-  //     const response = [];
-  //     files.forEach((file) => {
-  //       const fileResponse = {
-  //         originalname: file.originalname,
-  //         filename: file.filename,
-  //       };
-  //       response.push(fileResponse);
-  //     });
-  //     return response;
-  //   } catch (e) {
-  //     console.error(e);
-  //     throw new Error('Can not Upload ');
-  //   }
-  // }
 
   @Delete('webbookingImageDelete/:filename')
   async deleteImage(@Param('filename') filename: string) {

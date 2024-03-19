@@ -38,6 +38,9 @@ export class MedicalFacilities {
   introduce: string;
 
   @Prop()
+  typeOfFacility: string;
+
+  @Prop()
   operatingStatus: string; // trạng thái hoạt động
 
   @Prop()

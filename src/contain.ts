@@ -64,6 +64,16 @@ export enum EPermission {
   MagagerVaccine = 'Quản lý tim chủng',
 }
 
+export enum ETypeOfFacility {
+  publicHospital = 'Bệnh viện công',
+  privateHospital = 'Bệnh viện tư',
+  clinic = 'Phòng khám',
+  vaccinationCenter = 'Trung tâm tiêm chủng',
+}
+
+registerEnumType(ETypeOfFacility, {
+  name: 'ETypeOfFacility',
+});
 registerEnumType(EPermission, {
   name: 'EPermission',
 });

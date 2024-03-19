@@ -12,7 +12,7 @@ import { CreateMedicalFacilityInput } from './entities/dto/create-medical-facili
 import { Doctor } from '../doctors/entities/doctor.entity';
 import { DoctorsService } from '../doctors/doctors.service';
 import { Roles } from '../auth/roles.decorator';
-import { UseGuards } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common/decorators/core/use-guards.decorator';
 import { JWtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Role } from '../auth/entities/role.enum';

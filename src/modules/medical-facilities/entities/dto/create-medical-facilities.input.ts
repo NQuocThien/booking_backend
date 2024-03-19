@@ -1,5 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { EStatusService } from 'src/contain';
+import { EStatusService, ETypeOfFacility } from 'src/contain';
 import { LinkImageInput } from 'src/modules/users/dto/linkimage.input';
 
 @InputType()
@@ -36,6 +36,9 @@ export class CreateMedicalFacilityInput {
 
   @Field()
   introduce: string;
+
+  @Field(() => ETypeOfFacility)
+  typeOfFacility: ETypeOfFacility;
 
   @Field()
   operatingStatus: string; // trạng thái hoạt động

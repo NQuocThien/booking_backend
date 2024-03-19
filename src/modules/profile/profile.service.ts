@@ -13,25 +13,25 @@ export class ProfileService {
     private readonly model: Model<Profile>,
   ) {}
 
-  private profileLoader = new DataLoader<string, Profile[]>(
-    async (customerIds) => {
-      const profiles = await this.model
-        .find({ customerId: { $in: customerIds } })
-        .exec();
-      const profileMap = new Map<string, Profile[]>();
-      profiles.forEach((profile) => {
-        const customerId = profile.customerId.toString();
-        if (profileMap.has(customerId)) {
-          profileMap.get(customerId).push(profile);
-        } else {
-          profileMap.set(customerId, [profile]);
-        }
-      });
-      return customerIds.map(
-        (customerId) => profileMap.get(customerId) || null,
-      );
-    },
-  );
+  // private profileLoader = new DataLoader<string, Profile[]>(
+  //   async (customerIds) => {
+  //     const profiles = await this.model
+  //       .find({ customerId: { $in: customerIds } })
+  //       .exec();
+  //     const profileMap = new Map<string, Profile[]>();
+  //     profiles.forEach((profile) => {
+  //       const customerId = profile.customerId.toString();
+  //       if (profileMap.has(customerId)) {
+  //         profileMap.get(customerId).push(profile);
+  //       } else {
+  //         profileMap.set(customerId, [profile]);
+  //       }
+  //     });
+  //     return customerIds.map(
+  //       (customerId) => profileMap.get(customerId) || null,
+  //     );
+  //   },
+  // );
 
   async create(profile: CreateProfileInput): Promise<Profile> {
     return this.model.create(profile);
@@ -62,8 +62,7 @@ export class ProfileService {
   }
   async getProfileByCustomerId(customerId: string): Promise<Profile[]> {
     var profiles: Profile[] = [];
-    const profileLoad = await this.profileLoader.load(customerId);
-
+    const profileLoad = await this.model.find({ customerId: customerId });
     return profileLoad;
   }
 }

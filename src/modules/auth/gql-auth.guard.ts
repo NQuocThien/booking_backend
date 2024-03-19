@@ -1,11 +1,6 @@
-import {
-  Injectable,
-  ExecutionContext,
-  ForbiddenException,
-} from '@nestjs/common';
+import { Injectable, ExecutionContext } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { AuthGuard } from '@nestjs/passport';
-import { log } from 'console';
 
 @Injectable()
 export class GqlAuthGruard extends AuthGuard('local') {
