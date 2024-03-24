@@ -17,7 +17,7 @@ export class UpdateUserWithPassInput {
   @Field()
   password: string;
 
-  @Field(() => LinkImageInput)
+  @Field(() => LinkImageInput, { nullable: true })
   linkImage: LinkImageInput;
 
   @Field()

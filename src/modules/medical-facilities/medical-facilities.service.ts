@@ -4,6 +4,7 @@ import { MedicalFacilities } from './entities/mecical-facilies.entity';
 import { Model } from 'mongoose';
 import { CreateMedicalFacilityInput } from './entities/dto/create-medical-facilities.input';
 import { UpdateMedicalFacilityInput } from './entities/dto/update-medical-facilities.input';
+import { ETypeOfFacility } from 'src/contain';
 
 @Injectable()
 export class MedicalFacilitiesService {
@@ -26,10 +27,13 @@ export class MedicalFacilitiesService {
   async findById(id: String): Promise<MedicalFacilities> {
     return this.medicalModel.findById(id);
   }
-  async getTotalFacilitiesCount(search: string): Promise<number> {
-    const query = search
-      ? { medicalFacilityName: { $regex: new RegExp(search, 'i') } }
-      : {};
+  async getTotalFacilitiesCount(
+    search: string,
+    type: ETypeOfFacility,
+  ): Promise<number> {
+    var query: any = {};
+    if (search) query.medicalFacilityName = { $regex: search, $options: 'i' };
+    if (type) query.typeOfFacility = type;
     const count = await this.medicalModel.countDocuments(query);
     return count;
   }
@@ -39,18 +43,27 @@ export class MedicalFacilitiesService {
     limit: number,
     sortField: string,
     sortOrder: string,
+    type: ETypeOfFacility = undefined,
   ): Promise<MedicalFacilities[]> {
-    const query = search
-      ? { medicalFacilityName: { $regex: search, $options: 'i' } }
-      : {};
+    console.log('test 2: ', type);
+    var query: any = {};
+    if (search) query.medicalFacilityName = { $regex: search, $options: 'i' };
+    if (type) query.typeOfFacility = type;
     const sortOptions: { [key: string]: 'asc' | 'desc' } = {};
     sortOptions[sortField] = sortOrder === 'asc' ? 'asc' : 'desc';
     const skip = (page - 1) * limit;
+
     return this.medicalModel
       .find({ ...query })
       .limit(limit)
       .skip(skip)
       .sort(sortOptions);
+  }
+  async getTopMedicalFacilities(
+    limit: number,
+    type: ETypeOfFacility,
+  ): Promise<MedicalFacilities[]> {
+    return this.medicalModel.find({ typeOfFacility: type }).limit(limit);
   }
 
   async findOneByUserId(id: String): Promise<MedicalFacilities> {

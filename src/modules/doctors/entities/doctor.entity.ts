@@ -21,7 +21,7 @@ export class Doctor {
   medicalFactilitiesId?: string;
 
   @Field()
-  name: String;
+  doctorName: String;
 
   @Field(() => String)
   gender: EGender;

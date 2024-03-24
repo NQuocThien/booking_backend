@@ -49,25 +49,19 @@ export class AuthService {
     if (user)
       throw new Error(`User ${loginUserInput.username} already exists ! `);
     const password = await bcrypt.hash(loginUserInput.password, 10);
-    const roles: Role[] = [Role.User];
-    // tạo thông tin người dùng
-    // this.cusSv.createCustomer
-    const { fullname, ...createUser } = loginUserInput;
-    return this.userService.create(
-      {
-        username: loginUserInput.username,
-        active: true,
-        email: loginUserInput.email,
-        password: password,
-        roles: roles,
-      },
-      fullname,
-    );
+    const roles: Role[] = [Role.Customer];
+
+    return this.userService.create({
+      username: loginUserInput.username,
+      active: true,
+      email: loginUserInput.email,
+      password: password,
+      roles: roles,
+    });
   }
   async signupUser(loginUserInput: CreateUserByAdminInput) {
     const user = await this.userService.findOne(loginUserInput.username);
-    if (user)
-      throw new Error(`User ${loginUserInput.username} already exists ! `);
+    if (user) throw new Error(`User already exists ! `);
     const password = await bcrypt.hash(loginUserInput.password, 10);
     const roles: Role[] = [];
     return this.userService.createByAdmin({

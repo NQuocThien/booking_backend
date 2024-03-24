@@ -12,7 +12,7 @@ export class UpdateMedicalStaffInput {
   medicalFacilityId: String;
 
   @Field(() => String)
-  name: String;
+  staffName: String;
 
   @Field(() => EGender)
   gender: EGender;

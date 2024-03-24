@@ -61,7 +61,9 @@ export class MedicalStaffService {
     sortField: string,
     sortOrder: string,
   ): Promise<MedicalStaff[]> {
-    const query = search ? { name: { $regex: search, $options: 'i' } } : {};
+    const query = search
+      ? { staffName: { $regex: search, $options: 'i' } }
+      : {};
     const sortOptions: { [key: string]: 'asc' | 'desc' } = {};
     sortOptions[sortField] = sortOrder === 'asc' ? 'asc' : 'desc';
     const skip = (page - 1) * limit;
@@ -73,7 +75,9 @@ export class MedicalStaffService {
   }
 
   async getTotalStaffCount(search: string): Promise<number> {
-    const query = search ? { name: { $regex: new RegExp(search, 'ui') } } : {};
+    const query = search
+      ? { staffName: { $regex: new RegExp(search, 'ui') } }
+      : {};
     const count = await this.model.countDocuments(query);
     return count;
   }
@@ -88,7 +92,7 @@ export class MedicalStaffService {
   ): Promise<MedicalStaff[]> {
     const query = search
       ? {
-          name: { $regex: search, $options: 'i' },
+          staffName: { $regex: search, $options: 'i' },
           medicalFacilityId: facilityId,
         }
       : { medicalFacilityId: facilityId };
@@ -108,7 +112,7 @@ export class MedicalStaffService {
   ): Promise<number> {
     const query = search
       ? {
-          packageName: {
+          staffName: {
             $regex: new RegExp(search, 'i'),
             medicalFacilityId: facilityId,
           },

@@ -5,7 +5,7 @@ import { Doctor } from './entities/doctor.entity';
 import { CreateDoctorInput } from './entities/dtos/create-doctor.input';
 import { UpdateDoctorInput } from './entities/dtos/update-doctor.input';
 import { deleteDatePast } from 'src/utils/contain';
-import { EAcademicTitle, EDegree, EGender } from 'src/contain';
+import { EAcademicTitle, EDegree, EGender, EStatusService } from 'src/contain';
 import { Filter } from 'typeorm';
 import { FilterDoctorInput } from './entities/dtos/filter-doctor.input';
 
@@ -49,7 +49,9 @@ export class DoctorsService {
     sortField: string,
     sortOrder: string,
   ): Promise<Doctor[]> {
-    const query = search ? { name: { $regex: search, $options: 'i' } } : {};
+    const query = search
+      ? { doctorName: { $regex: search, $options: 'i' } }
+      : {};
     const sortOptions: { [key: string]: 'asc' | 'desc' } = {};
     sortOptions[sortField] = sortOrder === 'asc' ? 'asc' : 'desc';
     const skip = (page - 1) * limit;
@@ -115,10 +117,15 @@ export class DoctorsService {
   async findByFacilitiesId(id: String): Promise<Doctor[]> {
     return await this.doctorModel.find({ medicalFactilitiesId: id });
   }
-  async getTotalPackagesCountByFacilityId(facilityId: string): Promise<number> {
-    const count = await this.doctorModel.countDocuments({
-      medicalFactilitiesId: facilityId,
-    });
+  async getTotalPackagesCountByFacilityId(
+    facilityId: string,
+    isClient: boolean = false,
+  ): Promise<number> {
+    const query: any = { medicalFactilitiesId: facilityId };
+    if (isClient) {
+      query['workSchedule.status'] = EStatusService.Open;
+    }
+    const count = await this.doctorModel.countDocuments(query);
     return count;
   }
   renderQuery(filter: FilterDoctorInput, facilityId: string = undefined): any {
@@ -127,8 +134,8 @@ export class DoctorsService {
     if (facilityId) {
       query.medicalFactilitiesId = facilityId;
     }
-    if (filter?.name) {
-      query.name = { $regex: filter.name, $options: 'i' };
+    if (filter?.doctorName) {
+      query.doctorName = { $regex: filter.doctorName, $options: 'i' };
     }
 
     if (filter?.degree) {

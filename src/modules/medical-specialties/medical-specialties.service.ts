@@ -5,6 +5,7 @@ import { CreateMedicalSpecialtyInput } from './entities/dtos/create-medical-spec
 import { MedicalSpecialties } from './entities/medical-specialties.entity';
 import { UpdateMedicalSpecialtyInput } from './entities/dtos/update-medical-specialties.input';
 import { deleteDatePast } from 'src/utils/contain';
+import { EStatusService } from 'src/contain';
 
 @Injectable()
 export class MedicalSpecialtiesService {
@@ -94,10 +95,14 @@ export class MedicalSpecialtiesService {
   }
   async getTotalSpacialtyCountByFacilityId(
     facilityId: string,
+    isClient: boolean = false,
   ): Promise<number> {
-    const count = await this.medicalSpecialtiesModel.countDocuments({
-      medicalFactilityId: facilityId,
-    });
+    const query: any = { medicalFactilityId: facilityId };
+    if (isClient) {
+      query['workSchedule.status'] = EStatusService.Open;
+    }
+    console.log(query);
+    const count = await this.medicalSpecialtiesModel.countDocuments(query);
     return count;
   }
 
@@ -111,7 +116,7 @@ export class MedicalSpecialtiesService {
   ): Promise<MedicalSpecialties[]> {
     const query = search
       ? {
-          name: { $regex: search, $options: 'i' },
+          specialtyName: { $regex: search, $options: 'i' },
           medicalFactilityId: facilityId,
         }
       : { medicalFactilityId: facilityId };
@@ -127,7 +132,9 @@ export class MedicalSpecialtiesService {
       .exec();
   }
   async getTotalMedicalSpecialtyCount(search: string): Promise<number> {
-    const query = search ? { name: { $regex: new RegExp(search, 'i') } } : {};
+    const query = search
+      ? { specialtyName: { $regex: new RegExp(search, 'i') } }
+      : {};
     const count = await this.medicalSpecialtiesModel.countDocuments(query);
     return count;
   }

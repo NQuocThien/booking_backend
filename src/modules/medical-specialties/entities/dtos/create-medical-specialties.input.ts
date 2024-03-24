@@ -6,7 +6,7 @@ export class CreateMedicalSpecialtyInput {
   medicalFactilityId: string;
 
   @Field()
-  name: string;
+  specialtyName: string;
 
   @Field()
   price: number;

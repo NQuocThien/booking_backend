@@ -6,7 +6,7 @@ export class MedicalSpecialties {
   medicalFactilityId: string;
 
   @Prop()
-  name: string;
+  specialtyName: string;
 
   @Prop()
   price: number;

@@ -17,21 +17,11 @@ export class UsersService {
   ) {}
   async create(
     createUserInput: CreateUserInput,
-    fullname: string,
+    // fullname: string,
   ): Promise<User> {
     const user = await this.userModel.create({ ...createUserInput });
-    log('---> Created New User With ID:', user.id);
-    // create customer
-    await this.cusSv.createCustomer({
-      name: fullname,
-      userId: user.id,
-      gender: undefined,
-      numberPhone: undefined,
-      email: undefined,
-      address: undefined,
-      dateOfBirth: undefined,
-      ethnic: undefined,
-    });
+    log('---> Created New User:', user.username);
+
     return user;
   }
   async createByAdmin(createUserInput: CreateUserInput): Promise<User> {

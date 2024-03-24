@@ -37,7 +37,7 @@ export class CustomerService {
     sortField: string,
     sortOrder: string,
   ): Promise<Customer[]> {
-    const query = search ? { name: { $regex: search, $options: 'i' } } : {};
+    const query = search ? { fullname: { $regex: search, $options: 'i' } } : {};
     const sortOptions: { [key: string]: 'asc' | 'desc' } = {};
     sortOptions[sortField] = sortOrder === 'asc' ? 'asc' : 'desc';
     const skip = (page - 1) * limit;
@@ -50,7 +50,7 @@ export class CustomerService {
 
   async getTotalCustomersCount(search: string): Promise<number> {
     const query = search
-      ? { username: { $regex: new RegExp(search, 'i') } }
+      ? { fullname: { $regex: new RegExp(search, 'i') } }
       : {};
     const count = await this.customerModel.countDocuments(query);
     return count;

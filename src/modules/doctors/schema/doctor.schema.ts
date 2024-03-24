@@ -12,7 +12,7 @@ export class Doctor {
   medicalFactilitiesId?: string;
 
   @Prop()
-  name: String;
+  doctorName: String;
 
   @Prop()
   gender: String;

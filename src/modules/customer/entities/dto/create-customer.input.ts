@@ -6,7 +6,7 @@ export class CreateCustomerInput {
   userId: string;
 
   @Field()
-  name: String;
+  fullname: String;
 
   @Field(() => EGender)
   gender: EGender;

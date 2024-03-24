@@ -3,7 +3,7 @@ import { EAcademicTitle, EDegree, EGender } from 'src/contain';
 @InputType()
 export class FilterDoctorInput {
   @Field({ nullable: true })
-  name: String;
+  doctorName: String;
 
   @Field(() => EGender, { nullable: true })
   gender: EGender;

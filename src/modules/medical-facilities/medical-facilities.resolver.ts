@@ -26,7 +26,12 @@ import { MedicalSpecialties } from '../medical-specialties/entities/medical-spec
 import { MedicalSpecialtiesService } from '../medical-specialties/medical-specialties.service';
 import { MedicalStaffService } from '../medical-staff/medical-staff.service';
 import { MedicalStaff } from '../medical-staff/entities/medical-staff.entity';
-import { EPermission } from 'src/contain';
+import {
+  EPermission,
+  EStatusService,
+  ETypeOfFacility,
+  ETypeOfService,
+} from 'src/contain';
 
 @Resolver(() => MedicalFacilities)
 export class MedicalFacilitiesResolver {
@@ -85,14 +90,31 @@ export class MedicalFacilitiesResolver {
     @Args('sortField', { nullable: true, defaultValue: 'medicalFacilityName' })
     sortField: string,
     @Args('sortOrder', { nullable: true }) sortOrder: string,
+    @Args('type', { nullable: true }) type: ETypeOfFacility,
+  ): Promise<MedicalFacilities[]> {
+    console.log('test: ', type);
+    const user = await this.medicalService.getAllMedicalFacilityPagination(
+      search,
+      page,
+      limit,
+      sortField,
+      sortOrder,
+      type,
+    );
+    return user;
+  }
+
+  @Query(() => [MedicalFacilities], { name: 'getTopMedicalFacilities' })
+  // @UseGuards(JWtAuthGuard)
+  async getTopMedicalFacilities(
+    @Args('typeFacility')
+    type: ETypeOfFacility,
+    @Args('limit', { defaultValue: 10 }) limit: number,
   ): Promise<MedicalFacilities[]> {
     {
-      const user = await this.medicalService.getAllMedicalFacilityPagination(
-        search,
-        page,
+      const user = await this.medicalService.getTopMedicalFacilities(
         limit,
-        sortField,
-        sortOrder,
+        type,
       );
       return user;
     }
@@ -100,10 +122,12 @@ export class MedicalFacilitiesResolver {
 
   @Query(() => Number, { name: 'getTotalFacilitiesCount' })
   async getTotalFacilitiesCount(
-    @Args('search', { nullable: true }) search?: string,
+    @Args('search', { nullable: true }) search: string,
+    @Args('type', { nullable: true }) type: ETypeOfFacility,
   ): Promise<number> {
     const count = await this.medicalService.getTotalFacilitiesCount(
       search || '',
+      type,
     );
     return count;
   }
@@ -160,26 +184,73 @@ export class MedicalFacilitiesResolver {
   }
 
   @ResolveField(() => [Doctor], { name: 'doctors' })
-  async doctors(@Parent() mf: MedicalFacilities): Promise<Doctor[]> {
-    const docs = await this.doctorService.findByFacilitiesId(mf.id);
-    return docs;
+  async doctors(
+    @Parent() mf: MedicalFacilities,
+    @Args('isClient', { nullable: true, defaultValue: false })
+    isClient?: boolean,
+  ): Promise<Doctor[]> {
+    if (!isClient) {
+      const docs = await this.doctorService.findByFacilitiesId(mf.id);
+      return docs;
+    } else {
+      const docs = await this.doctorService.findByFacilitiesId(mf.id);
+      const filtered = docs.filter(
+        (doc) => doc.workSchedule.status === EStatusService.Open,
+      );
+      return filtered;
+    }
   }
 
   @ResolveField(() => [Package], { name: 'packages' })
-  async packages(@Parent() mf: MedicalFacilities): Promise<Package[]> {
-    return await this.packageSrv.findByMedicalFacilityId(mf.id);
+  async packages(
+    @Parent() mf: MedicalFacilities,
+    @Args('isClient', { nullable: true, defaultValue: false })
+    isClient?: boolean,
+  ): Promise<Package[]> {
+    if (!isClient) {
+      return await this.packageSrv.findByMedicalFacilityId(mf.id);
+    } else {
+      const packages = await this.packageSrv.findByMedicalFacilityId(mf.id);
+      const packagesOpen = packages.filter(
+        (p) => p.workSchedule.status === EStatusService.Open,
+      );
+      return packagesOpen;
+    }
   }
 
   @ResolveField(() => [Vaccination], { name: 'vaccinations' })
-  async vaccinations(@Parent() mf: MedicalFacilities): Promise<Vaccination[]> {
-    return await this.vaccineSvr.findByMedicalFacilityId(mf.id);
+  async vaccinations(
+    @Parent() mf: MedicalFacilities,
+    @Args('isClient', { nullable: true, defaultValue: false })
+    isClient?: boolean,
+  ): Promise<Vaccination[]> {
+    if (!isClient) return await this.vaccineSvr.findByMedicalFacilityId(mf.id);
+    else {
+      const vaccination = await this.vaccineSvr.findByMedicalFacilityId(mf.id);
+      const vaccinationOpen = vaccination.filter(
+        (p) => p.workSchedule.status === EStatusService.Open,
+      );
+      return vaccinationOpen;
+    }
   }
 
   @ResolveField(() => [MedicalSpecialties], { name: 'medicalSpecialties' })
   async medicalSpecialties(
     @Parent() mf: MedicalFacilities,
+    @Args('isClient', { nullable: true, defaultValue: false })
+    isClient?: boolean,
   ): Promise<MedicalSpecialties[]> {
-    return await this.specialtySrv.findByMedicalFacilityId(mf.id);
+    if (!isClient)
+      return await this.specialtySrv.findByMedicalFacilityId(mf.id);
+    else {
+      const specialties = await this.specialtySrv.findByMedicalFacilityId(
+        mf.id,
+      );
+      const specialtiesOpen = specialties.filter(
+        (p) => p.workSchedule.status === EStatusService.Open,
+      );
+      return specialtiesOpen;
+    }
   }
   @ResolveField(() => [MedicalSpecialties], { name: 'medicalStaffs' })
   async medicalStaffs(
@@ -189,22 +260,66 @@ export class MedicalFacilitiesResolver {
   }
 
   @ResolveField(() => Number, { name: 'totalPackages' })
-  async totalPackages(@Parent() mf: MedicalFacilities): Promise<number> {
-    return await this.packageSrv.getTotalPackagesCountByFacilityId(mf.id);
+  async totalPackages(
+    @Parent() mf: MedicalFacilities,
+    @Args('isClient', { nullable: true, defaultValue: false })
+    isClient: boolean,
+  ): Promise<number> {
+    if (!isClient)
+      return await this.packageSrv.getTotalPackagesCountByFacilityId(mf.id);
+    else {
+      return await this.packageSrv.getTotalPackagesCountByFacilityId(
+        mf.id,
+        isClient,
+      );
+    }
   }
 
   @ResolveField(() => Number, { name: 'totalDoctors' })
-  async totalDoctors(@Parent() mf: MedicalFacilities): Promise<number> {
-    return await this.doctorService.getTotalPackagesCountByFacilityId(mf.id);
+  async totalDoctors(
+    @Parent() mf: MedicalFacilities,
+    @Args('isClient', { nullable: true, defaultValue: false })
+    isClient: boolean,
+  ): Promise<number> {
+    if (!isClient)
+      return await this.doctorService.getTotalPackagesCountByFacilityId(mf.id);
+    else {
+      return await this.doctorService.getTotalPackagesCountByFacilityId(
+        mf.id,
+        isClient,
+      );
+    }
   }
 
   @ResolveField(() => Number, { name: 'totalSpecialties' })
-  async totalSpecialties(@Parent() mf: MedicalFacilities): Promise<number> {
-    return await this.specialtySrv.getTotalSpacialtyCountByFacilityId(mf.id);
+  async totalSpecialties(
+    @Parent() mf: MedicalFacilities,
+    @Args('isClient', { nullable: true, defaultValue: false })
+    isClient: boolean,
+  ): Promise<number> {
+    if (!isClient)
+      return await this.specialtySrv.getTotalSpacialtyCountByFacilityId(mf.id);
+    else {
+      return await this.specialtySrv.getTotalSpacialtyCountByFacilityId(
+        mf.id,
+        isClient,
+      );
+    }
   }
 
   @ResolveField(() => Number, { name: 'totalVaccinations' })
-  async totalVaccinations(@Parent() mf: MedicalFacilities): Promise<number> {
-    return await this.vaccineSvr.getTotalPackagesCountByFacilityId(mf.id);
+  async totalVaccinations(
+    @Parent() mf: MedicalFacilities,
+    @Args('isClient', { nullable: true, defaultValue: false })
+    isClient: boolean,
+  ): Promise<number> {
+    if (!isClient)
+      return await this.vaccineSvr.getTotalPackagesCountByFacilityId(mf.id);
+    else {
+      return await this.vaccineSvr.getTotalPackagesCountByFacilityId(
+        mf.id,
+        isClient,
+      );
+    }
   }
 }

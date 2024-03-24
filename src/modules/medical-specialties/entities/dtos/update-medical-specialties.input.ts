@@ -9,7 +9,7 @@ export class UpdateMedicalSpecialtyInput {
   medicalFactilityId: string;
 
   @Field()
-  name: string;
+  specialtyName: string;
 
   @Field()
   price: number;

@@ -11,7 +11,7 @@ export class CreateDoctorInput {
   medicalFactilitiesId?: string;
 
   @Field()
-  name: String;
+  doctorName: String;
 
   @Field(() => EGender)
   gender: EGender;

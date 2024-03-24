@@ -8,7 +8,7 @@ export class Customer {
   userId: string;
 
   @Prop()
-  name: String;
+  fullname: String;
 
   @Prop({ type: String, enum: EGender })
   gender: EGender;

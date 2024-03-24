@@ -36,6 +36,7 @@ export class RegisterResolver {
   async getAllRegisterByOption(
     @Args('input') input: GetRegisterByOptionInput,
   ): Promise<Register[]> {
+    console.log('test regis: ', input);
     return await this.regisService.getAllRegisterByOption(input);
   }
 

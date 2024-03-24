@@ -9,7 +9,7 @@ export class CreateMedicalStaffInput {
   medicalFacilityId: String;
 
   @Field()
-  name: String;
+  staffName: String;
 
   @Field(() => EGender)
   gender: EGender;

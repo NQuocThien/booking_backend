@@ -6,6 +6,7 @@ import { CreatePackageInput } from './entities/dto/create-package.input';
 import { UpdatePackageInput } from './entities/dto/update-package.input';
 import { Console } from 'console';
 import { deleteDatePast } from 'src/utils/contain';
+import { EStatusService } from 'src/contain';
 
 @Injectable()
 export class PackageService {
@@ -58,10 +59,15 @@ export class PackageService {
       return null;
     }
   }
-  async getTotalPackagesCountByFacilityId(facilityId: string): Promise<number> {
-    const count = await this.model.countDocuments({
-      medicalFactilitiesId: facilityId,
-    });
+  async getTotalPackagesCountByFacilityId(
+    facilityId: string,
+    isClient: boolean = false,
+  ): Promise<number> {
+    const query: any = { medicalFactilitiesId: facilityId };
+    if (isClient) {
+      query['workSchedule.status'] = EStatusService.Open;
+    }
+    const count = await this.model.countDocuments(query);
     return count;
   }
   async delete(id: string): Promise<Package> {

@@ -1,4 +1,5 @@
 import { Field, ID, InputType, ObjectType } from '@nestjs/graphql';
+import { SessionInput } from 'src/modules/contains/session/session.input';
 
 @InputType()
 export class CreateRegisterVaccineInput {
@@ -8,8 +9,8 @@ export class CreateRegisterVaccineInput {
   @Field()
   vaccineId?: String;
 
-  @Field()
-  sessionId: String;
+  @Field(() => SessionInput)
+  session: SessionInput;
 
   @Field()
   isHealthInsurance: boolean;

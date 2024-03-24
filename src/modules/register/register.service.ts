@@ -32,11 +32,22 @@ export class RegisterService {
   async getAllRegisterByOption(
     input: GetRegisterByOptionInput,
   ): Promise<Register[]> {
+    const startOfDay = new Date(input.date);
+    const endOfDay = new Date(input.date);
+
+    startOfDay.setHours(0, 0, 0, 0);
+    endOfDay.setHours(23, 59, 59, 999);
+
     const data = await this.model
       .find({
         ...input,
+        date: {
+          $gte: startOfDay,
+          $lte: endOfDay,
+        },
       })
       .exec();
+    // console.log('---> ', data);
     return data;
   }
 

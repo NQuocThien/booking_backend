@@ -12,8 +12,8 @@ input CreateCustomerInput {
   dateOfBirth: DateTime!
   email: String!
   ethnic: String!
+  fullname: String!
   gender: EGender!
-  name: String!
   numberPhone: String!
   userId: String!
 }
@@ -23,10 +23,10 @@ input CreateDoctorInput {
   avatar: LinkImageInput!
   degree: EDegree!
   discription: String!
+  doctorName: String!
   email: String!
   gender: EGender!
   medicalFactilitiesId: String!
-  name: String!
   numberPhone: String!
   price: Float!
   specialistId: String!
@@ -65,8 +65,8 @@ input CreateMedicalFacilityInput {
 input CreateMedicalSpecialtyInput {
   discription: String!
   medicalFactilityId: String!
-  name: String!
   price: Float!
+  specialtyName: String!
   workSchedule: WorkScheduleInput
 }
 
@@ -74,10 +74,10 @@ input CreateMedicalStaffInput {
   email: String!
   gender: EGender!
   medicalFacilityId: String!
-  name: String!
   numberPhone: String!
   permissions: [EPermission!]!
   specialtyId: [String!]
+  staffName: String!
   userId: String!
 }
 
@@ -126,14 +126,14 @@ input CreateRegisterPackageInput {
   isHealthInsurance: Boolean!
   packageId: String!
   profileId: String!
-  sessionId: String!
+  session: SessionInput!
 }
 
 input CreateRegisterSpecialtyInput {
   date: DateTime!
   isHealthInsurance: Boolean!
   profileId: String!
-  sessionId: String!
+  session: SessionInput!
   specialtyId: String!
 }
 
@@ -141,7 +141,7 @@ input CreateRegisterVaccineInput {
   date: DateTime!
   isHealthInsurance: Boolean!
   profileId: String!
-  sessionId: String!
+  session: SessionInput!
   vaccineId: String!
 }
 
@@ -153,7 +153,6 @@ input CreateUserByAdminInput {
 
 input CreateUserInput {
   email: String!
-  fullname: String!
   password: String!
   username: String!
 }
@@ -174,9 +173,9 @@ type Customer {
   dateOfBirth: DateTime!
   email: String!
   ethnic: String!
+  fullname: String!
   gender: String!
   id: ID!
-  name: String!
   numberPhone: String!
   profiles: [Profile!]
   userId: String!
@@ -192,11 +191,11 @@ type Doctor {
   avatar: LinkImage!
   degree: String!
   discription: String!
+  doctorName: String!
   email: String!
   gender: String!
   id: ID!
   medicalFactilitiesId: String!
-  name: String!
   numberPhone: String!
   price: Float!
   specialistId: String!
@@ -280,8 +279,8 @@ type Evaluate {
 input FilterDoctorInput {
   academicTitle: EAcademicTitle
   degree: EDegree
+  doctorName: String
   gender: EGender
-  name: String
   specialistId: String
 }
 
@@ -348,7 +347,7 @@ type MedicalFacilities {
   address: String!
   dateOff: [DateTime!]
   discription: String!
-  doctors: [Doctor!]
+  doctors(isClient: Boolean = false): [Doctor!]
   email: String!
   id: ID!
   image: LinkImage!
@@ -358,29 +357,29 @@ type MedicalFacilities {
   lng: Float
   logo: LinkImage!
   medicalFacilityName: String!
-  medicalSpecialties: [MedicalSpecialties!]
+  medicalSpecialties(isClient: Boolean = false): [MedicalSpecialties!]
   medicalStaffs: [MedicalStaff!]
   numberPhone: String!
   operatingStatus: String!
-  packages: [Package!]
+  packages(isClient: Boolean = false): [Package!]
   schedule: String!
   status: String!
   taxCode: String!
-  totalDoctors: Float
-  totalPackages: Float
-  totalSpecialties: Float
-  totalVaccinations: Float
+  totalDoctors(isClient: Boolean = false): Float
+  totalPackages(isClient: Boolean = false): Float
+  totalSpecialties(isClient: Boolean = false): Float
+  totalVaccinations(isClient: Boolean = false): Float
   typeOfFacility: String!
   userId: String!
-  vaccinations: [Vaccination!]
+  vaccinations(isClient: Boolean = false): [Vaccination!]
 }
 
 type MedicalSpecialties {
   discription: String!
   id: ID!
   medicalFactilityId: String!
-  name: String!
   price: Float!
+  specialtyName: String!
   workSchedule: WorkSchedule
 }
 
@@ -389,11 +388,11 @@ type MedicalStaff {
   gender: String!
   id: ID!
   medicalFacilityId: String!
-  name: String!
   numberPhone: String!
   permissions: [String!]!
   specialties: [MedicalSpecialties!]
   specialtyId: [String!]
+  staffName: String!
   userId: String!
 }
 
@@ -496,7 +495,7 @@ type Query {
   getAllEvaluate: [Evaluate!]!
   getAllMecialSpecialty: [MedicalSpecialties!]!
   getAllMedicalFacility: [MedicalFacilities!]!
-  getAllMedicalFacilityPagination(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "medicalFacilityName", sortOrder: String): [MedicalFacilities!]!
+  getAllMedicalFacilityPagination(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "medicalFacilityName", sortOrder: String, type: String): [MedicalFacilities!]!
   getAllMedicalSpecialtiesPaginationByStaff(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "name", sortOrder: String, staffId: String!): [MedicalSpecialties!]!
   getAllMedicalSpecialtiesPaginationOfFacility(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "name", sortOrder: String, staffId: String = "", userId: String = ""): [MedicalSpecialties!]!
   getAllMedicalStaff: [MedicalStaff!]!
@@ -531,9 +530,10 @@ type Query {
   getPackageById(input: String!): Package!
   getProfileByCustomerId(id: String!): [Profile!]!
   getSetting: Setting!
+  getTopMedicalFacilities(limit: Float! = 10, typeFacility: String!): [MedicalFacilities!]!
   getTotalCustomersCount(search: String): Float!
   getTotalDoctorsCount(filter: FilterDoctorInput, staffId: String = "", userId: String = ""): Float!
-  getTotalFacilitiesCount(search: String): Float!
+  getTotalFacilitiesCount(search: String, type: String): Float!
   getTotalMedicalSpecialtiesCount(search: String, staffId: String = "", userId: String = ""): Float!
   getTotalPackagesCount(search: String, staffId: String = "", userId: String = ""): Float!
   getTotalVaccinationsCount(search: String, staffId: String = "", userId: String = ""): Float!
@@ -572,7 +572,6 @@ enum Role {
   Doctor
   Facility
   Staff
-  User
 }
 
 type Schedule {
@@ -604,9 +603,9 @@ input UpdateCustomerInput {
   dateOfBirth: DateTime!
   email: String!
   ethnic: String!
+  fullname: String!
   gender: EGender!
   id: String!
-  name: String!
   numberPhone: String!
 }
 
@@ -615,11 +614,11 @@ input UpdateDoctorInput {
   avatar: LinkImageInput!
   degree: EDegree!
   discription: String!
+  doctorName: String!
   email: String!
   gender: EGender!
   id: String!
   medicalFactilitiesId: String!
-  name: String!
   numberPhone: String!
   price: Float!
   specialistId: String!
@@ -661,8 +660,8 @@ input UpdateMedicalSpecialtyInput {
   discription: String!
   id: String!
   medicalFactilityId: String!
-  name: String!
   price: Float!
+  specialtyName: String!
   workSchedule: WorkScheduleInput
 }
 
@@ -671,10 +670,10 @@ input UpdateMedicalStaffInput {
   gender: EGender!
   id: String!
   medicalFacilityId: String!
-  name: String!
   numberPhone: String!
   permissions: [EPermission!]!
   specialtyId: [String!]
+  staffName: String!
   userId: String!
 }
 
@@ -740,7 +739,7 @@ input UpdateUserWithPassInput {
   active: Boolean
   email: String!
   id: String!
-  linkImage: LinkImageInput!
+  linkImage: LinkImageInput
   password: String!
   passwordNew: String!
   username: String!
@@ -764,7 +763,7 @@ type User {
   doctor: Doctor
   email: String!
   id: ID!
-  linkImage: LinkImage!
+  linkImage: LinkImage
   medicalFacilities: MedicalFacilities
   password: String!
   roles: [String!]

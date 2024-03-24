@@ -5,6 +5,7 @@ import { Vaccination } from './entities/Vaccination.entity';
 import { CreateVaccineInput } from './entities/dto/create-vaccination.input';
 import { UpdateVaccineInput } from './entities/dto/update-vaccination.input';
 import { deleteDatePast } from 'src/utils/contain';
+import { EStatusService } from 'src/contain';
 @Injectable()
 export class VaccinationService {
   constructor(
@@ -107,10 +108,15 @@ export class VaccinationService {
   async delete(id: String): Promise<Vaccination> {
     return this.model.findByIdAndDelete(id);
   }
-  async getTotalPackagesCountByFacilityId(facilityId: string): Promise<number> {
-    const count = await this.model.countDocuments({
-      medicalFactilitiesId: facilityId,
-    });
+  async getTotalPackagesCountByFacilityId(
+    facilityId: string,
+    isClient: boolean = false,
+  ): Promise<number> {
+    const query: any = { medicalFactilitiesId: facilityId };
+    if (isClient) {
+      query['workSchedule.status'] = EStatusService.Open;
+    }
+    const count = await this.model.countDocuments(query);
     return count;
   }
 }

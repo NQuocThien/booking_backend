@@ -6,7 +6,7 @@ export class UpdateCustomerInput {
   id: String;
 
   @Field()
-  name: String;
+  fullname: String;
 
   @Field(() => EGender)
   gender: EGender;
