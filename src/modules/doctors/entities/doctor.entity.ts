@@ -7,6 +7,7 @@ import {
   EStatusService,
 } from 'src/contain';
 import { WorkSchedule } from 'src/modules/contains/work-schedule/work-schedule.entity';
+import { MedicalFacilities } from 'src/modules/medical-facilities/entities/mecical-facilies.entity';
 import { MedicalSpecialties } from 'src/modules/medical-specialties/entities/medical-specialties.entity';
 import { LinkImage } from 'src/modules/users/dto/image';
 @ObjectType()
@@ -55,6 +56,9 @@ export class Doctor {
 
   @Field(() => MedicalSpecialties, { nullable: true })
   specialty: MedicalSpecialties;
+
+  @Field(() => MedicalFacilities, { nullable: true })
+  facility: MedicalFacilities;
 }
 registerEnumType(EDayOfWeed, {
   name: 'EDayOfWeed',

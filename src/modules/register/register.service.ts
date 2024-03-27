@@ -11,7 +11,6 @@ import { CreateRegisterVaccineInput } from './entities/dtos/create-register-vacc
 import { CreateRegisterInput } from './entities/dtos/create-register.input';
 import { GetRegisterByOptionInput } from './entities/dtos/get-register-option.input';
 import { ConfirmRegisterInput } from './entities/dtos/confirm-register.input';
-
 @Injectable()
 export class RegisterService {
   constructor(
@@ -26,6 +25,7 @@ export class RegisterService {
       ...data,
       state: EStateRegister.Pending,
       typeOfService: ETypeOfService.Doctor,
+      cancel: false,
     };
     return await this.model.create(datainput);
   }
@@ -51,6 +51,32 @@ export class RegisterService {
     return data;
   }
 
+  async getAllRegisPending(
+    input: GetRegisterByOptionInput,
+  ): Promise<Register[]> {
+    const startOfDay = new Date(input.date);
+    const endOfDay = new Date(input.date);
+
+    startOfDay.setHours(0, 0, 0, 0);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const data = await this.model
+      .find({
+        ...input,
+        date: {
+          $gte: startOfDay,
+          $lte: endOfDay,
+        },
+      })
+      .exec(); // tất cả các ký của ngày
+
+    const regisFilter = data.filter((d) => {
+      return d.state === EStateRegister.Pending;
+    });
+    console.log(regisFilter);
+    return regisFilter;
+  }
+
   async createRegisterSpecialty(
     data: CreateRegisterSpecialtyInput,
   ): Promise<Register> {
@@ -58,6 +84,7 @@ export class RegisterService {
       ...data,
       state: EStateRegister.Pending,
       typeOfService: ETypeOfService.Specialty,
+      cancel: false,
     };
     return await this.model.create(datainput);
   }
@@ -69,6 +96,7 @@ export class RegisterService {
       ...data,
       state: EStateRegister.Pending,
       typeOfService: ETypeOfService.Package,
+      cancel: false,
     };
     return await this.model.create(datainput);
   }
@@ -80,6 +108,7 @@ export class RegisterService {
       ...data,
       state: EStateRegister.Pending,
       typeOfService: ETypeOfService.Vaccine,
+      cancel: false,
     };
     return await this.model.create(datainput);
   }
@@ -115,7 +144,17 @@ export class RegisterService {
   async getRegisterByPackageId(packageId: String): Promise<Register[]> {
     return await this.model.find({ packegeId: packageId });
   }
-  async getRegisterByProfileId(profileId: String): Promise<Register[]> {
+  async getRegisterByProfileId(profileId: string): Promise<Register[]> {
     return await this.model.find({ profileId: profileId });
+  }
+  async getRegisterByProfileIds(profileIds: String[]): Promise<Register[]> {
+    return await this.model.find({ profileId: { $in: profileIds } });
+  }
+  parseTimeStringToDate(timeString: string): Date {
+    const [hours, minutes] = timeString.split(':').map(Number);
+    const currentDate = new Date();
+    currentDate.setHours(hours);
+    currentDate.setMinutes(minutes);
+    return currentDate;
   }
 }

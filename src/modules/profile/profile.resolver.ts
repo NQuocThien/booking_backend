@@ -14,6 +14,8 @@ import { UpdateProfileInput } from './entity/dtos/update-profile.input';
 import { RegisterService } from '../register/register.service';
 import { Register } from '../register/entities/register.entity';
 import { Customer } from '../customer/entities/customer.entity';
+import { ProfileLoaderService } from './profile-loader.service';
+import { RegisterLoaderService } from '../register/register-loader.service';
 
 @Resolver(() => Profile)
 export class ProfileResolver {
@@ -21,6 +23,8 @@ export class ProfileResolver {
     private readonly profileService: ProfileService,
     private readonly regisService: RegisterService,
     private readonly customerSvr: CustomerService,
+    private readonly profileLoader: ProfileLoaderService,
+    private readonly registeredSrvLoader: RegisterLoaderService,
   ) {}
 
   @Mutation(() => Profile, { name: 'createProfile' })
@@ -47,9 +51,15 @@ export class ProfileResolver {
     const result = await this.profileService.findAll();
     return result;
   }
+  @Query(() => Profile, { name: 'getProfiles' })
+  async getProfiles(@Args('id') id: string) {
+    const result = await this.profileLoader.load(id);
+    return result;
+  }
   @ResolveField(() => [Register], { name: 'register' })
   async register(@Parent() profile: Profile): Promise<Register[]> {
-    return this.regisService.getRegisterByProfileId(profile.id);
+    return await this.registeredSrvLoader.load(profile.id);
+    // return this.regisService.getRegisterByProfileId(profile.id);
   }
   @ResolveField(() => Customer, { name: 'customer' })
   async customer(@Parent() profile: Profile): Promise<Customer | null> {

@@ -6,6 +6,7 @@ import { Vaccination } from './entities/Vaccination.entity';
 import { VaccinationSchema } from './schema/vaccination.schema';
 import { MedicalFacilitiesModule } from '../medical-facilities/medical-facilities.module';
 import { MedicalStaffModule } from '../medical-staff/medical-staff.module';
+import { VaccinationLoaderService } from './vaccination-loader.service';
 
 @Module({
   imports: [
@@ -18,7 +19,11 @@ import { MedicalStaffModule } from '../medical-staff/medical-staff.module';
     forwardRef(() => MedicalFacilitiesModule),
     MedicalStaffModule,
   ],
-  providers: [VaccinationResolver, VaccinationService],
-  exports: [VaccinationService],
+  providers: [
+    VaccinationResolver,
+    VaccinationService,
+    VaccinationLoaderService,
+  ],
+  exports: [VaccinationService, VaccinationLoaderService],
 })
 export class VaccinationModule {}

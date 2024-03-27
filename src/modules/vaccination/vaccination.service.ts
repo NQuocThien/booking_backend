@@ -78,6 +78,10 @@ export class VaccinationService {
     }
     return currVaccine;
   }
+  async findByIds(ids: string[]): Promise<Vaccination[]> {
+    let res = await this.model.find({ _id: { $in: ids } });
+    return res;
+  }
 
   async findByMedicalFacilityId(
     medicalFacilityId: String,

@@ -23,7 +23,7 @@ export class Register {
   session: Session;
 
   @Prop()
-  isHealthInsurance: boolean;
+  cancel: boolean;
 
   @Prop()
   typeOfService: string;

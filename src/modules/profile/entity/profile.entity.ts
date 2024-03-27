@@ -5,7 +5,7 @@ import { Register } from 'src/modules/register/entities/register.entity';
 @ObjectType()
 export class Profile {
   @Field(() => ID)
-  id: String;
+  id: string;
 
   @Field()
   customerId: string;

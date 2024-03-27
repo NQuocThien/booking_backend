@@ -27,6 +27,9 @@ export class MedicalFacilitiesService {
   async findById(id: String): Promise<MedicalFacilities> {
     return this.medicalModel.findById(id);
   }
+  async findByIds(ids: string[]): Promise<MedicalFacilities[]> {
+    return this.medicalModel.find({ _id: { $in: ids } });
+  }
   async getTotalFacilitiesCount(
     search: string,
     type: ETypeOfFacility,
@@ -45,7 +48,6 @@ export class MedicalFacilitiesService {
     sortOrder: string,
     type: ETypeOfFacility = undefined,
   ): Promise<MedicalFacilities[]> {
-    console.log('test 2: ', type);
     var query: any = {};
     if (search) query.medicalFacilityName = { $regex: search, $options: 'i' };
     if (type) query.typeOfFacility = type;

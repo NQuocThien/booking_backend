@@ -59,7 +59,7 @@ export class CustomerResolver {
   @Mutation(() => Customer, { name: 'createCustomer' })
   async createCustomer(@Args('input') input: CreateCustomerInput) {
     const oldCustomer = await this.customerService.findByUserId(input.userId);
-    console.log(input);
+    // console.log(input);
     if (!oldCustomer && input.userId !== '') {
       return this.customerService.createCustomer(input);
     }

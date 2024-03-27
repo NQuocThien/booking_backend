@@ -35,6 +35,10 @@ dotenv.config();
       autoSchemaFile: join(process.cwd(), 'src.shema.gql'),
       sortSchema: true,
       driver: ApolloDriver,
+      subscriptions: {
+        'graphql-ws': true,
+        'subscriptions-transport-ws': true,
+      },
     }),
     // ServeStaticModule.forRoot({
     //   rootPath: join(__dirname, '../files'),

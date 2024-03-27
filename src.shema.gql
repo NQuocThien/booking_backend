@@ -116,14 +116,12 @@ input CreateProfileInput {
 input CreateRegisterDoctorInput {
   date: DateTime!
   doctorId: String!
-  isHealthInsurance: Boolean!
   profileId: String!
   session: SessionInput!
 }
 
 input CreateRegisterPackageInput {
   date: DateTime!
-  isHealthInsurance: Boolean!
   packageId: String!
   profileId: String!
   session: SessionInput!
@@ -131,7 +129,6 @@ input CreateRegisterPackageInput {
 
 input CreateRegisterSpecialtyInput {
   date: DateTime!
-  isHealthInsurance: Boolean!
   profileId: String!
   session: SessionInput!
   specialtyId: String!
@@ -139,7 +136,6 @@ input CreateRegisterSpecialtyInput {
 
 input CreateRegisterVaccineInput {
   date: DateTime!
-  isHealthInsurance: Boolean!
   profileId: String!
   session: SessionInput!
   vaccineId: String!
@@ -193,6 +189,7 @@ type Doctor {
   discription: String!
   doctorName: String!
   email: String!
+  facility: MedicalFacilities
   gender: String!
   id: ID!
   medicalFactilitiesId: String!
@@ -376,6 +373,7 @@ type MedicalFacilities {
 
 type MedicalSpecialties {
   discription: String!
+  facility: MedicalFacilities
   id: ID!
   medicalFactilityId: String!
   price: Float!
@@ -455,6 +453,7 @@ type Notification {
 
 type Package {
   examinationDetails: String!
+  facility: MedicalFacilities
   gender: String!
   id: ID!
   image: LinkImage!
@@ -507,6 +506,7 @@ type Query {
   getAllPackagePaginationOfFacility(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "packageName", sortOrder: String, staffId: String = "", userId: String = ""): [Package!]!
   getAllPackageSelect(input: String!): [Package!]!
   getAllProfile: [Profile!]!
+  getAllRegisPending(input: GetRegisterByOptionInput!): [Register!]!
   getAllRegisterByOption(input: GetRegisterByOptionInput!): [Register!]!
   getAllStaffPagination(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "name", sortOrder: String): [MedicalStaff!]!
   getAllUsersPagination(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "username", sortOrder: String): [User!]!
@@ -529,6 +529,7 @@ type Query {
   getMedicalStaffByUserId(input: String!): MedicalStaff!
   getPackageById(input: String!): Package!
   getProfileByCustomerId(id: String!): [Profile!]!
+  getProfiles(id: String!): Profile!
   getSetting: Setting!
   getTopMedicalFacilities(limit: Float! = 10, typeFacility: String!): [MedicalFacilities!]!
   getTotalCustomersCount(search: String): Float!
@@ -552,17 +553,21 @@ type Query {
 }
 
 type Register {
+  cancel: Boolean!
   date: DateTime!
+  doctor: Doctor
   doctorId: String
   id: ID!
-  isHealthInsurance: Boolean!
+  package: Package
   packageId: String
-  profile: Profile!
+  profile: Profile
   profileId: String!
   session: Session!
+  specialty: MedicalSpecialties
   specialtyId: String
   state: String!
   typeOfService: String!
+  vaccination: Vaccination
   vaccineId: String
 }
 
@@ -596,6 +601,10 @@ input SessionInput {
 
 type Setting {
   defaultLang: String!
+}
+
+type Subscription {
+  registerCreated: Register!
 }
 
 input UpdateCustomerInput {
@@ -712,6 +721,7 @@ input UpdateProfileInput {
 }
 
 input UpdateRegisterInput {
+  cancel: Boolean!
   id: String!
   state: EStateRegister!
 }
@@ -776,6 +786,7 @@ input UserSelectInput {
 
 type Vaccination {
   countryOfOrigin: String!
+  facility: MedicalFacilities
   id: ID!
   indication: String!
   medicalFactilitiesId: String!

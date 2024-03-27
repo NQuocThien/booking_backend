@@ -6,6 +6,7 @@ import { Package } from './entities/package.entity';
 import { PackageSchema } from './schema/package.schema';
 import { MedicalFacilitiesModule } from '../medical-facilities/medical-facilities.module';
 import { MedicalStaffModule } from '../medical-staff/medical-staff.module';
+import { PackageLoaderService } from './package-loader.service';
 
 @Module({
   imports: [
@@ -18,7 +19,7 @@ import { MedicalStaffModule } from '../medical-staff/medical-staff.module';
     forwardRef(() => MedicalFacilitiesModule),
     MedicalStaffModule,
   ],
-  providers: [PackageResolver, PackageService],
-  exports: [PackageService],
+  providers: [PackageResolver, PackageService, PackageLoaderService],
+  exports: [PackageService, PackageLoaderService],
 })
 export class PackageModule {}

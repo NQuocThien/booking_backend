@@ -4,7 +4,6 @@ import { Profile } from './entity/profile.entity';
 import { Model } from 'mongoose';
 import { CreateProfileInput } from './entity/dtos/create-profile.input';
 import { UpdateProfileInput } from './entity/dtos/update-profile.input';
-import * as DataLoader from 'dataloader';
 
 @Injectable()
 export class ProfileService {
@@ -13,31 +12,14 @@ export class ProfileService {
     private readonly model: Model<Profile>,
   ) {}
 
-  // private profileLoader = new DataLoader<string, Profile[]>(
-  //   async (customerIds) => {
-  //     const profiles = await this.model
-  //       .find({ customerId: { $in: customerIds } })
-  //       .exec();
-  //     const profileMap = new Map<string, Profile[]>();
-  //     profiles.forEach((profile) => {
-  //       const customerId = profile.customerId.toString();
-  //       if (profileMap.has(customerId)) {
-  //         profileMap.get(customerId).push(profile);
-  //       } else {
-  //         profileMap.set(customerId, [profile]);
-  //       }
-  //     });
-  //     return customerIds.map(
-  //       (customerId) => profileMap.get(customerId) || null,
-  //     );
-  //   },
-  // );
-
   async create(profile: CreateProfileInput): Promise<Profile> {
     return this.model.create(profile);
   }
   async findById(id: String): Promise<Profile> {
     return this.model.findById(id);
+  }
+  async findByIds(ids: string[]): Promise<Profile[]> {
+    return this.model.find({ _id: { $in: ids } });
   }
   async findAll(): Promise<Profile[]> {
     const result = await this.model.find();
@@ -64,5 +46,10 @@ export class ProfileService {
     var profiles: Profile[] = [];
     const profileLoad = await this.model.find({ customerId: customerId });
     return profileLoad;
+  }
+  // =================================================================
+
+  async findByCutomerIds(customerIds: string[]): Promise<Profile[]> {
+    return this.model.find({ customerId: { $in: customerIds } }).exec();
   }
 }

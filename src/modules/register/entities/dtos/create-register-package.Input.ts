@@ -13,8 +13,5 @@ export class CreateRegisterPackageInput {
   session: SessionInput;
 
   @Field()
-  isHealthInsurance: boolean;
-
-  @Field()
   date: Date;
 }

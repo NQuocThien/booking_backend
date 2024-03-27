@@ -6,9 +6,9 @@ import {
   MedicalSpecialties,
   MedicalSpecialtiesSchema,
 } from './schemas/medical-specialties.schema';
-import { MedicalFacilitiesService } from '../medical-facilities/medical-facilities.service';
 import { MedicalFacilitiesModule } from '../medical-facilities/medical-facilities.module';
 import { MedicalStaffModule } from '../medical-staff/medical-staff.module';
+import { MedicalSpecialtiesLoaderService } from './medical-specialties-loader.service';
 
 @Module({
   imports: [
@@ -21,7 +21,11 @@ import { MedicalStaffModule } from '../medical-staff/medical-staff.module';
     forwardRef(() => MedicalFacilitiesModule),
     forwardRef(() => MedicalStaffModule),
   ],
-  providers: [MedicalSpecialtiesResolver, MedicalSpecialtiesService],
-  exports: [MedicalSpecialtiesService],
+  providers: [
+    MedicalSpecialtiesResolver,
+    MedicalSpecialtiesService,
+    MedicalSpecialtiesLoaderService,
+  ],
+  exports: [MedicalSpecialtiesService, MedicalSpecialtiesLoaderService],
 })
 export class MedicalSpecialtiesModule {}

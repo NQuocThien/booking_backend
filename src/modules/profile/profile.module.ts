@@ -6,6 +6,7 @@ import { Profile, ProfileSchema } from './schemas/profile.schema';
 import { CustomerModule } from '../customer/customer.module';
 import { Register } from '../register/entities/register.entity';
 import { RegisterModule } from '../register/register.module';
+import { ProfileLoaderService } from './profile-loader.service';
 
 @Module({
   imports: [
@@ -18,7 +19,7 @@ import { RegisterModule } from '../register/register.module';
     forwardRef(() => CustomerModule),
     forwardRef(() => RegisterModule),
   ],
-  providers: [ProfileResolver, ProfileService],
+  providers: [ProfileResolver, ProfileService, ProfileLoaderService],
   exports: [ProfileService],
 })
 export class ProfileModule {}

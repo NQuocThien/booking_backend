@@ -71,7 +71,6 @@ export class CustomerService {
     try {
       const existingDoc = await this.customerModel.findById(input.id);
       if (!existingDoc) {
-        console.log('Document not found for ID:', input.id);
         return null;
       }
       // Cập nhật dữ liệu từ input vào existingDoc

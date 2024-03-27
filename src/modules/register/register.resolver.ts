@@ -5,6 +5,7 @@ import {
   Query,
   ResolveField,
   Parent,
+  Subscription,
 } from '@nestjs/graphql';
 import { RegisterService } from './register.service';
 import { Register } from './entities/register.entity';
@@ -17,12 +18,36 @@ import { CreateRegisterVaccineInput } from './entities/dtos/create-register-vacc
 import { Profile } from '../profile/entity/profile.entity';
 import { GetRegisterByOptionInput } from './entities/dtos/get-register-option.input';
 import { ConfirmRegisterInput } from './entities/dtos/confirm-register.input';
+import { PubSub } from 'graphql-subscriptions';
+import { Doctor } from '../doctors/entities/doctor.entity';
+import { DoctorsService } from '../doctors/doctors.service';
+import { MedicalSpecialtiesService } from '../medical-specialties/medical-specialties.service';
+import { PackageService } from '../package/package.service';
+import { VaccinationService } from '../vaccination/vaccination.service';
+import { Package } from '../package/entities/package.entity';
+import { Vaccination } from '../vaccination/entities/Vaccination.entity';
+import { MedicalSpecialties } from '../medical-specialties/entities/medical-specialties.entity';
+import { RegisterLoaderService } from './register-loader.service';
+import { MedicalSpecialtiesLoaderService } from '../medical-specialties/medical-specialties-loader.service';
+import { PackageLoaderService } from '../package/package-loader.service';
+import { DoctorLoaderService } from '../doctors/doctor-loader.service';
+import { VaccinationLoaderService } from '../vaccination/vaccination-loader.service';
+const pubSub = new PubSub();
 
 @Resolver(() => Register)
 export class RegisterResolver {
   constructor(
     private readonly regisService: RegisterService,
     private readonly profileSvr: ProfileService,
+    private readonly doctorSrv: DoctorsService,
+    private readonly specialtySrv: MedicalSpecialtiesService,
+    private readonly packageSrv: PackageService,
+    private readonly vaccinationSrv: VaccinationService,
+    private readonly registeredSrv: RegisterLoaderService,
+    private readonly specialtyLoader: MedicalSpecialtiesLoaderService,
+    private readonly packageLoader: PackageLoaderService,
+    private readonly doctorLoader: DoctorLoaderService,
+    private readonly vaccinationLoader: VaccinationLoaderService,
   ) {}
 
   @Mutation(() => Register, { name: 'createRegisterDoctor' })
@@ -36,15 +61,24 @@ export class RegisterResolver {
   async getAllRegisterByOption(
     @Args('input') input: GetRegisterByOptionInput,
   ): Promise<Register[]> {
-    console.log('test regis: ', input);
     return await this.regisService.getAllRegisterByOption(input);
+  }
+
+  @Query(() => [Register], { name: 'getAllRegisPending' })
+  async getAllRegisPending(
+    @Args('input') input: GetRegisterByOptionInput,
+  ): Promise<any> {
+    return await this.regisService.getAllRegisPending(input);
   }
 
   @Mutation(() => Register, { name: 'createRegisterSpecialty' })
   async createRegisterSpecialty(
     @Args('input') input: CreateRegisterSpecialtyInput,
   ): Promise<Register> {
-    return await this.regisService.createRegisterSpecialty(input);
+    const regiter = await this.regisService.createRegisterSpecialty(input);
+    this.emitRegisterCreatedEvent(regiter);
+    console.log('Register created:', regiter);
+    return regiter;
   }
 
   @Mutation(() => Register, { name: 'createRegisterPackage' })
@@ -74,9 +108,48 @@ export class RegisterResolver {
   ): Promise<Register> {
     return await this.regisService.confirmRegister(input);
   }
+  @Subscription(() => Register, { name: 'registerCreated' })
+  async registerCreated() {
+    // Return an asynchronous iterator to listen for events
+    return pubSub.asyncIterator('registerCreated');
+  }
+
+  // Resolver method to emit the event when a new register is created
+  private async emitRegisterCreatedEvent(register: Register): Promise<void> {
+    await pubSub.publish('registerCreated', { registerCreated: register });
+  }
 
   @ResolveField(() => Profile, { name: 'profile' })
   async profile(@Parent() regis: Register): Promise<Profile> {
     return this.profileSvr.findById(regis.profileId);
+  }
+
+  @ResolveField(() => Doctor, { name: 'doctor' })
+  async doctor(@Parent() regis: Register): Promise<Doctor> {
+    if (regis?.doctorId) return this.doctorLoader.load(regis.doctorId);
+    else return null;
+  }
+
+  @ResolveField(() => Package, { name: 'package' })
+  async package(@Parent() regis: Register): Promise<Package> {
+    if (regis?.packageId) return this.packageLoader.load(regis.packageId);
+    else return null;
+  }
+
+  @ResolveField(() => Vaccination, { name: 'vaccination' })
+  async vaccination(@Parent() regis: Register): Promise<Vaccination> {
+    if (regis?.vaccineId) return this.vaccinationLoader.load(regis.vaccineId);
+    else return null;
+  }
+
+  @ResolveField(() => MedicalSpecialties, { name: 'specialty' })
+  async specialty(@Parent() regis: Register): Promise<MedicalSpecialties> {
+    if (regis?.specialtyId) {
+      console.log('Call Specialties:', regis.specialtyId);
+      const data = await this.specialtyLoader.load(regis.specialtyId);
+      // console.log('Call Specialties data', data);
+
+      return data;
+    } else return null;
   }
 }

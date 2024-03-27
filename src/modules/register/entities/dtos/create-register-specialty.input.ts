@@ -13,8 +13,5 @@ export class CreateRegisterSpecialtyInput {
   session: SessionInput;
 
   @Field()
-  isHealthInsurance: boolean;
-
-  @Field()
   date: Date;
 }

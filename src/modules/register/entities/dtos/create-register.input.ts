@@ -30,14 +30,14 @@ export class CreateRegisterInput {
   @Field({ nullable: true })
   vaccineId?: String;
 
-  @Field()
-  isHealthInsurance: boolean;
-
   @Field(() => ETypeOfService)
   typeOfService: ETypeOfService;
 
   @Field()
   date: Date;
+
+  @Field()
+  cancel: boolean;
 
   @Field(() => EStateRegister)
   state: EStateRegister;

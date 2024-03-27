@@ -13,8 +13,5 @@ export class CreateRegisterVaccineInput {
   session: SessionInput;
 
   @Field()
-  isHealthInsurance: boolean;
-
-  @Field()
   date: Date;
 }

@@ -2,7 +2,11 @@ import { Field, ID, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { EStateRegister, ETypeOfService } from 'src/contain';
 import { Session } from 'src/modules/contains/session/session.entitty';
 import { Customer } from 'src/modules/customer/entities/customer.entity';
+import { Doctor } from 'src/modules/doctors/entities/doctor.entity';
+import { MedicalSpecialties } from 'src/modules/medical-specialties/entities/medical-specialties.entity';
+import { Package } from 'src/modules/package/entities/package.entity';
 import { Profile } from 'src/modules/profile/entity/profile.entity';
+import { Vaccination } from 'src/modules/vaccination/entities/Vaccination.entity';
 
 // Đăng ký enum với GraphQL
 registerEnumType(EStateRegister, {
@@ -20,22 +24,22 @@ export class Register {
   profileId: string;
 
   @Field({ nullable: true })
-  specialtyId?: String;
+  specialtyId?: string;
 
   @Field({ nullable: true })
-  doctorId?: String;
+  doctorId?: string;
 
   @Field({ nullable: true })
-  packageId?: String;
+  packageId?: string;
 
   @Field({ nullable: true })
-  vaccineId?: String;
+  vaccineId?: string;
 
   @Field(() => Session)
   session: Session;
 
   @Field()
-  isHealthInsurance: boolean;
+  cancel: boolean;
 
   @Field(() => String)
   typeOfService: ETypeOfService;
@@ -46,6 +50,18 @@ export class Register {
   @Field(() => String)
   state: EStateRegister;
 
-  @Field(() => Profile)
+  @Field(() => Profile, { nullable: true })
   profile: Profile;
+
+  @Field(() => Doctor, { nullable: true })
+  doctor: Doctor;
+
+  @Field(() => Package, { nullable: true })
+  package: Package;
+
+  @Field(() => Vaccination, { nullable: true })
+  vaccination: Vaccination;
+
+  @Field(() => MedicalSpecialties, { nullable: true })
+  specialty: MedicalSpecialties;
 }

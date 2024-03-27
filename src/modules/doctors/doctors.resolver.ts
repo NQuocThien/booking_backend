@@ -18,6 +18,7 @@ import { generate } from 'rxjs';
 import { EAcademicTitle, EDegree, EGender } from 'src/contain';
 import { FilterDoctorInput } from './entities/dtos/filter-doctor.input';
 import { MedicalStaffService } from '../medical-staff/medical-staff.service';
+import { MedicalFacilities } from '../medical-facilities/entities/mecical-facilies.entity';
 
 @Resolver(() => Doctor)
 export class DoctorsResolver {
@@ -195,5 +196,13 @@ export class DoctorsResolver {
       return null;
     }
     return await this.specialtySvr.findOneById(doctor.specialistId);
+  }
+
+  @ResolveField(() => MedicalFacilities, { name: 'facility' })
+  async facility(@Parent() doctor: Doctor): Promise<MedicalFacilities> {
+    if (doctor.specialistId === '') {
+      return null;
+    }
+    return await this.facilitySvr.findById(doctor.medicalFactilitiesId);
   }
 }

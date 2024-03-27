@@ -1,4 +1,11 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { Vaccination } from './entities/Vaccination.entity';
 import { VaccinationService } from './vaccination.service';
 import { CreateVaccineInput } from './entities/dto/create-vaccination.input';
@@ -7,6 +14,7 @@ import { MedicalFacilitiesService } from '../medical-facilities/medical-faciliti
 import { MedicalStaffService } from '../medical-staff/medical-staff.service';
 import { EPermission } from 'src/contain';
 import { UnauthorizedException } from '@nestjs/common';
+import { MedicalFacilities } from '../medical-facilities/entities/mecical-facilies.entity';
 
 @Resolver(() => Vaccination)
 export class VaccinationResolver {
@@ -172,5 +180,10 @@ export class VaccinationResolver {
   @Mutation(() => Vaccination, { name: 'deleteVaccination' })
   async deleteVaccination(@Args('input') input: String): Promise<Vaccination> {
     return await this.vaccinationService.delete(input);
+  }
+
+  @ResolveField(() => MedicalFacilities, { name: 'facility' })
+  async facility(@Parent() vaccine: Vaccination): Promise<MedicalFacilities> {
+    return this.facilitySvr.findById(vaccine.medicalFactilitiesId);
   }
 }

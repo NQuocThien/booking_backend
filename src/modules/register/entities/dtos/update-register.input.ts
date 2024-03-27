@@ -5,6 +5,10 @@ import { EStateRegister } from 'src/contain';
 export class UpdateRegisterInput {
   @Field()
   id: String;
+
   @Field(() => EStateRegister)
   state: EStateRegister;
+
+  @Field()
+  cancel: boolean;
 }

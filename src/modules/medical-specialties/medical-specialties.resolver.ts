@@ -1,4 +1,11 @@
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 import { MedicalSpecialtiesService } from './medical-specialties.service';
 import { MedicalSpecialties } from './entities/medical-specialties.entity';
 import { CreateMedicalSpecialtyInput } from './entities/dtos/create-medical-specialties.input';
@@ -6,13 +13,17 @@ import { UpdateMedicalSpecialtyInput } from './entities/dtos/update-medical-spec
 import { MedicalFacilitiesService } from '../medical-facilities/medical-facilities.service';
 import { MedicalStaffService } from '../medical-staff/medical-staff.service';
 import { EPermission } from 'src/contain';
+import { MedicalFacilities } from '../medical-facilities/entities/mecical-facilies.entity';
+import { FacilitiesLoaderService } from '../medical-facilities/facility-loader';
+import { MedicalStaff } from '../medical-staff/entities/medical-staff.entity';
 
-@Resolver()
+@Resolver(() => MedicalSpecialties)
 export class MedicalSpecialtiesResolver {
   constructor(
     private readonly medicalSpecialtiesService: MedicalSpecialtiesService,
     private readonly facilitySvr: MedicalFacilitiesService,
     private readonly staffSvr: MedicalStaffService,
+    private readonly facilityLoaderSrv: FacilitiesLoaderService,
   ) {}
 
   @Mutation(() => MedicalSpecialties, { name: 'createMedicalSpecialty' })
@@ -181,4 +192,21 @@ export class MedicalSpecialtiesResolver {
       return null;
     }
   }
+
+  @ResolveField(() => MedicalFacilities, { name: 'facility' })
+  async facility(
+    @Parent() specialty: MedicalSpecialties,
+  ): Promise<MedicalFacilities> {
+    console.log('Call medicalFactilityId:', specialty.medicalFactilityId);
+    const data = await this.facilityLoaderSrv.load(
+      specialty.medicalFactilityId,
+    );
+    return data;
+  }
+  // @ResolveField(() => MedicalStaff, { name: 'staff' })
+  // async staff(@Parent() specialty: MedicalSpecialties): Promise<MedicalStaff> {
+  //   console.log('Call medicalFactilityId:', specialty.medicalFactilityId);
+  //   // const data = await this.facilitySvr.findById(specialty.medicalFactilityId);
+  //   return;
+  // }
 }

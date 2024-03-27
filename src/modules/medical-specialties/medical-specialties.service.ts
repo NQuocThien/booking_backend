@@ -30,6 +30,12 @@ export class MedicalSpecialtiesService {
     }
     return currSpecialty;
   }
+  async findByIds(ids: string[]) {
+    let currSpecialty = await this.medicalSpecialtiesModel.find({
+      _id: { $in: ids },
+    });
+    return currSpecialty;
+  }
 
   async findByMedicalFacilityId(
     medicalFacilityId: String,
@@ -44,37 +50,18 @@ export class MedicalSpecialtiesService {
   async update(data: UpdateMedicalSpecialtyInput) {
     try {
       const existingDoc = await this.medicalSpecialtiesModel.findById(data.id);
-
       if (!existingDoc) {
-        // console.log('Document not found for ID:', data.id);
         return null;
       }
-
-      // Cập nhật dữ liệu từ input vào existingDoc
       Object.assign(existingDoc, data);
-      // Lưu tài liệu đã cập nhật
       const updatedDoc = await existingDoc.save();
-      // console.log('---> Updated document:', updatedDoc);
       return updatedDoc;
     } catch (error) {
-      // console.error('Error updating document:', error);
       return null;
     }
   }
   async findOneById(id: String): Promise<MedicalSpecialties> {
     let currSpecialty = await this.medicalSpecialtiesModel.findById(id);
-    const dateOffs: [Date] = currSpecialty.workSchedule.dayOff;
-    console.log('-> old dayOff: ', dateOffs);
-    if (dateOffs.length > 0) {
-      const removedPastDates: [Date] = deleteDatePast(dateOffs);
-      if (removedPastDates !== dateOffs) {
-        currSpecialty.workSchedule.dayOff = removedPastDates;
-        const newSpecialty = await currSpecialty.save();
-        console.log('-> new dayOff: ', newSpecialty);
-        return newSpecialty;
-      }
-      return currSpecialty;
-    }
     return currSpecialty;
   }
   async getAll(): Promise<MedicalSpecialties[]> {

@@ -94,6 +94,10 @@ export class DoctorsService {
     const count = await this.doctorModel.countDocuments(query);
     return count;
   }
+  async findByIds(ids: string[]) {
+    let res = await this.doctorModel.find({ _id: { $in: ids } });
+    return res;
+  }
   async findOneById(id: String) {
     let currDoctor = await this.doctorModel.findById(id);
     const dateOffs: [Date] = currDoctor.workSchedule.dayOff;

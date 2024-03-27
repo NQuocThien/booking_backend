@@ -29,6 +29,11 @@ export class PackageService {
     }
     return currPackage;
   }
+  async findByIds(ids: string[]): Promise<Package[]> {
+    let res = await this.model.find({ _id: { $in: ids } });
+
+    return res;
+  }
 
   async findAll(): Promise<Package[]> {
     return await this.model.find();

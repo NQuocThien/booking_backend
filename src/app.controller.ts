@@ -25,7 +25,7 @@ export class AppController {
         imagePath = path.join(imagePath, folder);
       }
       imagePath = path.join(imagePath, filename);
-      console.log('--> image path: ' + imagePath);
+      console.log('--> get image: ' + filename);
       // Kiểm tra xem tệp có tồn tại không
       if (!fs.existsSync(imagePath)) {
         // Trả về lỗi 404 Not Found nếu tệp không tồn tại
