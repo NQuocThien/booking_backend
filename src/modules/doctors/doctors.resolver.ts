@@ -67,6 +67,18 @@ export class DoctorsResolver {
     }
   }
 
+  @Query(() => Number, { name: 'getTotalDoctorsCountForClient' })
+  async getTotalDoctorsCountForClient(
+    @Args('filter', { nullable: true }) filter: FilterDoctorInput,
+    @Args('facilityId') facilityId?: string,
+  ): Promise<number> {
+    const count = await this.doctorService.getTotalDoctorsCountOfFacility(
+      filter,
+      facilityId,
+    );
+    return count;
+  }
+
   @Query(() => [Doctor], { name: 'getAllDoctorPagination' })
   async getAllDoctorPagination(
     @Args('search', { nullable: true }) search: string,
@@ -131,6 +143,30 @@ export class DoctorsResolver {
           } else return null;
         }
       }
+    }
+  }
+  @Query(() => [Doctor], { name: 'getAllDoctorPaginationOfFacilityForClient' })
+  // @UseGuards(JWtAuthGuard)
+  async getAllDoctorPaginationOfFacilityForClient(
+    @Args('filter', { nullable: true }) filter: FilterDoctorInput,
+    @Args('page', { defaultValue: 1 }) page: number,
+    @Args('limit', { defaultValue: 10 }) limit: number,
+    @Args('sortField', { nullable: true, defaultValue: 'doctorName' })
+    sortField: string,
+    @Args('sortOrder', { nullable: true }) sortOrder: string,
+    @Args('facilityId') facilityId: string,
+  ): Promise<Doctor[]> {
+    {
+      const docs = await this.doctorService.getAllDoctorPaginationOfFacility(
+        filter,
+        page,
+        limit,
+        sortField,
+        sortOrder,
+        facilityId,
+        true,
+      );
+      return docs;
     }
   }
 

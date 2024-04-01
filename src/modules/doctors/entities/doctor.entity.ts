@@ -49,7 +49,7 @@ export class Doctor {
   discription?: string;
 
   @Field()
-  price?: number;
+  price: number;
 
   @Field(() => WorkSchedule)
   workSchedule: WorkSchedule;

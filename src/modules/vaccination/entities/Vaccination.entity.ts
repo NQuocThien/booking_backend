@@ -8,7 +8,7 @@ export class Vaccination {
   id: string;
 
   @Field()
-  medicalFactilitiesId: String;
+  medicalFactilitiesId: string;
 
   @Field()
   vaccineName: String;

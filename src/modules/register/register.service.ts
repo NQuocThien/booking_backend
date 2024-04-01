@@ -47,7 +47,6 @@ export class RegisterService {
         },
       })
       .exec();
-    // console.log('---> ', data);
     return data;
   }
 

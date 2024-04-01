@@ -42,7 +42,6 @@ export class UsersResolver {
   @UseGuards(JWtAuthGuard, RolesGuard)
   @Roles(Role.Admin)
   async findAll(@Context() context): Promise<[User]> {
-    console.log('--> request: get all user');
     const users = await this.usersService.findAll();
     return users;
   }

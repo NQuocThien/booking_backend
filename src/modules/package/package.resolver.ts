@@ -116,6 +116,34 @@ export class PackageResolver {
     }
   }
 
+  @Query(() => [Package], {
+    name: 'getAllPackagePaginationOfFacilityForClient',
+  })
+  // @UseGuards(JWtAuthGuard)
+  async getAllPackagePaginationOfFacilityForClient(
+    @Args('search', { nullable: true }) search: string,
+    @Args('page', { defaultValue: 1 }) page: number,
+    @Args('limit', { defaultValue: 10 }) limit: number,
+    @Args('sortField', { nullable: true, defaultValue: 'packageName' })
+    sortField: string,
+    @Args('sortOrder', { nullable: true }) sortOrder: string,
+    @Args('facilityId')
+    facilityId: string,
+  ): Promise<Package[]> {
+    {
+      const docs = await this.packageService.getAllPackagePaginationOfFacility(
+        search,
+        page,
+        limit,
+        sortField,
+        sortOrder,
+        facilityId,
+        true,
+      );
+      return docs;
+    }
+  }
+
   @Query(() => [Package], { name: 'getAllPackagePaginationByStaff' })
   // @UseGuards(JWtAuthGuard)
   async getAllPackagePaginationByStaff(
@@ -182,6 +210,19 @@ export class PackageResolver {
       }
       return null;
     }
+  }
+  @Query(() => Number, { name: 'getTotalPackagesCountForClient' })
+  async getTotalPackagesCountForClient(
+    @Args('search', { nullable: true }) search: string,
+    @Args('facilityId', { nullable: true, defaultValue: '' })
+    facilityId: string,
+  ): Promise<number> {
+    const count = await this.packageService.getTotalPackagesCountOfFacility(
+      search || '',
+      facilityId,
+      true,
+    );
+    return count;
   }
 
   @Mutation(() => Package, { name: 'deletePackage' })

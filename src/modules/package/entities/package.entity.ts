@@ -9,7 +9,7 @@ export class Package {
   id: string;
 
   @Field()
-  medicalFactilitiesId: String;
+  medicalFactilitiesId: string;
 
   @Field()
   packageName: String;

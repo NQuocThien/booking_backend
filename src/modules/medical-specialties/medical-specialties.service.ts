@@ -100,13 +100,11 @@ export class MedicalSpecialtiesService {
     sortField: string,
     sortOrder: string,
     facilityId: string,
+    isClient: boolean = false,
   ): Promise<MedicalSpecialties[]> {
-    const query = search
-      ? {
-          specialtyName: { $regex: search, $options: 'i' },
-          medicalFactilityId: facilityId,
-        }
-      : { medicalFactilityId: facilityId };
+    const query: any = { medicalFactilityId: facilityId };
+    if (search) query.specialtyName = { $regex: search, $options: 'i' };
+    if (isClient) query['workSchedule.status'] = EStatusService.Open;
     const sortOptions: { [key: string]: 'asc' | 'desc' } = {};
     sortOptions[sortField] = sortOrder === 'asc' ? 'asc' : 'desc';
     const skip = (page - 1) * limit;
@@ -128,15 +126,11 @@ export class MedicalSpecialtiesService {
   async getTotalMedialSpecialtyCountOfFacility(
     search: string,
     facilityId: string,
+    isClient: boolean = false,
   ): Promise<number> {
-    const query = search
-      ? {
-          packageName: {
-            $regex: new RegExp(search, 'i'),
-            medicalFactilityId: facilityId,
-          },
-        }
-      : { medicalFactilityId: facilityId };
+    const query: any = { medicalFactilityId: facilityId };
+    if (search) query.specialtyName = { $regex: search, $options: 'i' };
+    if (isClient) query['workSchedule.status'] = EStatusService.Open;
     const count = await this.medicalSpecialtiesModel.countDocuments(query);
     return count;
   }

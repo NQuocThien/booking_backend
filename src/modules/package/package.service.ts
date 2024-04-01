@@ -85,13 +85,11 @@ export class PackageService {
     sortField: string,
     sortOrder: string,
     facilityId: string,
+    isClient: boolean = false,
   ): Promise<Package[]> {
-    const query = search
-      ? {
-          packageName: { $regex: search, $options: 'i' },
-          medicalFactilitiesId: facilityId,
-        }
-      : { medicalFactilitiesId: facilityId };
+    const query: any = { medicalFactilitiesId: facilityId };
+    if (search) query.packageName = { $regex: search, $options: 'i' };
+    if (isClient) query['workSchedule.status'] = EStatusService.Open;
     const sortOptions: { [key: string]: 'asc' | 'desc' } = {};
     sortOptions[sortField] = sortOrder === 'asc' ? 'asc' : 'desc';
     const skip = (page - 1) * limit;
@@ -112,15 +110,12 @@ export class PackageService {
   async getTotalPackagesCountOfFacility(
     search: string,
     facilityId: string,
+    isClient: boolean = false,
   ): Promise<number> {
-    const query = search
-      ? {
-          packageName: {
-            $regex: new RegExp(search, 'i'),
-            medicalFactilitiesId: facilityId,
-          },
-        }
-      : { medicalFactilitiesId: facilityId };
+    const query: any = { medicalFactilitiesId: facilityId };
+    if (search) query.packageName = { $regex: search, $options: 'i' };
+    if (isClient) query['workSchedule.status'] = EStatusService.Open;
+
     const count = await this.model.countDocuments(query);
     return count;
   }

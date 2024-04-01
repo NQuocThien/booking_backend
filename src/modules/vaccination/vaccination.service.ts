@@ -24,15 +24,13 @@ export class VaccinationService {
     sortField: string,
     sortOrder: string,
     facilityId: string,
+    isClient: boolean = false,
   ): Promise<Vaccination[]> {
-    const query = search
-      ? {
-          vaccineName: { $regex: search, $options: 'i' },
-          medicalFactilitiesId: facilityId,
-        }
-      : { medicalFactilitiesId: facilityId };
+    const query: any = { medicalFactilitiesId: facilityId };
+    if (search) query.vaccineName = { $regex: search, $options: 'i' };7
+    if (isClient) query['workSchedule.status'] = EStatusService.Open;
+
     const sortOptions: { [key: string]: 'asc' | 'desc' } = {};
-    console.log('sort: ', sortField);
     sortOptions[sortField] = sortOrder === 'asc' ? 'asc' : 'desc';
     const skip = (page - 1) * limit;
     return this.model
@@ -52,15 +50,11 @@ export class VaccinationService {
   async getTotalVaccinationsCountOfFacility(
     search: string,
     facilityId: string,
+    isClient: boolean = false,
   ): Promise<number> {
-    const query = search
-      ? {
-          vaccineName: {
-            $regex: new RegExp(search, 'i'),
-            medicalFactilitiesId: facilityId,
-          },
-        }
-      : { medicalFactilitiesId: facilityId };
+    const query: any = { medicalFactilitiesId: facilityId };
+    if (search) query.vaccineName = { $regex: search, $options: 'i' };
+    if (isClient) query['workSchedule.status'] = EStatusService.Open;
     const count = await this.model.countDocuments(query);
     return count;
   }
@@ -95,17 +89,12 @@ export class VaccinationService {
     try {
       const existingDoc = await this.model.findById(input.id);
       if (!existingDoc) {
-        // console.log('Document not found for ID:', input.id);
         return null;
       }
-      // Cập nhật dữ liệu từ input vào existingDoc
       Object.assign(existingDoc, input);
-      // Lưu tài liệu đã cập nhật
       const updatedDoc = await existingDoc.save();
-      // console.log('---> Updated document:', updatedDoc);
       return updatedDoc;
     } catch (error) {
-      // console.error('Error updating document:', error);
       return null;
     }
   }

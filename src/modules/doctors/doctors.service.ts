@@ -5,8 +5,7 @@ import { Doctor } from './entities/doctor.entity';
 import { CreateDoctorInput } from './entities/dtos/create-doctor.input';
 import { UpdateDoctorInput } from './entities/dtos/update-doctor.input';
 import { deleteDatePast } from 'src/utils/contain';
-import { EAcademicTitle, EDegree, EGender, EStatusService } from 'src/contain';
-import { Filter } from 'typeorm';
+import { EStatusService } from 'src/contain';
 import { FilterDoctorInput } from './entities/dtos/filter-doctor.input';
 
 @Injectable()
@@ -68,8 +67,10 @@ export class DoctorsService {
     sortField: string,
     sortOrder: string,
     facilityId: string,
+    isClient: boolean = false,
   ): Promise<Doctor[]> {
-    const query = this.renderQuery(filter, facilityId);
+    const query = this.renderQueryOfFacility(filter, facilityId, isClient);
+    console.log('test query:', query);
     const sortOptions: { [key: string]: 'asc' | 'desc' } = {};
     sortOptions[sortField] = sortOrder === 'asc' ? 'asc' : 'desc';
     const skip = (page - 1) * limit;
@@ -90,7 +91,7 @@ export class DoctorsService {
     filter: FilterDoctorInput,
     facilityId: string,
   ): Promise<number> {
-    const query = this.renderQuery(filter, facilityId);
+    const query = this.renderQueryOfFacility(filter, facilityId);
     const count = await this.doctorModel.countDocuments(query);
     return count;
   }
@@ -132,7 +133,11 @@ export class DoctorsService {
     const count = await this.doctorModel.countDocuments(query);
     return count;
   }
-  renderQuery(filter: FilterDoctorInput, facilityId: string = undefined): any {
+  renderQuery(
+    filter: FilterDoctorInput,
+    facilityId: string = undefined,
+    isClient: boolean = false,
+  ): any {
     const query: any = {};
 
     if (facilityId) {
@@ -152,6 +157,46 @@ export class DoctorsService {
 
     if (filter?.gender) {
       query.gender = filter.gender;
+    }
+
+    if (isClient) {
+      query['workSchedule.status'] = EStatusService.Open;
+    }
+    return query;
+  }
+  renderQueryOfFacility(
+    filter: FilterDoctorInput,
+    facilityId: string,
+    isClient: boolean = false,
+  ): any {
+    // console.log('filter', filter);
+    const query: any = {};
+
+    {
+      query.medicalFactilitiesId = facilityId;
+    }
+    if (filter?.doctorName) {
+      query.doctorName = { $regex: filter.doctorName, $options: 'i' };
+    }
+
+    if (filter?.specialistId) {
+      query.specialistId = { $regex: filter.specialistId, $options: 'i' };
+    }
+
+    if (filter?.degree) {
+      query.degree = filter.degree;
+    }
+
+    if (filter?.academicTitle) {
+      query.academicTitle = filter.academicTitle;
+    }
+
+    if (filter?.gender) {
+      query.gender = filter.gender;
+    }
+
+    if (isClient) {
+      query['workSchedule.status'] = EStatusService.Open;
     }
     return query;
   }

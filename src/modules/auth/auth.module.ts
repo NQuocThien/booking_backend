@@ -23,7 +23,7 @@ import { CustomerModule } from '../customer/customer.module';
     UsersModule,
     CustomerModule,
     JwtModule.register({
-      signOptions: { expiresIn: '2h' },
+      signOptions: { expiresIn: '4h' },
       secret: 'hiden-me',
     }),
   ],

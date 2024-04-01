@@ -104,6 +104,44 @@ export class MedicalFacilitiesResolver {
     return user;
   }
 
+  @Query(() => [MedicalFacilities], {
+    name: 'getAllMedicalFacilityHaveSrvPaginationForClient',
+  })
+  // @UseGuards(JWtAuthGuard)
+  async getAllMedicalFacilityHaveServrvinationForClient(
+    @Args('search', { nullable: true }) search: string,
+    @Args('page', { defaultValue: 1 }) page: number,
+    @Args('limit', { defaultValue: 10 }) limit: number,
+    @Args('sortField', { nullable: true, defaultValue: 'medicalFacilityName' })
+    sortField: string,
+    @Args('sortOrder', { nullable: true }) sortOrder: string,
+    @Args('type', { nullable: true }) type: ETypeOfService,
+  ): Promise<MedicalFacilities[]> {
+    const facilies =
+      await this.medicalService.getAllMedicalFacilityHaveSrvPagination(
+        search,
+        page,
+        limit,
+        sortField,
+        sortOrder,
+        type,
+      );
+    return facilies;
+  }
+
+  @Query(() => Number, { name: 'getTotalFacilitiesHaveSrvCountForClient' })
+  async getTotalFacilitiesHaveSrvCountForClient(
+    @Args('search', { nullable: true }) search: string,
+    @Args('type', { nullable: true }) type: ETypeOfService,
+  ): Promise<number> {
+    const count =
+      await this.medicalService.getTotalFacilitiesHaveSrvCountForClient(
+        search || '',
+        type,
+      );
+    return count;
+  }
+
   @Query(() => [MedicalFacilities], { name: 'getTopMedicalFacilities' })
   // @UseGuards(JWtAuthGuard)
   async getTopMedicalFacilities(

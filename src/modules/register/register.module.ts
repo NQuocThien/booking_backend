@@ -25,12 +25,7 @@ import { RegisterLoaderService } from './register-loader.service';
     forwardRef(() => MedicalSpecialtiesModule),
     forwardRef(() => VaccinationModule),
   ],
-  providers: [
-    RegisterResolver,
-    RegisterService,
-    RegisterLoaderService,
-    { provide: PubSub, useValue: new PubSub() },
-  ],
+  providers: [RegisterResolver, RegisterService, RegisterLoaderService, PubSub],
   exports: [RegisterService, RegisterLoaderService],
 })
 export class RegisterModule {}

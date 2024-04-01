@@ -117,6 +117,33 @@ export class MedicalSpecialtiesResolver {
   }
 
   @Query(() => [MedicalSpecialties], {
+    name: 'getAllMedicalSpecialtiesPaginationOfFacilityForClient',
+  })
+  async getAllMedicalSpecialtiesPaginationOfFacilityForClient(
+    @Args('search', { nullable: true }) search: string,
+    @Args('page', { defaultValue: 1 }) page: number,
+    @Args('limit', { defaultValue: 10 }) limit: number,
+    @Args('sortField', { nullable: true, defaultValue: 'name' })
+    sortField: string,
+    @Args('sortOrder', { nullable: true }) sortOrder: string,
+    @Args('facilityId') facilityId: string,
+  ): Promise<MedicalSpecialties[]> {
+    {
+      const docs =
+        await this.medicalSpecialtiesService.getAllMedicalSpcialtyPaginationOfFacility(
+          search,
+          page,
+          limit,
+          sortField,
+          sortOrder,
+          facilityId,
+          true,
+        );
+      return docs;
+    }
+  }
+
+  @Query(() => [MedicalSpecialties], {
     name: 'getAllMedicalSpecialtiesPaginationByStaff',
   })
   // @UseGuards(JWtAuthGuard)
@@ -130,7 +157,6 @@ export class MedicalSpecialtiesResolver {
     @Args('staffId') staffId: string,
   ): Promise<MedicalSpecialties[]> {
     {
-      console.log('---> input staffId: ', staffId);
       const staff = await this.staffSvr.findById(staffId);
 
       if (
@@ -193,11 +219,24 @@ export class MedicalSpecialtiesResolver {
     }
   }
 
+  @Query(() => Number, { name: 'getTotalMedicalSpecialtiesCountForClient' })
+  async getTotalMedicalSpecialtiesCountForClient(
+    @Args('search', { nullable: true }) search: string,
+    @Args('facilityId') facilityId: string,
+  ): Promise<number> {
+    const count =
+      await this.medicalSpecialtiesService.getTotalMedialSpecialtyCountOfFacility(
+        search || '',
+        facilityId,
+        true,
+      );
+    return count;
+  }
+
   @ResolveField(() => MedicalFacilities, { name: 'facility' })
   async facility(
     @Parent() specialty: MedicalSpecialties,
   ): Promise<MedicalFacilities> {
-    console.log('Call medicalFactilityId:', specialty.medicalFactilityId);
     const data = await this.facilityLoaderSrv.load(
       specialty.medicalFactilityId,
     );

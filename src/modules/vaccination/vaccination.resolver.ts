@@ -94,6 +94,31 @@ export class VaccinationResolver {
       }
     }
   }
+  @Query(() => [Vaccination], {
+    name: 'getAllVaccinationPaginationOfFacilityForClient',
+  })
+  // @UseGuards(JWtAuthGuard)
+  async getAllVaccinationPaginationOfFacilityForClient(
+    @Args('search', { nullable: true }) search: string,
+    @Args('page', { defaultValue: 1 }) page: number,
+    @Args('limit', { defaultValue: 10 }) limit: number,
+    @Args('sortField', { nullable: true, defaultValue: 'vaccineName' })
+    sortField: string,
+    @Args('sortOrder', { nullable: true }) sortOrder: string,
+    @Args('facilityId') facilityId: string,
+  ): Promise<Vaccination[]> {
+    const docs =
+      await this.vaccinationService.getAllVaccinationPaginationOfFacility(
+        search,
+        page,
+        limit,
+        sortField,
+        sortOrder,
+        facilityId,
+        true,
+      );
+    return docs;
+  }
   @Query(() => [Vaccination], { name: 'getAllVaccinationPaginationByStaff' })
   // @UseGuards(JWtAuthGuard)
   async getAllVaccinationPaginationByStaff(
@@ -162,11 +187,24 @@ export class VaccinationResolver {
       return null;
     }
   }
+
+  @Query(() => Number, { name: 'getTotalVaccinationsCountForClient' })
+  async getTotalVaccinationsCountForClient(
+    @Args('search', { nullable: true }) search: string,
+    @Args('facilityId') facilityId: string,
+  ): Promise<number> {
+    const count =
+      await this.vaccinationService.getTotalVaccinationsCountOfFacility(
+        search || '',
+        facilityId,
+        true,
+      );
+    return count;
+  }
   @Mutation(() => Vaccination, { name: 'createVaccination' })
   async createVaccination(
     @Args('input') input: CreateVaccineInput,
   ): Promise<Vaccination> {
-    // console.log('createVaccination');
     return await this.vaccinationService.create(input);
   }
 

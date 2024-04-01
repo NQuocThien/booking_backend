@@ -7,7 +7,7 @@ export class CreateRegisterDoctorInput {
   profileId: string;
 
   @Field()
-  doctorId?: String;
+  doctorId?: string;
 
   @Field(() => SessionInput)
   session: SessionInput;
