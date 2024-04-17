@@ -92,7 +92,7 @@ export class MedicalFacilitiesResolver {
     @Args('sortOrder', { nullable: true }) sortOrder: string,
     @Args('type', { nullable: true }) type: ETypeOfFacility,
   ): Promise<MedicalFacilities[]> {
-    console.log('test: ', type);
+    // console.log('test: ', type);
     const user = await this.medicalService.getAllMedicalFacilityPagination(
       search,
       page,

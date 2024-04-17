@@ -71,6 +71,24 @@ export enum ETypeOfFacility {
   vaccinationCenter = 'Trung tâm tiêm chủng',
 }
 
+export enum EnumBlogStatus {
+  NotPublic = 'NotPublic',
+  Public = 'Public',
+  Deleted = 'Deleted',
+}
+
+export enum EnumBlogType {
+  Medical = 'Medical',
+  Health = 'Health',
+  Service = 'Service',
+}
+
+registerEnumType(EnumBlogType, {
+  name: 'EnumBlogType',
+});
+registerEnumType(EnumBlogStatus, {
+  name: 'EnumBlogStatus',
+});
 registerEnumType(ETypeOfFacility, {
   name: 'ETypeOfFacility',
 });

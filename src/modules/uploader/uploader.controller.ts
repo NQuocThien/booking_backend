@@ -43,6 +43,9 @@ export const getDestination = (req, file, callback) => {
     case 'users':
       destination = `${destination}/users`;
       break;
+    case 'blogs':
+      destination = `${destination}/blogs`;
+      break;
     default:
       destination = `${destination}`;
   }

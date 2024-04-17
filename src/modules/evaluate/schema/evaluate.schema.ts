@@ -1,6 +1,4 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { WorkSchedule } from 'src/modules/contains/work-schedule/work-schedule.schema';
-import { LinkImage } from 'src/modules/users/schema/linkImage.schema';
 @Schema({
   timestamps: true,
 })

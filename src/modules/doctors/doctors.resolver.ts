@@ -84,7 +84,7 @@ export class DoctorsResolver {
     @Args('search', { nullable: true }) search: string,
     @Args('page', { defaultValue: 1 }) page: number,
     @Args('limit', { defaultValue: 10 }) limit: number,
-    @Args('sortField', { nullable: true, defaultValue: 'name' })
+    @Args('sortField', { nullable: true, defaultValue: 'doctorName' })
     sortField: string,
     @Args('sortOrder', { nullable: true }) sortOrder: string,
   ): Promise<Doctor[]> {

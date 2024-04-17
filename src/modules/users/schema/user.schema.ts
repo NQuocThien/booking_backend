@@ -29,7 +29,7 @@ export class User extends Document {
     type: Object,
     default: null,
   })
-  linkImage: LinkImage;
+  avatar: LinkImage;
 
   @Prop(() => [String])
   roles: string[];

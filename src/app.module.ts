@@ -25,6 +25,7 @@ import { PackageModule } from './modules/package/package.module';
 import { WorkScheduleModule } from './modules/work-schedule/work-schedule.module';
 import { EvaluateModule } from './modules/evaluate/evaluate.module';
 import { NotificationModule } from './modules/notification/notification.module';
+import { BlogsModule } from './modules/blogs/blogs.module';
 
 dotenv.config();
 @Module({
@@ -61,6 +62,7 @@ dotenv.config();
     WorkScheduleModule,
     EvaluateModule,
     NotificationModule,
+    BlogsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

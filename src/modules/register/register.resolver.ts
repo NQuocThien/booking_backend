@@ -141,26 +141,11 @@ export class RegisterResolver {
       const specialtyId = variables.option.specialtyId;
       const vaccineId = variables.option.vaccineId;
       const inputDate = variables.option.date;
-      // console.log(' ==> doctorId:', doctorId);
-      // console.log(' ==> packageId:', packageId);
-      // console.log(' ==> specialtyId:', specialtyId);
-      // console.log(' ==> vaccineId:', vaccineId);
-      // console.log(' ==> inputDate:', inputDate);
-      // console.log(' ==> payload', payload.registerCreated.vaccineId);
-      // console.log(
-      //   ' ==> payload',
-      //   payload.registerCreated.date,
-      //   isEqualDate(inputDate, payload.registerCreated.date),
-      // );
-
-      // console.log(' ==> =-================================================:');
       if (doctorId) {
         if (
           doctorId === payload.registerCreated.doctorId &&
           isEqualDate(inputDate, payload.registerCreated.date)
         ) {
-          console.log(' ---> doctor <---');
-
           return true;
         }
         return false;

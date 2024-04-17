@@ -15,5 +15,5 @@ export class UpdateUserInput {
   email: string;
 
   @Field({ nullable: true })
-  linkImage: LinkImageInput;
+  avatar: LinkImageInput;
 }

@@ -146,12 +146,12 @@ export class UsersResolver {
       const currentUser = await this.usersService.findOne(
         updateUserInput.username,
       );
-      if (updateUserInput.linkImage) {
+      if (updateUserInput.avatar) {
         const compare: boolean =
-          JSON.stringify(currentUser.linkImage) !==
-          JSON.stringify(updateUserInput.linkImage);
+          JSON.stringify(currentUser.avatar) !==
+          JSON.stringify(updateUserInput.avatar);
         console.log('---> Delete old image: ' + compare);
-        if (compare) deleteImage(currentUser.linkImage, 'users');
+        if (compare) deleteImage(currentUser.avatar, 'users');
       }
     } catch (e) {
       console.log('Error Delete Image');
@@ -179,8 +179,8 @@ export class UsersResolver {
     if (valid) {
       try {
         const currentUser = await this.findOne(updateUserInput.username);
-        if (updateUserInput.linkImage) {
-          deleteImage(currentUser.linkImage, 'users');
+        if (updateUserInput.avatar) {
+          deleteImage(currentUser.avatar, 'users');
         }
       } catch (e) {
         console.error('Error Delete: ', e);
@@ -189,8 +189,8 @@ export class UsersResolver {
       const dataUserUpdate = { ...updateUserInput, password };
       return this.usersService.updateUserById(dataUserUpdate);
     } else {
-      if (updateUserInput.linkImage) {
-        deleteImage(updateUserInput.linkImage, 'users');
+      if (updateUserInput.avatar) {
+        deleteImage(updateUserInput.avatar, 'users');
       }
       throw new Error('Password Error');
     }

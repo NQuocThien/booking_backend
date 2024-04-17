@@ -7,6 +7,9 @@ import { User } from './entities/user.entity';
 import { log } from 'console';
 import { CustomerService } from '../customer/customer.service';
 import { DoctorsService } from '../doctors/doctors.service';
+import { UserSlimEntity } from '../contains/user-slim/user-slim.entity';
+import { Role } from '../auth/entities/role.enum';
+import { UserSlimInput } from '../contains/user-slim/user-slim.input';
 
 @Injectable()
 export class UsersService {
@@ -120,5 +123,24 @@ export class UsersService {
       : {};
     const count = await this.userModel.countDocuments(query);
     return count;
+  }
+
+  async getUserSlim(username: string): Promise<UserSlimInput> {
+    const user = await this.userModel.findOne({ username: username }).exec();
+    if (user) {
+      if (user.roles.includes(Role.Admin)) {
+        return {
+          username: username,
+          role: Role.Admin,
+          showName: username,
+        };
+      } else if (user.roles.includes(Role.Facility)) {
+        return {
+          username: username,
+          role: Role.Facility,
+          showName: username,
+        };
+      }
+    } else return null;
   }
 }

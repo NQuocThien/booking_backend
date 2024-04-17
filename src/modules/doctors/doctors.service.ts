@@ -70,7 +70,6 @@ export class DoctorsService {
     isClient: boolean = false,
   ): Promise<Doctor[]> {
     const query = this.renderQueryOfFacility(filter, facilityId, isClient);
-    console.log('test query:', query);
     const sortOptions: { [key: string]: 'asc' | 'desc' } = {};
     sortOptions[sortField] = sortOrder === 'asc' ? 'asc' : 'desc';
     const skip = (page - 1) * limit;

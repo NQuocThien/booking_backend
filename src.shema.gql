@@ -2,9 +2,40 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Blog {
+  content: String!
+  createdAt: Float!
+  createdBy: UserSlimEntity!
+  deletedAt: Float
+  deletedBy: UserSlimEntity
+  id: ID!
+  keywords: String!
+  mainPhoto: LinkImage!
+  priority: Float!
+  shortContent: String!
+  slug: String!
+  status: String!
+  title: String!
+  type: String!
+  updatedAt: Float
+  updatedBy: UserSlimEntity
+}
+
 input ConfirmRegisterInput {
   registerId: String!
   state: EStateRegister!
+}
+
+input CreateBlogInput {
+  content: String!
+  keywords: String!
+  mainPhoto: LinkImageInput!
+  priority: Float!
+  shortContent: String!
+  slug: String!
+  status: EnumBlogStatus!
+  title: String!
+  type: EnumBlogType!
 }
 
 input CreateCustomerInput {
@@ -265,6 +296,18 @@ enum ETypeOfNotification {
   Seen
 }
 
+enum EnumBlogStatus {
+  Deleted
+  NotPublic
+  Public
+}
+
+enum EnumBlogType {
+  Health
+  Medical
+  Service
+}
+
 type Evaluate {
   comment: String!
   id: ID!
@@ -397,6 +440,7 @@ type MedicalStaff {
 type Mutation {
   activeUser(id: String!): User!
   confirmRegister(input: ConfirmRegisterInput!): Register!
+  createBlog(input: CreateBlogInput!): Blog!
   createCustomer(input: CreateCustomerInput!): Customer!
   createDoctor(createDoctorInput: CreateDoctorInput!): Doctor!
   createEvaluate(input: CreateEvaluateInput!): Evaluate!
@@ -419,12 +463,14 @@ type Mutation {
   deleteNotification(id: String!): Notification!
   deletePackage(input: String!): Package!
   deleteProfile(id: String!): Profile!
+  deleteUnDeleteBlog(id: String!): Blog!
   deleteUser(id: String!): User!
   deleteVaccination(input: String!): Vaccination!
   login(loginUserInput: LoginUserInput!): LoginRespone!
   logout: LogoutUser!
   signup(createUserInput: CreateUserInput!): User!
   signupUser(createUserInput: CreateUserByAdminInput!): User!
+  updateBlog(input: UpdateBlogInput!): Blog!
   updateCustomer(input: UpdateCustomerInput!): Customer!
   updateDoctor(input: UpdateDoctorInput!): Doctor!
   updateEvaluate(input: UpdateEvaluateInput!): Evaluate!
@@ -484,11 +530,13 @@ type Profile {
 type Query {
   checklogin: User!
   checkloginCustomer: User!
+  getAllBlogPagination(isDeleted: Boolean = false, limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "title", sortOrder: String = "asc"): [Blog!]!
+  getAllBlogPaginationForClient(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "title", sortOrder: String = "asc", type: String): [Blog!]!
   getAllCustomer: [Customer!]!
   getAllCustomerPagination(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "name", sortOrder: String): [Customer!]!
   getAllDoctor: [Doctor!]!
   getAllDoctorByFacilityId(input: String!): [Doctor!]!
-  getAllDoctorPagination(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "name", sortOrder: String): [Doctor!]!
+  getAllDoctorPagination(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "doctorName", sortOrder: String): [Doctor!]!
   getAllDoctorPaginationOfFacility(filter: FilterDoctorInput, limit: Float! = 10, page: Float! = 1, sortField: String = "name", sortOrder: String, staffId: String = "", userId: String = ""): [Doctor!]!
   getAllDoctorPaginationOfFacilityForClient(facilityId: String!, filter: FilterDoctorInput, limit: Float! = 10, page: Float! = 1, sortField: String = "doctorName", sortOrder: String): [Doctor!]!
   getAllDoctorPending: [Doctor!]!
@@ -520,6 +568,7 @@ type Query {
   getAllVaccinationPaginationOfFacility(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "vaccineName", sortOrder: String, staffId: String = "", userId: String = ""): [Vaccination!]!
   getAllVaccinationPaginationOfFacilityForClient(facilityId: String!, limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "vaccineName", sortOrder: String): [Vaccination!]!
   getAllVaccinationSelect(input: String!): [Vaccination!]!
+  getBlogBySlug(slug: String!): Blog!
   getDoctorbyId(id: String!): Doctor!
   getDoctorbyUserId(id: String!): Doctor!
   getEvaluateById(id: String!): Evaluate!
@@ -537,6 +586,8 @@ type Query {
   getProfiles(id: String!): Profile!
   getSetting: Setting!
   getTopMedicalFacilities(limit: Float! = 10, typeFacility: String!): [MedicalFacilities!]!
+  getTotalBlogsCount(isDeleted: Boolean = false, search: String): Float!
+  getTotalBlogsCountForClient(search: String, type: String): Float!
   getTotalCustomersCount(search: String): Float!
   getTotalDoctorsCount(filter: FilterDoctorInput, staffId: String = "", userId: String = ""): Float!
   getTotalDoctorsCountForClient(facilityId: String!, filter: FilterDoctorInput): Float!
@@ -619,6 +670,23 @@ type Subscription {
   registerPackageCreated: Register!
   registerSpecialtyCreated: Register!
   registerVaccinationCreated: Register!
+}
+
+input UpdateBlogInput {
+  content: String
+  deletedAt: Float
+  deletedBy: UserSlimInput
+  id: ID!
+  keywords: String
+  mainPhoto: LinkImageInput
+  priority: Float
+  shortContent: String!
+  slug: String
+  status: EnumBlogStatus
+  title: String
+  type: EnumBlogType
+  updatedAt: Float
+  updatedBy: UserSlimInput
 }
 
 input UpdateCustomerInput {
@@ -753,17 +821,17 @@ input UpdateSettingInput {
 
 input UpdateUserInput {
   active: Boolean
+  avatar: LinkImageInput
   email: String
   id: String!
-  linkImage: LinkImageInput
   username: String
 }
 
 input UpdateUserWithPassInput {
   active: Boolean
+  avatar: LinkImageInput
   email: String!
   id: String!
-  linkImage: LinkImageInput
   password: String!
   passwordNew: String!
   username: String!
@@ -783,11 +851,11 @@ input UpdateVaccineInput {
 
 type User {
   active: Boolean
+  avatar: LinkImage
   customer: Customer
   doctor: Doctor
   email: String!
   id: ID!
-  linkImage: LinkImage
   medicalFacilities: MedicalFacilities
   password: String!
   roles: [String!]
@@ -796,6 +864,18 @@ type User {
 
 input UserSelectInput {
   role: Role!
+}
+
+type UserSlimEntity {
+  role: String!
+  showName: String!
+  username: String!
+}
+
+input UserSlimInput {
+  role: String!
+  showName: String!
+  username: String!
 }
 
 type Vaccination {

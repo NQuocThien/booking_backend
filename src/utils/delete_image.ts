@@ -5,6 +5,7 @@ export type TypeFileImage =
   | 'packages'
   | 'facilities'
   | 'users'
+  | 'blogs'
   | '';
 const getImageDirectory = (type: TypeFileImage): string => {
   var imageDirectory = `${process.env.FILE_PATH || 'files'}/images`;
@@ -21,6 +22,9 @@ const getImageDirectory = (type: TypeFileImage): string => {
     case 'facilities':
       imageDirectory = `${imageDirectory}/facilities`;
       break;
+    case 'blogs':
+      imageDirectory = `${imageDirectory}/blogs`;
+      break;
     default:
       imageDirectory = `${imageDirectory}`;
       break;
@@ -31,8 +35,7 @@ export default async function deleteImage(
   linkImage: LinkImage,
   typeFileImage: TypeFileImage = '',
 ) {
-  if (linkImage.url) {
-    // const imageDirectory = `${process.env.FILE_PATH || 'files'}/images`;
+  if (linkImage?.url) {
     const imageDirectory = getImageDirectory(typeFileImage);
     const imagePath = `${imageDirectory}/${linkImage.filename}`;
     await fsPromises
