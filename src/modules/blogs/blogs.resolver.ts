@@ -10,13 +10,15 @@ import { UserSlimInput } from '../contains/user-slim/user-slim.input';
 import { UpdateBlogInput } from './entities/dtos/update-blog.input';
 import deleteImage from 'src/utils/delete_image';
 import { EnumBlogStatus, EnumBlogType } from 'src/contain';
-import { ErrorMes } from '../auth/entities/mess.enum';
-
+import { DoctorsService } from '../doctors/doctors.service';
+import { MedicalStaffService } from '../medical-staff/medical-staff.service';
 @Resolver(() => Blog)
 export class BlogsResolver {
   constructor(
     private readonly blogSrv: BlogsService,
     private readonly userSrv: UsersService,
+    private readonly doctorSrv: DoctorsService,
+    private readonly stafSrv: MedicalStaffService,
   ) {}
 
   //====================================== --> QUERY <-- ===============================
@@ -35,9 +37,9 @@ export class BlogsResolver {
     @Args('search', { nullable: true }) search: string,
     @Args('page', { defaultValue: 1 }) page: number,
     @Args('limit', { defaultValue: 10 }) limit: number,
-    @Args('sortField', { nullable: true, defaultValue: 'title' })
+    @Args('sortField', { nullable: true, defaultValue: 'priority' })
     sortField: string,
-    @Args('sortOrder', { nullable: true, defaultValue: 'asc' })
+    @Args('sortOrder', { nullable: true, defaultValue: 'desc' })
     sortOrder: string,
     @Args('isDeleted', { nullable: true, defaultValue: false })
     isDeleted: boolean,
@@ -53,14 +55,47 @@ export class BlogsResolver {
     );
     return blogs;
   }
+
+  @Query(() => [Blog], { name: 'getAllBlogOfFacilityPagination' })
+  async getAllBlogOfFacilityPagination(
+    @Args('search', { nullable: true }) search: string,
+    @Args('page', { defaultValue: 1 }) page: number,
+    @Args('limit', { defaultValue: 10 }) limit: number,
+    @Args('sortField', { nullable: true, defaultValue: 'priority' })
+    sortField: string,
+    @Args('sortOrder', { nullable: true, defaultValue: 'desc' })
+    sortOrder: string,
+    @Args('isDeleted', { nullable: true, defaultValue: false })
+    isDeleted: boolean,
+    @Args('facilityId')
+    facilityId: string,
+  ): Promise<Blog[]> {
+    const staffUserIds = await this.stafSrv.getAllUserMedicalStaff(facilityId);
+    const doctorIds = await this.doctorSrv.findAllUserIds(facilityId);
+    const ids: string[] = Array.from(new Set([...staffUserIds, ...doctorIds]));
+    const usernames = await this.userSrv.getUserNameByIds(ids);
+    console.log('test: ', usernames, ids, doctorIds, staffUserIds);
+
+    const blogs = await this.blogSrv.getAllBlogOfFaciityPagination(
+      search,
+      page,
+      limit,
+      sortField,
+      sortOrder,
+      false,
+      isDeleted,
+      usernames,
+    );
+    return blogs;
+  }
   @Query(() => [Blog], { name: 'getAllBlogPaginationForClient' })
   async getAllBlogPaginationForClient(
     @Args('search', { nullable: true }) search: string,
     @Args('page', { defaultValue: 1 }) page: number,
     @Args('limit', { defaultValue: 10 }) limit: number,
-    @Args('sortField', { nullable: true, defaultValue: 'title' })
+    @Args('sortField', { nullable: true, defaultValue: 'priority' })
     sortField: string,
-    @Args('sortOrder', { nullable: true, defaultValue: 'asc' })
+    @Args('sortOrder', { nullable: true, defaultValue: 'desc' })
     sortOrder: string,
     @Args('type', { nullable: true, defaultValue: undefined })
     type: EnumBlogType,

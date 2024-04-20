@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Blog } from './entities/blog.entity';
 import { Model } from 'mongoose';
-import { CreateBlogInput } from './entities/dtos/create-blog.input';
 import { BlogInput } from './entities/dtos/blog.input';
 import { EnumBlogStatus, EnumBlogType } from 'src/contain';
 import { UpdateBlogInput } from './entities/dtos/update-blog.input';
@@ -50,6 +49,35 @@ export class BlogsService {
       .skip(skip)
       .sort(sortOptions);
   }
+
+  async getAllBlogOfFaciityPagination(
+    search: string,
+    page: number,
+    limit: number,
+    sortField: string,
+    sortOrder: string,
+    isClient: boolean,
+    isDeleted: boolean = false,
+    usernames: string[],
+  ): Promise<Blog[]> {
+    const query: any = {
+      'createdBy.username': { $in: usernames },
+    };
+    if (isDeleted) {
+      query.status = { $eq: EnumBlogStatus.Deleted };
+    } else query.status = { $ne: EnumBlogStatus.Deleted };
+    if (search) query.title = { $regex: search, $options: 'i' };
+    if (isClient) query.status = { $eq: EnumBlogStatus.Public };
+    // if (type) query.type = { $eq: type };
+    const sortOptions: { [key: string]: 'asc' | 'desc' } = {};
+    sortOptions[sortField] = sortOrder === 'asc' ? 'asc' : 'desc';
+    const skip = (page - 1) * limit;
+    return this.blogModel
+      .find({ ...query })
+      .limit(limit)
+      .skip(skip)
+      .sort(sortOptions);
+  }
   async getTotalBlogsCount(
     search: string,
     isDeleted: boolean,
@@ -74,7 +102,6 @@ export class BlogsService {
   //======================= ---> UPDATE <--- =========================
 
   async createBlog(blogInput: BlogInput): Promise<Blog> {
-    console.log('test data 33 ', blogInput);
     return this.blogModel.create(blogInput);
   }
 

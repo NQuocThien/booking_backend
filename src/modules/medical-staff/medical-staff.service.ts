@@ -15,6 +15,14 @@ export class MedicalStaffService {
   async getAllMedicalStaff(): Promise<MedicalStaff[]> {
     return await this.model.find();
   }
+  async getAllUserMedicalStaff(facilityId: string): Promise<string[]> {
+    const arr = await this.model
+      .find({ medicalFacilityId: facilityId }, 'userId')
+      .exec();
+    const userIds: string[] = arr.map((s) => s.userId as string);
+    console.log('test staff:', userIds);
+    return userIds;
+  }
   async findById(id: String): Promise<MedicalStaff> {
     return await this.model.findById(id);
   }

@@ -530,8 +530,9 @@ type Profile {
 type Query {
   checklogin: User!
   checkloginCustomer: User!
-  getAllBlogPagination(isDeleted: Boolean = false, limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "title", sortOrder: String = "asc"): [Blog!]!
-  getAllBlogPaginationForClient(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "title", sortOrder: String = "asc", type: String): [Blog!]!
+  getAllBlogOfFacilityPagination(facilityId: String!, isDeleted: Boolean = false, limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "priority", sortOrder: String = "desc"): [Blog!]!
+  getAllBlogPagination(isDeleted: Boolean = false, limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "priority", sortOrder: String = "desc"): [Blog!]!
+  getAllBlogPaginationForClient(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "priority", sortOrder: String = "desc", type: String): [Blog!]!
   getAllCustomer: [Customer!]!
   getAllCustomerPagination(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "name", sortOrder: String): [Customer!]!
   getAllDoctor: [Doctor!]!

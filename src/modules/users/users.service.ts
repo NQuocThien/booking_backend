@@ -143,4 +143,12 @@ export class UsersService {
       }
     } else return null;
   }
+
+  async getUserNameByIds(ids: string[]): Promise<string[]> {
+    const arr = await this.userModel
+      .find({ _id: { $in: ids } }, 'username')
+      .exec();
+    const userNames: string[] = arr.map((user) => user.username);
+    return userNames;
+  }
 }

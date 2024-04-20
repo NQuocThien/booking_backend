@@ -41,6 +41,13 @@ export class DoctorsService {
   async findAll() {
     return await this.doctorModel.find();
   }
+  async findAllUserIds(facilityId: string) {
+    const arr = await this.doctorModel
+      .find({ medicalFactilitiesId: facilityId }, 'userId')
+      .exec();
+    const userIds: string[] = arr.map((s) => s.userId as string);
+    return userIds;
+  }
   async getAllDoctorPagination(
     search: string,
     page: number,
