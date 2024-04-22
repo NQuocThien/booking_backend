@@ -7,6 +7,7 @@ import { PackageSchema } from './schema/package.schema';
 import { MedicalFacilitiesModule } from '../medical-facilities/medical-facilities.module';
 import { MedicalStaffModule } from '../medical-staff/medical-staff.module';
 import { PackageLoaderService } from './package-loader.service';
+import { RegisterModule } from '../register/register.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { PackageLoaderService } from './package-loader.service';
       },
     ]),
     forwardRef(() => MedicalFacilitiesModule),
+    forwardRef(() => RegisterModule),
     MedicalStaffModule,
   ],
   providers: [PackageResolver, PackageService, PackageLoaderService],

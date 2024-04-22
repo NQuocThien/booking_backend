@@ -87,6 +87,13 @@ export class DoctorsService {
       .sort(sortOptions)
       .exec();
   }
+  async getAllDoctorOfFacility(facilityId: string): Promise<Doctor[]> {
+    return this.doctorModel
+      .find({
+        medicalFactilitiesId: facilityId,
+      })
+      .exec();
+  }
 
   async getTotalDoctorsCount(filter: FilterDoctorInput): Promise<number> {
     const query = this.renderQuery(filter);

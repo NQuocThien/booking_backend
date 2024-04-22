@@ -31,6 +31,9 @@ export class Package {
 
   @Field(() => MedicalFacilities, { nullable: true })
   facility: MedicalFacilities;
+
+  @Field(() => Number, { nullable: true })
+  registerCount: Number;
 }
 
 registerEnumType(EStatusService, {

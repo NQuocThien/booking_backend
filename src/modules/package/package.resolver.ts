@@ -16,6 +16,8 @@ import { MedicalStaffService } from '../medical-staff/medical-staff.service';
 import { EPermission } from 'src/contain';
 import { UnauthorizedException } from '@nestjs/common';
 import { MedicalFacilities } from '../medical-facilities/entities/mecical-facilies.entity';
+import { RegisterService } from '../register/register.service';
+import { FacilitiesLoaderService } from '../medical-facilities/facility-loader';
 
 @Resolver(() => Package)
 export class PackageResolver {
@@ -23,6 +25,8 @@ export class PackageResolver {
     private readonly packageService: PackageService,
     private readonly facilitySvr: MedicalFacilitiesService,
     private readonly staffSvr: MedicalStaffService,
+    private readonly registerSrv: RegisterService,
+    private readonly facilityLoaderSvr: FacilitiesLoaderService,
   ) {}
 
   @Query(() => [Package], { name: 'getAllPackage' })
@@ -109,6 +113,35 @@ export class PackageResolver {
                 sortOrder,
                 staff.medicalFacilityId,
               );
+            return docs;
+          } else return null;
+        } else return null;
+      }
+    }
+  }
+
+  @Query(() => [Package], { name: 'getAllPackageOfFacility' })
+  // @UseGuards(JWtAuthGuard)
+  async getAllPackageOfFacility(
+    @Args('userId', { nullable: true, defaultValue: '' }) userId: string,
+    @Args('staffId', { nullable: true, defaultValue: '' }) staffId: string,
+  ): Promise<Package[]> {
+    {
+      if (userId !== '') {
+        const facility = await this.facilityLoaderSvr.loadByUserId(userId);
+        if (facility) {
+          const docs = await this.packageService.getAllPackageOfFacility(
+            facility.id,
+          );
+          return docs;
+        } else return null;
+      } else {
+        if (staffId !== '') {
+          const staff = await this.staffSvr.findById(staffId);
+          if (staff) {
+            const docs = await this.packageService.getAllPackageOfFacility(
+              staff.medicalFacilityId,
+            );
             return docs;
           } else return null;
         } else return null;
@@ -239,5 +272,15 @@ export class PackageResolver {
   @ResolveField(() => MedicalFacilities, { name: 'facility' })
   async facility(@Parent() p: Package): Promise<MedicalFacilities> {
     return this.facilitySvr.findById(p.medicalFactilitiesId);
+  }
+
+  @ResolveField(() => Number, { name: 'registerCount' })
+  async registerCount(
+    @Parent() p: Package,
+    @Args('startTime') startTime: string,
+    @Args('endTime') endTime: string,
+  ): Promise<number> {
+    const count = this.registerSrv.regisPackageCount(p.id, startTime, endTime);
+    return count;
   }
 }

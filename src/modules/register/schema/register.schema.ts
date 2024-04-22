@@ -33,5 +33,8 @@ export class Register {
 
   @Prop()
   state: string;
+
+  @Prop()
+  createdAt: Date;
 }
 export const RegisterSchema = SchemaFactory.createForClass(Register);

@@ -4,8 +4,7 @@ import { MedicalFacilities } from './entities/mecical-facilies.entity';
 import { Model } from 'mongoose';
 import { CreateMedicalFacilityInput } from './entities/dto/create-medical-facilities.input';
 import { UpdateMedicalFacilityInput } from './entities/dto/update-medical-facilities.input';
-import { ETypeOfFacility, ETypeOfService } from 'src/contain';
-import { DoctorLoaderService } from '../doctors/doctor-loader.service';
+import { EStatusService, ETypeOfFacility, ETypeOfService } from 'src/contain';
 import { DoctorsService } from '../doctors/doctors.service';
 import { PackageService } from '../package/package.service';
 import { MedicalSpecialtiesService } from '../medical-specialties/medical-specialties.service';
@@ -39,6 +38,22 @@ export class MedicalFacilitiesService {
   async findByIds(ids: string[]): Promise<MedicalFacilities[]> {
     return this.medicalModel.find({ _id: { $in: ids } });
   }
+  async findByUserIds(ids: string[]): Promise<MedicalFacilities[]> {
+    return this.medicalModel.find({ userId: { $in: ids } });
+  }
+  async getTotalFacilitiesCountForClient(
+    search: string,
+    searchField: string,
+    type: ETypeOfFacility,
+  ): Promise<number> {
+    var query: any = {};
+    query.status = { $eq: EStatusService.Open };
+    if (search) query[searchField] = { $regex: search, $options: 'i' };
+    if (type) query.typeOfFacility = type;
+
+    const count = await this.medicalModel.countDocuments(query);
+    return count;
+  }
   async getTotalFacilitiesCount(
     search: string,
     type: ETypeOfFacility,
@@ -61,6 +76,29 @@ export class MedicalFacilitiesService {
     }
     const count = await this.medicalModel.countDocuments(query);
     return count;
+  }
+  async getAllMedicalFacilityPaginationForClient(
+    search: string,
+    searchField: string,
+    page: number,
+    limit: number,
+    sortField: string,
+    sortOrder: string,
+    type: ETypeOfFacility = undefined,
+  ): Promise<MedicalFacilities[]> {
+    var query: any = {};
+    query.status = { $eq: EStatusService.Open };
+    if (search) query[searchField] = { $regex: search, $options: 'i' };
+    if (type) query.typeOfFacility = type;
+    const sortOptions: { [key: string]: 'asc' | 'desc' } = {};
+    sortOptions[sortField] = sortOrder === 'asc' ? 'asc' : 'desc';
+    const skip = (page - 1) * limit;
+
+    return this.medicalModel
+      .find({ ...query })
+      .limit(limit)
+      .skip(skip)
+      .sort(sortOptions);
   }
   async getAllMedicalFacilityPagination(
     search: string,

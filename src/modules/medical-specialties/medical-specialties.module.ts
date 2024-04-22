@@ -9,6 +9,7 @@ import {
 import { MedicalFacilitiesModule } from '../medical-facilities/medical-facilities.module';
 import { MedicalStaffModule } from '../medical-staff/medical-staff.module';
 import { MedicalSpecialtiesLoaderService } from './medical-specialties-loader.service';
+import { RegisterModule } from '../register/register.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { MedicalSpecialtiesLoaderService } from './medical-specialties-loader.se
     ]),
     forwardRef(() => MedicalFacilitiesModule),
     forwardRef(() => MedicalStaffModule),
+    forwardRef(() => RegisterModule),
   ],
   providers: [
     MedicalSpecialtiesResolver,

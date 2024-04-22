@@ -49,7 +49,7 @@ export class CreateMedicalFacilityInput {
   @Field()
   taxCode: string; // mã số thuế
 
-  @Field(() => String)
+  @Field(() => EStatusService)
   status: EStatusService;
 
   @Field(() => [Date], { nullable: true })

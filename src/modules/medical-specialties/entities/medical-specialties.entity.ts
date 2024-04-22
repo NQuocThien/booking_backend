@@ -26,6 +26,9 @@ export class MedicalSpecialties {
   @Field(() => MedicalFacilities, { nullable: true })
   facility: MedicalFacilities;
 
+  @Field(() => Number, { nullable: true })
+  registerCount: Number;
+
   // @Field(() => MedicalStaff, { nullable: true })
   // staff: MedicalStaff;
 }

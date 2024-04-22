@@ -15,6 +15,8 @@ import { MedicalStaffService } from '../medical-staff/medical-staff.service';
 import { EPermission } from 'src/contain';
 import { UnauthorizedException } from '@nestjs/common';
 import { MedicalFacilities } from '../medical-facilities/entities/mecical-facilies.entity';
+import { RegisterService } from '../register/register.service';
+import { FacilitiesLoaderService } from '../medical-facilities/facility-loader';
 
 @Resolver(() => Vaccination)
 export class VaccinationResolver {
@@ -22,6 +24,8 @@ export class VaccinationResolver {
     private readonly vaccinationService: VaccinationService,
     private readonly facilitySvr: MedicalFacilitiesService,
     private readonly staffSvr: MedicalStaffService,
+    private readonly facilityLoaderSvr: FacilitiesLoaderService,
+    private readonly registerSrv: RegisterService,
   ) {}
 
   @Query(() => [Vaccination], { name: 'getAllVacation' })
@@ -86,6 +90,37 @@ export class VaccinationResolver {
                 limit,
                 sortField,
                 sortOrder,
+                staff.medicalFacilityId,
+              );
+            return docs;
+          } else return null;
+        }
+      }
+    }
+  }
+
+  @Query(() => [Vaccination], { name: 'getAllVaccinationOfFacility' })
+  // @UseGuards(JWtAuthGuard)
+  async getAllVaccinationOfFacility(
+    @Args('userId', { nullable: true, defaultValue: '' }) userId: string,
+    @Args('staffId', { nullable: true, defaultValue: '' }) staffId: string,
+  ): Promise<Vaccination[]> {
+    {
+      if (userId !== '') {
+        const facility = await this.facilitySvr.findOneByUserId(userId);
+        if (facility) {
+          const docs =
+            await this.vaccinationService.getAllVaccinationOfFacility(
+              facility.id,
+            );
+          return docs;
+        } else return null;
+      } else {
+        if (staffId !== '') {
+          const staff = await this.staffSvr.findById(staffId);
+          if (staff) {
+            const docs =
+              await this.vaccinationService.getAllVaccinationOfFacility(
                 staff.medicalFacilityId,
               );
             return docs;
@@ -223,5 +258,19 @@ export class VaccinationResolver {
   @ResolveField(() => MedicalFacilities, { name: 'facility' })
   async facility(@Parent() vaccine: Vaccination): Promise<MedicalFacilities> {
     return this.facilitySvr.findById(vaccine.medicalFactilitiesId);
+  }
+
+  @ResolveField(() => Number, { name: 'registerCount' })
+  async registerCount(
+    @Parent() vaccination: Vaccination,
+    @Args('startTime') startTime: string,
+    @Args('endTime') endTime: string,
+  ): Promise<number> {
+    const count = this.registerSrv.regisVaccinationCount(
+      vaccination.id,
+      startTime,
+      endTime,
+    );
+    return count;
   }
 }

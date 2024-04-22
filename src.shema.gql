@@ -87,7 +87,7 @@ input CreateMedicalFacilityInput {
   numberPhone: String!
   operatingStatus: String!
   schedule: String!
-  status: String!
+  status: EStatusService!
   taxCode: String!
   typeOfFacility: ETypeOfFacility!
   userId: String!
@@ -226,6 +226,7 @@ type Doctor {
   medicalFactilitiesId: String!
   numberPhone: String!
   price: Float!
+  registerCount(endTime: String!, startTime: String!): Float
   specialistId: String!
   specialty: MedicalSpecialties
   userId: String!
@@ -420,6 +421,7 @@ type MedicalSpecialties {
   id: ID!
   medicalFactilityId: String!
   price: Float!
+  registerCount(endTime: String!, startTime: String!): Float
   specialtyName: String!
   workSchedule: WorkSchedule
 }
@@ -439,6 +441,7 @@ type MedicalStaff {
 
 type Mutation {
   activeUser(id: String!): User!
+  cancelRegister(id: String!): Register!
   confirmRegister(input: ConfirmRegisterInput!): Register!
   createBlog(input: CreateBlogInput!): Blog!
   createCustomer(input: CreateCustomerInput!): Customer!
@@ -506,6 +509,7 @@ type Package {
   medicalFactilitiesId: String!
   packageName: String!
   price: Float!
+  registerCount(endTime: String!, startTime: String!): Float
   workSchedule: WorkSchedule!
 }
 
@@ -537,6 +541,7 @@ type Query {
   getAllCustomerPagination(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "name", sortOrder: String): [Customer!]!
   getAllDoctor: [Doctor!]!
   getAllDoctorByFacilityId(input: String!): [Doctor!]!
+  getAllDoctorOfFacility(staffId: String = "", userId: String = ""): [Doctor!]!
   getAllDoctorPagination(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "doctorName", sortOrder: String): [Doctor!]!
   getAllDoctorPaginationOfFacility(filter: FilterDoctorInput, limit: Float! = 10, page: Float! = 1, sortField: String = "name", sortOrder: String, staffId: String = "", userId: String = ""): [Doctor!]!
   getAllDoctorPaginationOfFacilityForClient(facilityId: String!, filter: FilterDoctorInput, limit: Float! = 10, page: Float! = 1, sortField: String = "doctorName", sortOrder: String): [Doctor!]!
@@ -546,6 +551,8 @@ type Query {
   getAllMedicalFacility: [MedicalFacilities!]!
   getAllMedicalFacilityHaveSrvPaginationForClient(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "medicalFacilityName", sortOrder: String, type: String): [MedicalFacilities!]!
   getAllMedicalFacilityPagination(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "medicalFacilityName", sortOrder: String, type: String): [MedicalFacilities!]!
+  getAllMedicalFacilityPaginationForClient(limit: Float! = 10, page: Float! = 1, search: String, searchField: String = "medicalFacilityName", sortField: String = "medicalFacilityName", sortOrder: String, type: String): [MedicalFacilities!]!
+  getAllMedicalSpecialtiesOfFacility(staffId: String = "", userId: String = ""): [MedicalSpecialties!]!
   getAllMedicalSpecialtiesPaginationByStaff(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "name", sortOrder: String, staffId: String!): [MedicalSpecialties!]!
   getAllMedicalSpecialtiesPaginationOfFacility(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "name", sortOrder: String, staffId: String = "", userId: String = ""): [MedicalSpecialties!]!
   getAllMedicalSpecialtiesPaginationOfFacilityForClient(facilityId: String!, limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "name", sortOrder: String): [MedicalSpecialties!]!
@@ -554,6 +561,7 @@ type Query {
   getAllNotification: [Notification!]!
   getAllPackage: [Package!]!
   getAllPackageByFacilityId(input: String!): [Package!]!
+  getAllPackageOfFacility(staffId: String = "", userId: String = ""): [Package!]!
   getAllPackagePaginationByStaff(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "packageName", sortOrder: String, staffId: String): [Package!]!
   getAllPackagePaginationOfFacility(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "packageName", sortOrder: String, staffId: String = "", userId: String = ""): [Package!]!
   getAllPackagePaginationOfFacilityForClient(facilityId: String!, limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "packageName", sortOrder: String): [Package!]!
@@ -565,6 +573,7 @@ type Query {
   getAllUsersPagination(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "username", sortOrder: String): [User!]!
   getAllVacation: [Vaccination!]!
   getAllVaccinationByFacilityId(input: String!): [Vaccination!]!
+  getAllVaccinationOfFacility(staffId: String = "", userId: String = ""): [Vaccination!]!
   getAllVaccinationPaginationByStaff(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "name", sortOrder: String, staffId: String): [Vaccination!]!
   getAllVaccinationPaginationOfFacility(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "vaccineName", sortOrder: String, staffId: String = "", userId: String = ""): [Vaccination!]!
   getAllVaccinationPaginationOfFacilityForClient(facilityId: String!, limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "vaccineName", sortOrder: String): [Vaccination!]!
@@ -593,6 +602,7 @@ type Query {
   getTotalDoctorsCount(filter: FilterDoctorInput, staffId: String = "", userId: String = ""): Float!
   getTotalDoctorsCountForClient(facilityId: String!, filter: FilterDoctorInput): Float!
   getTotalFacilitiesCount(search: String, type: String): Float!
+  getTotalFacilitiesCountForClient(search: String, searchField: String = "medicalFacilityName", type: String): Float!
   getTotalFacilitiesHaveSrvCountForClient(search: String, type: String): Float!
   getTotalMedicalSpecialtiesCount(search: String, staffId: String = "", userId: String = ""): Float!
   getTotalMedicalSpecialtiesCountForClient(facilityId: String!, search: String): Float!
@@ -616,6 +626,7 @@ type Query {
 
 type Register {
   cancel: Boolean!
+  createdAt: DateTime!
   date: DateTime!
   doctor: Doctor
   doctorId: String
@@ -667,10 +678,6 @@ type Setting {
 
 type Subscription {
   registerCreated(option: GetRegisterByOptionInput!): Register!
-  registerDoctorCreated(date: String!, doctorId: String!): Register!
-  registerPackageCreated: Register!
-  registerSpecialtyCreated: Register!
-  registerVaccinationCreated: Register!
 }
 
 input UpdateBlogInput {
@@ -742,7 +749,7 @@ input UpdateMedicalFacilityInput {
   numberPhone: String!
   operatingStatus: String!
   schedule: String!
-  status: String!
+  status: EStatusService!
   taxCode: String!
   typeOfFacility: ETypeOfFacility!
   userId: String!
@@ -888,6 +895,7 @@ type Vaccination {
   note: String!
   price: Float!
   prophylactic: String!
+  registerCount(endTime: String!, startTime: String!): Float
   vaccineName: String!
   workSchedule: WorkSchedule!
 }

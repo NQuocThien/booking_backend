@@ -11,12 +11,30 @@ import { CreateRegisterVaccineInput } from './entities/dtos/create-register-vacc
 import { CreateRegisterInput } from './entities/dtos/create-register.input';
 import { GetRegisterByOptionInput } from './entities/dtos/get-register-option.input';
 import { ConfirmRegisterInput } from './entities/dtos/confirm-register.input';
+import { GetAllRegisInYearInput } from './entities/dtos/get-all-register.input';
 @Injectable()
 export class RegisterService {
   constructor(
     @InjectModel(Register.name)
     private readonly model: Model<Register>,
   ) {}
+  async isExistInDay(date: string, profileId: string): Promise<Boolean> {
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+    const regis = await this.model
+      .findOne({
+        profileId: profileId,
+        date: {
+          $gte: startOfDay,
+          $lte: endOfDay,
+        },
+      })
+      .exec();
+    if (regis) return true;
+    return false;
+  }
 
   async createRegisterDoctor(
     data: CreateRegisterDoctorInput,
@@ -76,6 +94,31 @@ export class RegisterService {
     return regisFilter;
   }
 
+  async getAllRegisInYear(filter: GetAllRegisInYearInput): Promise<Register[]> {
+    const startDate = new Date(filter.year, 0, 1); // Ngày đầu tiên của năm
+    const endDate = new Date(filter.year, 11, 31, 23, 59, 59); // Ngày cuối cùng của năm
+    const data = await this.model
+      .find(
+        {
+          date: {
+            $gte: startDate,
+            $lte: endDate,
+          },
+
+          $or: [
+            { doctorId: filter.doctorIds },
+            { packageId: filter.packageIds },
+            { vaccineId: filter.vaccineIds },
+            { specialtyId: filter.specialtyIds },
+          ],
+        },
+        'typeOfService',
+      )
+      .exec(); // tất cả các ký của ngày
+
+    return data;
+  }
+
   async createRegisterSpecialty(
     data: CreateRegisterSpecialtyInput,
   ): Promise<Register> {
@@ -112,6 +155,29 @@ export class RegisterService {
     return await this.model.create(datainput);
   }
 
+  async cancelRegis(id: string): Promise<Register> {
+    try {
+      const existingDoc = await this.model.findByIdAndUpdate(
+        id,
+        { cancel: true },
+        { new: true },
+      );
+      if (!existingDoc) {
+        return null;
+      }
+      const newDoc = {
+        ...existingDoc,
+        cancel: true,
+      };
+      Object.assign(existingDoc, newDoc);
+      const updatedDoc = await existingDoc.save();
+      return updatedDoc;
+    } catch (error) {
+      console.error('Error updating document:', error);
+      return null;
+    }
+  }
+
   async update(data: UpdateRegisterInput): Promise<Register> {
     try {
       const existingDoc = await this.model.findById(data.id);
@@ -139,6 +205,70 @@ export class RegisterService {
       console.error('Error updating document:', error);
       return null;
     }
+  }
+  async regisDoctorCount(
+    doctorId: string,
+    startTime: string,
+    endTime: string,
+  ): Promise<number> {
+    const startDate = new Date(startTime);
+    const endDate = new Date(endTime);
+    const count = await this.model.count({
+      doctorId: doctorId,
+      date: {
+        $gte: startDate,
+        $lte: endDate,
+      },
+    });
+    return count;
+  }
+  async regisVaccinationCount(
+    vaccineId: string,
+    startTime: string,
+    endTime: string,
+  ): Promise<number> {
+    const startDate = new Date(startTime);
+    const endDate = new Date(endTime);
+    const count = await this.model.count({
+      vaccineId: vaccineId,
+      date: {
+        $gte: startDate,
+        $lte: endDate,
+      },
+    });
+    return count;
+  }
+  async regisPackageCount(
+    packageId: string,
+    startTime: string,
+    endTime: string,
+  ): Promise<number> {
+    const startDate = new Date(startTime);
+    const endDate = new Date(endTime);
+    const count = await this.model.count({
+      packageId: packageId,
+      date: {
+        $gte: startDate,
+        $lte: endDate,
+      },
+    });
+    return count;
+  }
+  async regisSpecialtyCount(
+    specialistId: string,
+    startTime: string,
+    endTime: string,
+  ): Promise<number> {
+    const startDate = new Date(startTime);
+    const endDate = new Date(endTime);
+    const count = await this.model.count({
+      specialtyId: specialistId,
+      date: {
+        $gte: startDate,
+        $lte: endDate,
+      },
+    });
+    return count;
   }
   async getRegisterByPackageId(packageId: String): Promise<Register[]> {
     return await this.model.find({ packegeId: packageId });

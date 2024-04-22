@@ -64,6 +64,7 @@ export class MedicalSpecialtiesService {
     let currSpecialty = await this.medicalSpecialtiesModel.findById(id);
     return currSpecialty;
   }
+
   async getAll(): Promise<MedicalSpecialties[]> {
     return await this.medicalSpecialtiesModel.find();
   }
@@ -93,6 +94,13 @@ export class MedicalSpecialtiesService {
     return count;
   }
 
+  async getAllMedicalSpcialtyOfFacility(
+    facilityId: string,
+  ): Promise<MedicalSpecialties[]> {
+    return this.medicalSpecialtiesModel
+      .find({ medicalFactilityId: facilityId })
+      .exec();
+  }
   async getAllMedicalSpcialtyPaginationOfFacility(
     search: string,
     page: number,

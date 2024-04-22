@@ -14,11 +14,11 @@ import deleteImage from 'src/utils/delete_image';
 import { MedicalSpecialtiesService } from '../medical-specialties/medical-specialties.service';
 import { MedicalSpecialties } from '../medical-specialties/entities/medical-specialties.entity';
 import { MedicalFacilitiesService } from '../medical-facilities/medical-facilities.service';
-import { generate } from 'rxjs';
-import { EAcademicTitle, EDegree, EGender } from 'src/contain';
 import { FilterDoctorInput } from './entities/dtos/filter-doctor.input';
 import { MedicalStaffService } from '../medical-staff/medical-staff.service';
 import { MedicalFacilities } from '../medical-facilities/entities/mecical-facilies.entity';
+import { RegisterService } from '../register/register.service';
+import { FacilitiesLoaderService } from '../medical-facilities/facility-loader';
 
 @Resolver(() => Doctor)
 export class DoctorsResolver {
@@ -26,7 +26,9 @@ export class DoctorsResolver {
     private readonly doctorService: DoctorsService,
     private readonly specialtySvr: MedicalSpecialtiesService,
     private readonly facilitySvr: MedicalFacilitiesService,
+    private readonly facilityLoaderSvr: FacilitiesLoaderService,
     private readonly staffSvr: MedicalStaffService,
+    private readonly registerSrv: RegisterService,
   ) {}
 
   @Query(() => [Doctor], { name: 'getAllDoctor' })
@@ -97,6 +99,34 @@ export class DoctorsResolver {
         sortOrder,
       );
       return user;
+    }
+  }
+  @Query(() => [Doctor], { name: 'getAllDoctorOfFacility' })
+  // @UseGuards(JWtAuthGuard)
+  async getAllDoctorOfFacility(
+    @Args('userId', { nullable: true, defaultValue: '' }) userId: string,
+    @Args('staffId', { nullable: true, defaultValue: '' }) staffId: string,
+  ): Promise<Doctor[]> {
+    {
+      if (userId !== '') {
+        const facility = await this.facilityLoaderSvr.loadByUserId(userId);
+        if (facility) {
+          const docs = await this.doctorService.getAllDoctorOfFacility(
+            facility.id,
+          );
+          return docs;
+        } else return null;
+      } else {
+        if (staffId !== '') {
+          const staff = await this.staffSvr.findById(staffId);
+          if (staff) {
+            const docs = await this.doctorService.getAllDoctorOfFacility(
+              staff.medicalFacilityId,
+            );
+            return docs;
+          } else return null;
+        }
+      }
     }
   }
   @Query(() => [Doctor], { name: 'getAllDoctorPaginationOfFacility' })
@@ -240,5 +270,19 @@ export class DoctorsResolver {
       return null;
     }
     return await this.facilitySvr.findById(doctor.medicalFactilitiesId);
+  }
+
+  @ResolveField(() => Number, { name: 'registerCount' })
+  async registerCount(
+    @Parent() doctor: Doctor,
+    @Args('startTime') startTime: string,
+    @Args('endTime') endTime: string,
+  ): Promise<number> {
+    const count = this.registerSrv.regisDoctorCount(
+      doctor.id,
+      startTime,
+      endTime,
+    );
+    return count;
   }
 }

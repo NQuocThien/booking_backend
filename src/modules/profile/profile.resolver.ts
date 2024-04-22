@@ -58,7 +58,13 @@ export class ProfileResolver {
   }
   @ResolveField(() => [Register], { name: 'register' })
   async register(@Parent() profile: Profile): Promise<Register[]> {
-    return await this.registeredSrvLoader.load(profile.id);
+    const data = await this.registeredSrvLoader.load(profile.id);
+    const dataSorted = data.sort((r1, r2) => {
+      const time1 = new Date(r1.createdAt);
+      const time2 = new Date(r2.createdAt);
+      return time2.getTime() - time1.getTime();
+    });
+    return dataSorted;
     // return this.regisService.getRegisterByProfileId(profile.id);
   }
   @ResolveField(() => Customer, { name: 'customer' })

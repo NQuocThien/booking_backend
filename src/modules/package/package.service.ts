@@ -78,6 +78,9 @@ export class PackageService {
   async delete(id: string): Promise<Package> {
     return this.model.findByIdAndDelete(id);
   }
+  async getAllPackageOfFacility(facilityId: string): Promise<Package[]> {
+    return this.model.find({ medicalFactilitiesId: facilityId }).exec();
+  }
   async getAllPackagePaginationOfFacility(
     search: string,
     page: number,

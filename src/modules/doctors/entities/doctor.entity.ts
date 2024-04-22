@@ -13,7 +13,7 @@ import { LinkImage } from 'src/modules/users/dto/image';
 @ObjectType()
 export class Doctor {
   @Field(() => ID)
-  id: String;
+  id: string;
 
   @Field()
   userId: string;
@@ -59,6 +59,9 @@ export class Doctor {
 
   @Field(() => MedicalFacilities, { nullable: true })
   facility: MedicalFacilities;
+
+  @Field(() => Number, { nullable: true })
+  registerCount: number;
 }
 registerEnumType(EDayOfWeed, {
   name: 'EDayOfWeed',

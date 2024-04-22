@@ -20,18 +20,14 @@ import { GetRegisterByOptionInput } from './entities/dtos/get-register-option.in
 import { ConfirmRegisterInput } from './entities/dtos/confirm-register.input';
 import { PubSub } from 'graphql-subscriptions';
 import { Doctor } from '../doctors/entities/doctor.entity';
-import { DoctorsService } from '../doctors/doctors.service';
-import { MedicalSpecialtiesService } from '../medical-specialties/medical-specialties.service';
-import { PackageService } from '../package/package.service';
-import { VaccinationService } from '../vaccination/vaccination.service';
 import { Package } from '../package/entities/package.entity';
 import { Vaccination } from '../vaccination/entities/Vaccination.entity';
 import { MedicalSpecialties } from '../medical-specialties/entities/medical-specialties.entity';
-import { RegisterLoaderService } from './register-loader.service';
 import { MedicalSpecialtiesLoaderService } from '../medical-specialties/medical-specialties-loader.service';
 import { PackageLoaderService } from '../package/package-loader.service';
 import { DoctorLoaderService } from '../doctors/doctor-loader.service';
 import { VaccinationLoaderService } from '../vaccination/vaccination-loader.service';
+import { MedicalFacilitiesService } from '../medical-facilities/medical-facilities.service';
 const pubSub = new PubSub();
 
 @Resolver(() => Register)
@@ -39,16 +35,10 @@ export class RegisterResolver {
   constructor(
     private readonly regisService: RegisterService,
     private readonly profileSvr: ProfileService,
-    private readonly doctorSrv: DoctorsService,
-    private readonly specialtySrv: MedicalSpecialtiesService,
-    private readonly packageSrv: PackageService,
-    private readonly vaccinationSrv: VaccinationService,
-    private readonly registeredSrv: RegisterLoaderService,
     private readonly specialtyLoader: MedicalSpecialtiesLoaderService,
     private readonly packageLoader: PackageLoaderService,
     private readonly doctorLoader: DoctorLoaderService,
     private readonly vaccinationLoader: VaccinationLoaderService,
-    private readonly pubSub: PubSub,
   ) {}
   // =============================== --> QUERY <--- ==================================
   @Query(() => [Register], { name: 'getAllRegisterByOption' })
@@ -65,16 +55,30 @@ export class RegisterResolver {
     return await this.regisService.getAllRegisPending(input);
   }
 
+  @Query(() => [Register], { name: 'getAllRegisPending' })
+  async getAllRegisCountByOption(
+    @Args('input') input: GetRegisterByOptionInput,
+  ): Promise<any> {
+    return await this.regisService.getAllRegisPending(input);
+  }
+
   // =============================== --> MUTATION <--- ==================================
 
   @Mutation(() => Register, { name: 'createRegisterDoctor' })
   async createRegisterDoctor(
     @Args('input') input: CreateRegisterDoctorInput,
   ): Promise<Register> {
-    const res = await this.regisService.createRegisterDoctor(input);
-    // console.log('Create Register Doctor: ', res);
-    this.emitRegisterCreatedEvent(res);
-    return res;
+    const isExist: Boolean = await this.regisService.isExistInDay(
+      input.date.toDateString(),
+      input.profileId,
+    );
+    console.log();
+    if (!isExist) {
+      const res = await this.regisService.createRegisterDoctor(input);
+      this.callEmitRegisterCreatedEvent(res);
+      return res;
+    }
+    throw new Error('!Regis Exist');
   }
 
   @Mutation(() => Register, { name: 'createRegisterSpecialty' })
@@ -82,7 +86,7 @@ export class RegisterResolver {
     @Args('input') input: CreateRegisterSpecialtyInput,
   ): Promise<Register> {
     const regiter = await this.regisService.createRegisterSpecialty(input);
-    this.emitRegisterCreatedEvent(regiter);
+    this.callEmitRegisterCreatedEvent(regiter);
     return regiter;
   }
 
@@ -91,7 +95,7 @@ export class RegisterResolver {
     @Args('input') input: CreateRegisterPackageInput,
   ): Promise<Register> {
     const res = await this.regisService.createRegisterPackage(input);
-    this.emitRegisterCreatedEvent(res);
+    this.callEmitRegisterCreatedEvent(res);
 
     return res;
   }
@@ -101,7 +105,7 @@ export class RegisterResolver {
     @Args('input') input: CreateRegisterVaccineInput,
   ): Promise<Register> {
     const res = await this.regisService.createRegisterVaccine(input);
-    this.emitRegisterCreatedEvent(res);
+    this.callEmitRegisterCreatedEvent(res);
 
     return res;
   }
@@ -111,6 +115,11 @@ export class RegisterResolver {
     @Args('input') input: UpdateRegisterInput,
   ): Promise<Register> {
     return await this.regisService.update(input);
+  }
+
+  @Mutation(() => Register, { name: 'cancelRegister' })
+  async cancelRegister(@Args('id') id: string): Promise<Register> {
+    return await this.regisService.cancelRegis(id);
   }
 
   @Mutation(() => Register, { name: 'confirmRegister' })
@@ -139,12 +148,14 @@ export class RegisterResolver {
       const doctorId = variables.option.doctorId;
       const packageId = variables.option.packageId;
       const specialtyId = variables.option.specialtyId;
-      const vaccineId = variables.option.vaccineId;
+      const vaccineId = variables.option?.vaccineId;
       const inputDate = variables.option.date;
+      // --- payload ---
+      const registered = payload.registerCreated;
       if (doctorId) {
         if (
-          doctorId === payload.registerCreated.doctorId &&
-          isEqualDate(inputDate, payload.registerCreated.date)
+          doctorId === registered.doctorId &&
+          isEqualDate(inputDate, registered.date)
         ) {
           return true;
         }
@@ -152,24 +163,24 @@ export class RegisterResolver {
       }
       if (packageId) {
         if (
-          packageId === payload.registerCreated.packageId &&
-          isEqualDate(inputDate, payload.registerCreated.date)
+          packageId === registered.packageId &&
+          isEqualDate(inputDate, registered.date)
         )
           return true;
         return false;
       }
       if (specialtyId) {
         if (
-          specialtyId === payload.registerCreated.specialtyId &&
-          isEqualDate(inputDate, payload.registerCreated.date)
+          specialtyId === registered.specialtyId &&
+          isEqualDate(inputDate, registered.date)
         )
           return true;
         return false;
       }
       if (vaccineId) {
         if (
-          vaccineId === payload.registerDoctorCreated.vaccineId &&
-          isEqualDate(inputDate, payload.registerDoctorCreated.date)
+          vaccineId === registered.vaccineId &&
+          isEqualDate(inputDate, registered.date)
         )
           return true;
         return false;
@@ -182,93 +193,15 @@ export class RegisterResolver {
     return pubSub.asyncIterator('registerCreated');
   }
 
+  private async callEmitRegisterCreatedEvent(
+    register: Register,
+  ): Promise<void> {
+    await this.emitRegisterCreatedEvent(register);
+  }
+
   private async emitRegisterCreatedEvent(register: Register): Promise<void> {
     await pubSub.publish('registerCreated', { registerCreated: register });
   }
-
-  //----------------------------------------------------------------
-
-  private async emitRegisterDoctorCreatedEvent(
-    register: Register,
-  ): Promise<void> {
-    await this.pubSub.publish('registerDoctorCreated', {
-      registerDoctorCreated: register,
-    });
-  }
-
-  @Subscription(() => Register, {
-    name: 'registerDoctorCreated',
-    filter: (payload, variables) => {
-      function isEqualDate(a: string, b: string): boolean {
-        const date1 = new Date(a);
-        const date2 = new Date(b);
-        if (
-          date1.getDay() === date2.getDay() &&
-          date1.getMonth() === date2.getMonth() &&
-          date1.getFullYear() === date2.getFullYear()
-        )
-          return true;
-        return false;
-      }
-      if (
-        variables.doctorId === payload.registerDoctorCreated.doctorId &&
-        isEqualDate(variables.date, payload.registerDoctorCreated.date)
-      )
-        return true;
-      return false;
-    },
-  })
-  async registerDoctorCreated(
-    @Args('doctorId') doctorId: string,
-    @Args('date') date: string,
-  ) {
-    const res = this.pubSub.asyncIterator('registerDoctorCreated');
-    return res;
-  }
-
-  //----------------------------------------------------------------
-  //----------------------------------------------------------------
-  @Subscription(() => Register, { name: 'registerSpecialtyCreated' })
-  async registerSpecialtyCreated() {
-    return pubSub.asyncIterator('registerSpecialtyCreated');
-  }
-
-  private async emitRegisterSpecialtCreatedEvent(
-    register: Register,
-  ): Promise<void> {
-    await pubSub.publish('registerSpecialtyCreated', {
-      registerSpecialtyCreated: register,
-    });
-  }
-  //----------------------------------------------------------------
-  //----------------------------------------------------------------
-  @Subscription(() => Register, { name: 'registerPackageCreated' })
-  async registerPackageCreated() {
-    return pubSub.asyncIterator('registerPackageCreated');
-  }
-
-  private async emitRegisterPackageCreatedEvent(
-    register: Register,
-  ): Promise<void> {
-    await pubSub.publish('registerPackageCreated', {
-      registerPackageCreated: register,
-    });
-  }
-  //----------------------------------------------------------------
-  //----------------------------------------------------------------
-  @Subscription(() => Register, { name: 'registerVaccinationCreated' })
-  async registerVaccinationCreated() {
-    return pubSub.asyncIterator('registerVaccinationCreated');
-  }
-
-  private async emitRegisterVacinationCreatedEvent(
-    register: Register,
-  ): Promise<void> {
-    await pubSub.publish('registerVaccinationCreated', {
-      registerVaccinationCreated: register,
-    });
-  }
-  //----------------------------------------------------------------
 
   // =============================== --> RESOLVE FIELD <--- ==================================
 

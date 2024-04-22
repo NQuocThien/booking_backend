@@ -10,6 +10,7 @@ import { PackageModule } from '../package/package.module';
 import { MedicalSpecialtiesModule } from '../medical-specialties/medical-specialties.module';
 import { VaccinationModule } from '../vaccination/vaccination.module';
 import { RegisterLoaderService } from './register-loader.service';
+import { MedicalFacilitiesModule } from '../medical-facilities/medical-facilities.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { RegisterLoaderService } from './register-loader.service';
     forwardRef(() => PackageModule),
     forwardRef(() => MedicalSpecialtiesModule),
     forwardRef(() => VaccinationModule),
+    MedicalFacilitiesModule,
   ],
   providers: [RegisterResolver, RegisterService, RegisterLoaderService, PubSub],
   exports: [RegisterService, RegisterLoaderService],

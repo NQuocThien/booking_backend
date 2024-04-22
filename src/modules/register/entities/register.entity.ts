@@ -50,6 +50,9 @@ export class Register {
   @Field(() => String)
   state: EStateRegister;
 
+  @Field()
+  createdAt: Date;
+
   @Field(() => Profile, { nullable: true })
   profile: Profile;
 

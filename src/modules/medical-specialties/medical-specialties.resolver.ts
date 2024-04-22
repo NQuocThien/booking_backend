@@ -15,7 +15,7 @@ import { MedicalStaffService } from '../medical-staff/medical-staff.service';
 import { EPermission } from 'src/contain';
 import { MedicalFacilities } from '../medical-facilities/entities/mecical-facilies.entity';
 import { FacilitiesLoaderService } from '../medical-facilities/facility-loader';
-import { MedicalStaff } from '../medical-staff/entities/medical-staff.entity';
+import { RegisterService } from '../register/register.service';
 
 @Resolver(() => MedicalSpecialties)
 export class MedicalSpecialtiesResolver {
@@ -24,6 +24,7 @@ export class MedicalSpecialtiesResolver {
     private readonly facilitySvr: MedicalFacilitiesService,
     private readonly staffSvr: MedicalStaffService,
     private readonly facilityLoaderSrv: FacilitiesLoaderService,
+    private readonly registerSrv: RegisterService,
   ) {}
 
   @Mutation(() => MedicalSpecialties, { name: 'createMedicalSpecialty' })
@@ -65,6 +66,39 @@ export class MedicalSpecialtiesResolver {
     @Args('input') id: String,
   ): Promise<MedicalSpecialties[]> {
     return this.medicalSpecialtiesService.getAllByMedicalFacilytyId(id);
+  }
+
+  @Query(() => [MedicalSpecialties], {
+    name: 'getAllMedicalSpecialtiesOfFacility',
+  })
+  // @UseGuards(JWtAuthGuard)
+  async getAllMedicalSpecialtiesOfFacility(
+    @Args('userId', { nullable: true, defaultValue: '' }) userId: string,
+    @Args('staffId', { nullable: true, defaultValue: '' }) staffId: string,
+  ): Promise<MedicalSpecialties[]> {
+    {
+      if (userId !== '') {
+        const facility = await this.facilityLoaderSrv.loadByUserId(userId);
+        if (facility) {
+          const docs =
+            await this.medicalSpecialtiesService.getAllMedicalSpcialtyOfFacility(
+              facility.id,
+            );
+          return docs;
+        } else return null;
+      } else {
+        if (staffId !== '') {
+          const staff = await this.staffSvr.findById(staffId);
+          if (staff) {
+            const docs =
+              await this.medicalSpecialtiesService.getAllMedicalSpcialtyOfFacility(
+                staff.medicalFacilityId,
+              );
+            return docs;
+          } else return null;
+        }
+      }
+    }
   }
 
   @Query(() => [MedicalSpecialties], {
@@ -242,10 +276,18 @@ export class MedicalSpecialtiesResolver {
     );
     return data;
   }
-  // @ResolveField(() => MedicalStaff, { name: 'staff' })
-  // async staff(@Parent() specialty: MedicalSpecialties): Promise<MedicalStaff> {
-  //   console.log('Call medicalFactilityId:', specialty.medicalFactilityId);
-  //   // const data = await this.facilitySvr.findById(specialty.medicalFactilityId);
-  //   return;
-  // }
+
+  @ResolveField(() => Number, { name: 'registerCount' })
+  async registerCount(
+    @Parent() p: MedicalSpecialties,
+    @Args('startTime') startTime: string,
+    @Args('endTime') endTime: string,
+  ): Promise<number> {
+    const count = this.registerSrv.regisSpecialtyCount(
+      p.id,
+      startTime,
+      endTime,
+    );
+    return count;
+  }
 }

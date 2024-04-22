@@ -17,6 +17,12 @@ export class VaccinationService {
     return await this.model.find();
   }
 
+  async getAllVaccinationOfFacility(
+    facilityId: string,
+  ): Promise<Vaccination[]> {
+    const query: any = { medicalFactilitiesId: facilityId };
+    return this.model.find({ medicalFactilitiesId: facilityId }).exec();
+  }
   async getAllVaccinationPaginationOfFacility(
     search: string,
     page: number,
@@ -27,7 +33,8 @@ export class VaccinationService {
     isClient: boolean = false,
   ): Promise<Vaccination[]> {
     const query: any = { medicalFactilitiesId: facilityId };
-    if (search) query.vaccineName = { $regex: search, $options: 'i' };7
+    if (search) query.vaccineName = { $regex: search, $options: 'i' };
+    7;
     if (isClient) query['workSchedule.status'] = EStatusService.Open;
 
     const sortOptions: { [key: string]: 'asc' | 'desc' } = {};

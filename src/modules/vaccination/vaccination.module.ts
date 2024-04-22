@@ -7,6 +7,7 @@ import { VaccinationSchema } from './schema/vaccination.schema';
 import { MedicalFacilitiesModule } from '../medical-facilities/medical-facilities.module';
 import { MedicalStaffModule } from '../medical-staff/medical-staff.module';
 import { VaccinationLoaderService } from './vaccination-loader.service';
+import { RegisterModule } from '../register/register.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { VaccinationLoaderService } from './vaccination-loader.service';
       },
     ]),
     forwardRef(() => MedicalFacilitiesModule),
+    forwardRef(() => RegisterModule),
     MedicalStaffModule,
   ],
   providers: [

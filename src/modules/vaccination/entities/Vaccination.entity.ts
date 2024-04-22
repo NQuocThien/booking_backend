@@ -33,6 +33,9 @@ export class Vaccination {
 
   @Field(() => MedicalFacilities, { nullable: true })
   facility: MedicalFacilities;
+
+  @Field(() => Number, { nullable: true })
+  registerCount: Number;
 }
 
 registerEnumType(EStatusService, {

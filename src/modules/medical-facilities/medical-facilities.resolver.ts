@@ -105,6 +105,38 @@ export class MedicalFacilitiesResolver {
   }
 
   @Query(() => [MedicalFacilities], {
+    name: 'getAllMedicalFacilityPaginationForClient',
+  })
+  // @UseGuards(JWtAuthGuard)
+  async getAllMedicalFacilityPaginationForClient(
+    @Args('search', { nullable: true }) search: string,
+    @Args('searchField', {
+      nullable: true,
+      defaultValue: 'medicalFacilityName',
+    })
+    searchField: string,
+    @Args('page', { defaultValue: 1 }) page: number,
+    @Args('limit', { defaultValue: 10 }) limit: number,
+    @Args('sortField', { nullable: true, defaultValue: 'medicalFacilityName' })
+    sortField: string,
+    @Args('sortOrder', { nullable: true }) sortOrder: string,
+    @Args('type', { nullable: true }) type: ETypeOfFacility,
+  ): Promise<MedicalFacilities[]> {
+    // console.log('test: ', type);
+    const user =
+      await this.medicalService.getAllMedicalFacilityPaginationForClient(
+        search,
+        searchField,
+        page,
+        limit,
+        sortField,
+        sortOrder,
+        type,
+      );
+    return user;
+  }
+
+  @Query(() => [MedicalFacilities], {
     name: 'getAllMedicalFacilityHaveSrvPaginationForClient',
   })
   // @UseGuards(JWtAuthGuard)
@@ -165,6 +197,24 @@ export class MedicalFacilitiesResolver {
   ): Promise<number> {
     const count = await this.medicalService.getTotalFacilitiesCount(
       search || '',
+      type,
+    );
+    return count;
+  }
+
+  @Query(() => Number, { name: 'getTotalFacilitiesCountForClient' })
+  async getTotalFacilitiesCountForClient(
+    @Args('search', { nullable: true }) search: string,
+    @Args('searchField', {
+      nullable: true,
+      defaultValue: 'medicalFacilityName',
+    })
+    searchField: string,
+    @Args('type', { nullable: true }) type: ETypeOfFacility,
+  ): Promise<number> {
+    const count = await this.medicalService.getTotalFacilitiesCountForClient(
+      search || '',
+      searchField,
       type,
     );
     return count;
