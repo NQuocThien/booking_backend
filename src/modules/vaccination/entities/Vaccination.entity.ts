@@ -11,7 +11,7 @@ export class Vaccination {
   medicalFactilitiesId: string;
 
   @Field()
-  vaccineName: String;
+  vaccineName: string;
 
   @Field()
   price: Number;

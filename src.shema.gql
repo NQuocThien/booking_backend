@@ -115,7 +115,6 @@ input CreateMedicalStaffInput {
 input CreateNotificationInput {
   content: String!
   detailPath: String!
-  status: ETypeOfNotification!
   userId: String!
 }
 
@@ -226,7 +225,7 @@ type Doctor {
   medicalFactilitiesId: String!
   numberPhone: String!
   price: Float!
-  registerCount(endTime: String!, startTime: String!): Float
+  registerCount(endTime: String!, isPending: Boolean = false, startTime: String!): Float
   specialistId: String!
   specialty: MedicalSpecialties
   userId: String!
@@ -269,13 +268,14 @@ enum EGenderPackage {
 
 enum EPermission {
   Magager
-  MagagerBlog
   MagagerPackage
+  MagagerPending
   MagagerVaccine
   ManagerSpecialty
 }
 
 enum EStateRegister {
+  Approved
   Pending
   Success
 }
@@ -295,6 +295,13 @@ enum ETypeOfFacility {
 enum ETypeOfNotification {
   NotSeen
   Seen
+}
+
+enum ETypeOfService {
+  Doctor
+  Package
+  Specialty
+  Vaccine
 }
 
 enum EnumBlogStatus {
@@ -350,10 +357,21 @@ input GeneralInforUpdateInput {
   logoHeader: LinkImageInput
 }
 
+input GetRegisPendingInput {
+  doctorIds: [String!]!
+  endTime: String!
+  packageIds: [String!]!
+  specialtyIds: [String!]!
+  startTime: String!
+  typeOfService: ETypeOfService
+  vaccineIds: [String!]!
+}
+
 input GetRegisterByOptionInput {
   date: DateTime!
   doctorId: String
   packageId: String
+  pedding: Boolean
   specialtyId: String
   vaccineId: String
 }
@@ -421,7 +439,7 @@ type MedicalSpecialties {
   id: ID!
   medicalFactilityId: String!
   price: Float!
-  registerCount(endTime: String!, startTime: String!): Float
+  registerCount(endTime: String!, isPending: Boolean = false, startTime: String!): Float
   specialtyName: String!
   workSchedule: WorkSchedule
 }
@@ -450,7 +468,7 @@ type Mutation {
   createMedicalFacility(input: CreateMedicalFacilityInput!): MedicalFacilities!
   createMedicalSpecialty(input: CreateMedicalSpecialtyInput!): MedicalSpecialties!
   createMedicalStaff(input: CreateMedicalStaffInput!): MedicalStaff!
-  createNotifition(input: CreateNotificationInput!): Notification!
+  createNotification(input: CreateNotificationInput!): Notification!
   createPackage(input: CreatePackageInput!): Package!
   createProfile(input: CreateProfileInput!): Profile!
   createRegisterDoctor(input: CreateRegisterDoctorInput!): Register!
@@ -494,6 +512,7 @@ type Mutation {
 
 type Notification {
   content: String!
+  createdAt: Float!
   detailPath: String!
   id: ID!
   status: ETypeOfNotification!
@@ -509,7 +528,7 @@ type Package {
   medicalFactilitiesId: String!
   packageName: String!
   price: Float!
-  registerCount(endTime: String!, startTime: String!): Float
+  registerCount(endTime: String!, isPending: Boolean = false, startTime: String!): Float
   workSchedule: WorkSchedule!
 }
 
@@ -567,7 +586,9 @@ type Query {
   getAllPackagePaginationOfFacilityForClient(facilityId: String!, limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "packageName", sortOrder: String): [Package!]!
   getAllPackageSelect(input: String!): [Package!]!
   getAllProfile: [Profile!]!
-  getAllRegisPending(input: GetRegisterByOptionInput!): [Register!]!
+  getAllRegisCountByOption(input: GetRegisterByOptionInput!): Register!
+  getAllRegisOfService(input: GetRegisterByOptionInput!): [Register!]!
+  getAllRegisPending(input: GetRegisPendingInput!): [Register!]!
   getAllRegisterByOption(input: GetRegisterByOptionInput!): [Register!]!
   getAllStaffPagination(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "name", sortOrder: String): [MedicalStaff!]!
   getAllUsersPagination(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "username", sortOrder: String): [User!]!
@@ -593,7 +614,9 @@ type Query {
   getMedicalStaffByUserId(input: String!): MedicalStaff!
   getPackageById(input: String!): Package!
   getProfileByCustomerId(id: String!): [Profile!]!
+  getProfileById(id: String!): Profile!
   getProfiles(id: String!): Profile!
+  getRegisHistory(profileId: String!, staffId: String = "", userId: String = ""): [Register!]!
   getSetting: Setting!
   getTopMedicalFacilities(limit: Float! = 10, typeFacility: String!): [MedicalFacilities!]!
   getTotalBlogsCount(isDeleted: Boolean = false, search: String): Float!
@@ -678,6 +701,7 @@ type Setting {
 
 type Subscription {
   registerCreated(option: GetRegisterByOptionInput!): Register!
+  registerPendingCreated(option: GetRegisPendingInput!): Register!
 }
 
 input UpdateBlogInput {
@@ -895,7 +919,7 @@ type Vaccination {
   note: String!
   price: Float!
   prophylactic: String!
-  registerCount(endTime: String!, startTime: String!): Float
+  registerCount(endTime: String!, isPending: Boolean = false, startTime: String!): Float
   vaccineName: String!
   workSchedule: WorkSchedule!
 }

@@ -47,6 +47,9 @@ export class ProfileService {
     const profileLoad = await this.model.find({ customerId: customerId });
     return profileLoad;
   }
+  async getProfileById(profileId: string): Promise<Profile> {
+    return this.model.findById(profileId);
+  }
   // =================================================================
 
   async findByCutomerIds(customerIds: string[]): Promise<Profile[]> {

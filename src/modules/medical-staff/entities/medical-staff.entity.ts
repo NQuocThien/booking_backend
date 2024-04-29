@@ -7,7 +7,7 @@ export class MedicalStaff {
   id: string;
 
   @Field()
-  userId: String;
+  userId: string;
 
   @Field()
   medicalFacilityId: string;

@@ -11,6 +11,10 @@ import { MedicalSpecialtiesModule } from '../medical-specialties/medical-special
 import { VaccinationModule } from '../vaccination/vaccination.module';
 import { RegisterLoaderService } from './register-loader.service';
 import { MedicalFacilitiesModule } from '../medical-facilities/medical-facilities.module';
+import { MedicalStaffModule } from '../medical-staff/medical-staff.module';
+import { MailModule } from '../mail/mail.module';
+import { CustomerModule } from '../customer/customer.module';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
   imports: [
@@ -25,7 +29,11 @@ import { MedicalFacilitiesModule } from '../medical-facilities/medical-facilitie
     forwardRef(() => PackageModule),
     forwardRef(() => MedicalSpecialtiesModule),
     forwardRef(() => VaccinationModule),
+    forwardRef(() => MedicalStaffModule),
+    forwardRef(() => CustomerModule),
     MedicalFacilitiesModule,
+    NotificationModule,
+    MailModule,
   ],
   providers: [RegisterResolver, RegisterService, RegisterLoaderService, PubSub],
   exports: [RegisterService, RegisterLoaderService],

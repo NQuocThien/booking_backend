@@ -12,7 +12,7 @@ export class Package {
   medicalFactilitiesId: string;
 
   @Field()
-  packageName: String;
+  packageName: string;
 
   @Field(() => String)
   gender: EGenderPackage;

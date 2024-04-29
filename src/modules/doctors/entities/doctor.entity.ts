@@ -22,7 +22,7 @@ export class Doctor {
   medicalFactilitiesId?: string;
 
   @Field()
-  doctorName: String;
+  doctorName: string;
 
   @Field(() => String)
   gender: EGender;

@@ -46,6 +46,11 @@ export class ProfileResolver {
     const result = await this.profileService.getProfileByCustomerId(id);
     return result;
   }
+  @Query(() => Profile, { name: 'getProfileById' })
+  async getProfileById(@Args('id') id: string): Promise<Profile> {
+    const result = await this.profileService.getProfileById(id);
+    return result;
+  }
   @Query(() => [Profile], { name: 'getAllProfile' })
   async getAllProfile(): Promise<Profile[]> {
     const result = await this.profileService.findAll();
@@ -65,7 +70,6 @@ export class ProfileResolver {
       return time2.getTime() - time1.getTime();
     });
     return dataSorted;
-    // return this.regisService.getRegisterByProfileId(profile.id);
   }
   @ResolveField(() => Customer, { name: 'customer' })
   async customer(@Parent() profile: Profile): Promise<Customer | null> {

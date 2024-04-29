@@ -14,5 +14,8 @@ export class Notification {
 
   @Prop()
   status: String;
+
+  @Prop()
+  createdAt: number;
 }
 export const NotificationSchema = SchemaFactory.createForClass(Notification);

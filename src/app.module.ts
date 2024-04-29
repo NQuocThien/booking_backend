@@ -22,10 +22,11 @@ import { RegisterModule } from './modules/register/register.module';
 import { MedicalStaffModule } from './modules/medical-staff/medical-staff.module';
 import { VaccinationModule } from './modules/vaccination/vaccination.module';
 import { PackageModule } from './modules/package/package.module';
-import { WorkScheduleModule } from './modules/work-schedule/work-schedule.module';
 import { EvaluateModule } from './modules/evaluate/evaluate.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { BlogsModule } from './modules/blogs/blogs.module';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { MailModule } from './modules/mail/mail.module';
 
 dotenv.config();
 @Module({
@@ -59,10 +60,10 @@ dotenv.config();
     MedicalStaffModule,
     VaccinationModule,
     PackageModule,
-    WorkScheduleModule,
     EvaluateModule,
     NotificationModule,
     BlogsModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

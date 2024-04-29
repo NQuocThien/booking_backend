@@ -25,6 +25,13 @@ export class DoctorsService {
     return await this.doctorModel.create(data);
   }
 
+  async getIdsByfacilityId(facilityIds: string) {
+    const ids: Doctor[] = await this.doctorModel.find({
+      medicalFactilitiesId: { $eq: facilityIds },
+    });
+    return ids;
+  }
+
   async updateById(data: UpdateDoctorInput) {
     try {
       const existingDoc = await this.doctorModel.findById(data.id);

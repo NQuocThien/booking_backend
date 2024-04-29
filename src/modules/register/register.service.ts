@@ -12,19 +12,26 @@ import { CreateRegisterInput } from './entities/dtos/create-register.input';
 import { GetRegisterByOptionInput } from './entities/dtos/get-register-option.input';
 import { ConfirmRegisterInput } from './entities/dtos/confirm-register.input';
 import { GetAllRegisInYearInput } from './entities/dtos/get-all-register.input';
+import { GetRegisPendingInput } from './entities/dtos/get-regis-pending.input';
+import { GetRegisHistoryInput } from './entities/dtos/get-register-history.input copy';
+import { SessionInput } from '../contains/session/session.input';
 @Injectable()
 export class RegisterService {
   constructor(
     @InjectModel(Register.name)
     private readonly model: Model<Register>,
   ) {}
-  async isExistInDay(date: string, profileId: string): Promise<Boolean> {
+  async isExistInDay(
+    date: string,
+    session: SessionInput,
+    profileId: string,
+  ): Promise<Boolean> {
     const startOfDay = new Date(date);
     startOfDay.setHours(0, 0, 0, 0);
     const endOfDay = new Date(date);
     endOfDay.setHours(23, 59, 59, 999);
     const regis = await this.model
-      .findOne({
+      .find({
         profileId: profileId,
         date: {
           $gte: startOfDay,
@@ -32,7 +39,15 @@ export class RegisterService {
         },
       })
       .exec();
-    if (regis) return true;
+    if (regis.length > 5) return true;
+    if (
+      regis.find(
+        (r) =>
+          r.session.startTime === session.startTime &&
+          r.session.endTime === session.endTime,
+      )
+    )
+      return true;
     return false;
   }
 
@@ -56,9 +71,18 @@ export class RegisterService {
     startOfDay.setHours(0, 0, 0, 0);
     endOfDay.setHours(23, 59, 59, 999);
 
+    const query: any = {};
+    query.doctorId = { $eq: input.doctorId };
+    query.packageId = { $eq: input.packageId };
+    query.vaccineId = { $eq: input.vaccineId };
+    query.specialtyId = { $eq: input.specialtyId };
+    query.date = { $eq: input.date };
+
+    if (input.pedding) query.state = { $eq: EStateRegister.Pending };
+    else query.state = { $ne: EStateRegister.Pending };
     const data = await this.model
       .find({
-        ...input,
+        ...query,
         date: {
           $gte: startOfDay,
           $lte: endOfDay,
@@ -68,7 +92,61 @@ export class RegisterService {
     return data;
   }
 
-  async getAllRegisPending(
+  async getAllRegisPending(input: GetRegisPendingInput): Promise<Register[]> {
+    const startOfDay = new Date(input.startTime);
+    const endOfDay = new Date(input.endTime);
+
+    startOfDay.setHours(0, 0, 0, 0);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const query: any = { $or: [] };
+    query.date = {
+      $gte: startOfDay,
+      $lte: endOfDay,
+    };
+    if (input.typeOfService) query.typeOfService = { $eq: input.typeOfService };
+    query.$or.push({ doctorId: { $in: input.doctorIds } });
+    query.$or.push({ packageId: { $in: input.packageIds } });
+    query.$or.push({ specialtyId: { $in: input.specialtyIds } });
+    query.$or.push({ vaccineId: { $in: input.vaccineIds } });
+
+    query.state = { $eq: EStateRegister.Pending };
+    const data = await this.model
+      .find({
+        ...query,
+      })
+      .exec();
+    // console.log('test get pending: ', data, query);
+    return data;
+  }
+
+  async getRegisHistory(
+    input: GetRegisHistoryInput,
+    sortField: string,
+    sortOrder: string,
+  ): Promise<Register[]> {
+    const query: any = { $or: [] };
+
+    query.$or.push({ doctorId: { $in: input.doctorIds } });
+    query.$or.push({ packageId: { $in: input.packageIds } });
+    query.$or.push({ specialtyId: { $in: input.specialtyIds } });
+    query.$or.push({ vaccineId: { $in: input.vaccineIds } });
+
+    query.profileId = { $eq: input.profileId };
+    // query.state = { $eq: EStateRegister.Pending };
+    const sortOptions: { [key: string]: 'asc' | 'desc' } = {};
+    sortOptions[sortField] = sortOrder === 'asc' ? 'asc' : 'desc';
+    const data = await this.model
+      .find({
+        ...query,
+      })
+      .sort(sortOptions)
+      .exec();
+    // console.log('test get pending: ', input);
+    return data;
+  }
+
+  async getAllRegisOfService(
     input: GetRegisterByOptionInput,
   ): Promise<Register[]> {
     const startOfDay = new Date(input.date);
@@ -77,21 +155,22 @@ export class RegisterService {
     startOfDay.setHours(0, 0, 0, 0);
     endOfDay.setHours(23, 59, 59, 999);
 
+    const query: any = { $or: [] };
+    query.date = {
+      $gte: startOfDay,
+      $lte: endOfDay,
+    };
+    query.$or.push({ doctorId: { $eq: input.doctorId } });
+    query.$or.push({ packageId: { $eq: input.packageId } });
+    query.$or.push({ specialtyId: { $eq: input.specialtyId } });
+    query.$or.push({ vaccineId: { $eq: input.vaccineId } });
     const data = await this.model
       .find({
-        ...input,
-        date: {
-          $gte: startOfDay,
-          $lte: endOfDay,
-        },
+        ...query,
       })
-      .exec(); // tất cả các ký của ngày
-
-    const regisFilter = data.filter((d) => {
-      return d.state === EStateRegister.Pending;
-    });
-    console.log(regisFilter);
-    return regisFilter;
+      .exec();
+    // console.log('test get pending: ', data, query);
+    return data;
   }
 
   async getAllRegisInYear(filter: GetAllRegisInYearInput): Promise<Register[]> {
@@ -210,15 +289,24 @@ export class RegisterService {
     doctorId: string,
     startTime: string,
     endTime: string,
+    isPending: boolean = false,
   ): Promise<number> {
     const startDate = new Date(startTime);
     const endDate = new Date(endTime);
+    startDate.setHours(0, 0, 0, 0);
+    endDate.setHours(23, 59, 59, 999);
+    const query: any = {};
+
+    query.doctorId = { $eq: doctorId };
+    query.date = {
+      $gte: startDate,
+      $lte: endDate,
+    };
+    if (isPending) query.state = { $eq: EStateRegister.Pending };
+    else query.state = { $ne: EStateRegister.Pending };
+
     const count = await this.model.count({
-      doctorId: doctorId,
-      date: {
-        $gte: startDate,
-        $lte: endDate,
-      },
+      ...query,
     });
     return count;
   }
@@ -226,15 +314,24 @@ export class RegisterService {
     vaccineId: string,
     startTime: string,
     endTime: string,
+    isPending: boolean = false,
   ): Promise<number> {
     const startDate = new Date(startTime);
     const endDate = new Date(endTime);
+    startDate.setHours(0, 0, 0, 0);
+    endDate.setHours(23, 59, 59, 999);
+    const query: any = {};
+
+    query.vaccineId = { $eq: vaccineId };
+    query.date = {
+      $gte: startDate,
+      $lte: endDate,
+    };
+    if (isPending) query.state = { $eq: EStateRegister.Pending };
+    else query.state = { $ne: EStateRegister.Pending };
+
     const count = await this.model.count({
-      vaccineId: vaccineId,
-      date: {
-        $gte: startDate,
-        $lte: endDate,
-      },
+      ...query,
     });
     return count;
   }
@@ -242,32 +339,54 @@ export class RegisterService {
     packageId: string,
     startTime: string,
     endTime: string,
+    isPending: boolean = false,
   ): Promise<number> {
     const startDate = new Date(startTime);
     const endDate = new Date(endTime);
-    const count = await this.model.count({
-      packageId: packageId,
-      date: {
-        $gte: startDate,
-        $lte: endDate,
-      },
-    });
+    startDate.setHours(0, 0, 0, 0);
+    endDate.setHours(23, 59, 59, 999);
+    const query: any = {};
+
+    query.packageId = { $eq: packageId };
+    query.date = {
+      $gte: startDate,
+      $lte: endDate,
+    };
+    if (isPending) query.state = { $eq: EStateRegister.Pending };
+    else query.state = { $ne: EStateRegister.Pending };
+
+    const count = await this.model
+      .count({
+        ...query,
+      })
+      .exec();
     return count;
   }
   async regisSpecialtyCount(
     specialistId: string,
     startTime: string,
     endTime: string,
+    isPending: boolean = false,
   ): Promise<number> {
     const startDate = new Date(startTime);
     const endDate = new Date(endTime);
-    const count = await this.model.count({
-      specialtyId: specialistId,
-      date: {
-        $gte: startDate,
-        $lte: endDate,
-      },
-    });
+    startDate.setHours(0, 0, 0, 0);
+    endDate.setHours(23, 59, 59, 999);
+    const query: any = {};
+
+    query.specialtyId = { $eq: specialistId };
+    query.date = {
+      $gte: startDate,
+      $lte: endDate,
+    };
+    if (isPending) query.state = { $eq: EStateRegister.Pending };
+    else query.state = { $ne: EStateRegister.Pending };
+
+    const count = await this.model
+      .count({
+        ...query,
+      })
+      .exec();
     return count;
   }
   async getRegisterByPackageId(packageId: String): Promise<Register[]> {

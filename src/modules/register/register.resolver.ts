@@ -28,17 +28,36 @@ import { PackageLoaderService } from '../package/package-loader.service';
 import { DoctorLoaderService } from '../doctors/doctor-loader.service';
 import { VaccinationLoaderService } from '../vaccination/vaccination-loader.service';
 import { MedicalFacilitiesService } from '../medical-facilities/medical-facilities.service';
+import { RegisterLoaderService } from './register-loader.service';
+import { GetRegisPendingInput } from './entities/dtos/get-regis-pending.input';
+import { start } from 'repl';
+import { GetRegisHistoryInput } from './entities/dtos/get-register-history.input copy';
+import { FacilitiesLoaderService } from '../medical-facilities/facility-loader';
+import { StaffLoaderService } from '../medical-staff/staff-loader';
+import { profile } from 'console';
+import { MailService } from '../mail/mail.service';
+import { CustomerService } from '../customer/customer.service';
+import { Customer } from '../customer/entities/customer.entity';
+import { EStateRegister, ETypeOfService } from 'src/contain';
+import { NotificationService } from '../notification/notification.service';
+import { CreateNotificationInput } from '../notification/entities/dtos/create-notification.input';
 const pubSub = new PubSub();
 
 @Resolver(() => Register)
 export class RegisterResolver {
   constructor(
     private readonly regisService: RegisterService,
+    private readonly registerLoader: RegisterLoaderService,
     private readonly profileSvr: ProfileService,
     private readonly specialtyLoader: MedicalSpecialtiesLoaderService,
     private readonly packageLoader: PackageLoaderService,
     private readonly doctorLoader: DoctorLoaderService,
     private readonly vaccinationLoader: VaccinationLoaderService,
+    private readonly facilityLoaderSrv: FacilitiesLoaderService,
+    private readonly staffLoaderSrv: StaffLoaderService,
+    private readonly customerSrv: CustomerService,
+    private readonly notificationSrv: NotificationService,
+    private readonly emailService: MailService,
   ) {}
   // =============================== --> QUERY <--- ==================================
   @Query(() => [Register], { name: 'getAllRegisterByOption' })
@@ -50,16 +69,84 @@ export class RegisterResolver {
 
   @Query(() => [Register], { name: 'getAllRegisPending' })
   async getAllRegisPending(
-    @Args('input') input: GetRegisterByOptionInput,
+    @Args('input') input: GetRegisPendingInput,
   ): Promise<any> {
     return await this.regisService.getAllRegisPending(input);
   }
 
-  @Query(() => [Register], { name: 'getAllRegisPending' })
+  @Query(() => [Register], { name: 'getAllRegisOfService' })
+  async getAllRegisOfService(
+    @Args('input') input: GetRegisterByOptionInput,
+  ): Promise<any> {
+    return await this.regisService.getAllRegisOfService(input);
+  }
+
+  @Query(() => [Register], { name: 'getRegisHistory' })
+  async getRegisHistory(
+    @Args('profileId') profileId: string,
+    @Args('userId', { nullable: true, defaultValue: '' }) userId: string,
+    @Args('staffId', { nullable: true, defaultValue: '' }) staffId: string,
+  ): Promise<Register[]> {
+    if (userId !== '') {
+      const facility = await this.facilityLoaderSrv.loadByUserId(userId);
+      if (facility) {
+        const doctorIds: string[] =
+          await this.registerLoader.loadDoctorIdsByFacilityId(facility.id);
+        const packageIds: string[] =
+          await this.registerLoader.loadPackageIdsByFacilityId(facility.id);
+        const vaccinatioIds: string[] =
+          await this.registerLoader.loadVaccinationIdsByFacilityId(facility.id);
+        const specialtyIds: string[] =
+          await this.registerLoader.loadSpecialtyIdsByFacilityId(facility.id);
+        const input: GetRegisHistoryInput = {
+          profileId: profileId,
+          doctorIds: doctorIds,
+          packageIds: packageIds,
+          specialtyIds: specialtyIds,
+          vaccineIds: vaccinatioIds,
+        };
+        return await this.regisService.getRegisHistory(input, 'date', 'desc');
+      }
+    } else {
+      if (staffId !== '') {
+        const staff = await this.staffLoaderSrv.load(staffId);
+        if (staff) {
+          const doctorIds: string[] =
+            await this.registerLoader.loadDoctorIdsByFacilityId(
+              staff.medicalFacilityId,
+            );
+          const packageIds: string[] =
+            await this.registerLoader.loadPackageIdsByFacilityId(
+              staff.medicalFacilityId,
+            );
+          const vaccinatioIds: string[] =
+            await this.registerLoader.loadVaccinationIdsByFacilityId(
+              staff.medicalFacilityId,
+            );
+          const specialtyIds: string[] =
+            await this.registerLoader.loadSpecialtyIdsByFacilityId(
+              staff.medicalFacilityId,
+            );
+          const input: GetRegisHistoryInput = {
+            profileId: profileId,
+            doctorIds: doctorIds,
+            packageIds: packageIds,
+            specialtyIds: specialtyIds,
+            vaccineIds: vaccinatioIds,
+          };
+          return await this.regisService.getRegisHistory(input, 'date', 'desc');
+        }
+      }
+    }
+    return;
+  }
+
+  @Query(() => Register, { name: 'getAllRegisCountByOption' })
   async getAllRegisCountByOption(
     @Args('input') input: GetRegisterByOptionInput,
   ): Promise<any> {
-    return await this.regisService.getAllRegisPending(input);
+    // return await this.regisService.getAllRegisPending(input);
+    return null;
   }
 
   // =============================== --> MUTATION <--- ==================================
@@ -70,12 +157,13 @@ export class RegisterResolver {
   ): Promise<Register> {
     const isExist: Boolean = await this.regisService.isExistInDay(
       input.date.toDateString(),
+      input.session,
       input.profileId,
     );
-    console.log();
     if (!isExist) {
       const res = await this.regisService.createRegisterDoctor(input);
-      this.callEmitRegisterCreatedEvent(res);
+      this.registerLoader.clean(input.profileId);
+      this.emitRegisterPendingCreatedEvent(res);
       return res;
     }
     throw new Error('!Regis Exist');
@@ -85,29 +173,55 @@ export class RegisterResolver {
   async createRegisterSpecialty(
     @Args('input') input: CreateRegisterSpecialtyInput,
   ): Promise<Register> {
-    const regiter = await this.regisService.createRegisterSpecialty(input);
-    this.callEmitRegisterCreatedEvent(regiter);
-    return regiter;
+    const isExist: Boolean = await this.regisService.isExistInDay(
+      input.date.toDateString(),
+      input.session,
+      input.profileId,
+    );
+    if (!isExist) {
+      const regiter = await this.regisService.createRegisterSpecialty(input);
+      this.registerLoader.clean(input.profileId);
+      this.emitRegisterPendingCreatedEvent(regiter);
+      return regiter;
+    }
+    throw new Error('!Regis Exist');
   }
 
   @Mutation(() => Register, { name: 'createRegisterPackage' })
   async createRegisterPackage(
     @Args('input') input: CreateRegisterPackageInput,
   ): Promise<Register> {
-    const res = await this.regisService.createRegisterPackage(input);
-    this.callEmitRegisterCreatedEvent(res);
+    const isExist: Boolean = await this.regisService.isExistInDay(
+      input.date.toDateString(),
+      input.session,
+      input.profileId,
+    );
+    if (!isExist) {
+      const res = await this.regisService.createRegisterPackage(input);
+      this.registerLoader.clean(input.profileId);
+      this.emitRegisterPendingCreatedEvent(res);
 
-    return res;
+      return res;
+    }
+    throw new Error('!Regis Exist');
   }
 
   @Mutation(() => Register, { name: 'createRegisterVaccine' })
   async createRegisterVaccine(
     @Args('input') input: CreateRegisterVaccineInput,
   ): Promise<Register> {
-    const res = await this.regisService.createRegisterVaccine(input);
-    this.callEmitRegisterCreatedEvent(res);
-
-    return res;
+    const isExist: Boolean = await this.regisService.isExistInDay(
+      input.date.toDateString(),
+      input.session,
+      input.profileId,
+    );
+    if (!isExist) {
+      const res = await this.regisService.createRegisterVaccine(input);
+      this.registerLoader.clean(input.profileId);
+      this.emitRegisterPendingCreatedEvent(res);
+      return res;
+    }
+    throw new Error('!Regis Exist');
   }
 
   @Mutation(() => Register, { name: 'updateRegister' })
@@ -126,7 +240,67 @@ export class RegisterResolver {
   async confirmRegister(
     @Args('input') input: ConfirmRegisterInput,
   ): Promise<Register> {
-    return await this.regisService.confirmRegister(input);
+    const regis = await this.regisService.confirmRegister(input);
+    this.callEmitRegisterCreatedEvent(regis);
+
+    const profile: Profile = await this.profileSvr.findById(regis.profileId);
+    const customer: Customer = await this.customerSrv.findById(
+      profile.customerId,
+    );
+    var service: string;
+    var notification: CreateNotificationInput = {
+      userId: '',
+      detailPath: '/account/ticket',
+      content: '',
+    };
+    if (regis.typeOfService === ETypeOfService.Doctor) {
+      service = (await this.doctorLoader.load(regis.doctorId)).doctorName;
+    }
+    if (regis.typeOfService === ETypeOfService.Package) {
+      service = (await this.packageLoader.load(regis.packageId)).packageName;
+    }
+    if (regis.typeOfService === ETypeOfService.Specialty) {
+      service = (await this.specialtyLoader.load(regis.specialtyId))
+        .specialtyName;
+    }
+    if (regis.typeOfService === ETypeOfService.Vaccine) {
+      service = (await this.vaccinationLoader.load(regis.vaccineId))
+        .vaccineName;
+    }
+
+    if (profile && customer) {
+      notification.userId = customer.userId;
+      const date: string = `${regis.date.getDate()} / ${
+        regis.date.getMonth() + 1
+      } / ${regis.date.getFullYear()}`;
+      if (regis.state === EStateRegister.Approved) {
+        notification.content = `Đã duyệt ${regis.typeOfService} "${service}"`;
+        this.emailService.sendUserConfirmation(
+          profile.email,
+          customer.fullname,
+          profile.fullname,
+          regis.typeOfService,
+          service,
+          date,
+          regis.session.startTime,
+          regis.session.endTime,
+        );
+      } else if (regis.state === EStateRegister.Success) {
+        notification.content = `Đã khám ${regis.typeOfService} "${service}"`;
+        this.emailService.sendUserSuccesss(
+          profile.email,
+          customer.fullname,
+          profile.fullname,
+          regis.typeOfService,
+          service,
+          date,
+          regis.session.startTime,
+          regis.session.endTime,
+        );
+      }
+    }
+    this.notificationSrv.create(notification);
+    return regis;
   }
 
   // =============================== --> SUBSCRIPTION <--- ==================================
@@ -201,6 +375,62 @@ export class RegisterResolver {
 
   private async emitRegisterCreatedEvent(register: Register): Promise<void> {
     await pubSub.publish('registerCreated', { registerCreated: register });
+  }
+
+  @Subscription(() => Register, {
+    name: 'registerPendingCreated',
+    filter: (payload, variables) => {
+      const doctorIds = variables.option.doctorIds;
+      const packageIds = variables.option.packageIds;
+      const specialtyIds = variables.option.specialtyIds;
+      const vaccineIds = variables.option?.vaccineIds;
+      const startTime = new Date(variables.option.startTime);
+      const endTime = new Date(variables.option.endTime);
+      startTime.setHours(0, 0, 0, 0);
+      endTime.setHours(23, 59, 59, 999);
+      // --- payload ---
+      const registered = payload.registerPendingCreated;
+      if (registered.doctorId) {
+        if (doctorIds.find((d) => d === registered.doctorId)) {
+          if (registered.date >= startTime && registered.date <= endTime)
+            return true;
+        }
+        return false;
+      }
+      if (registered.vaccineId) {
+        if (vaccineIds.find((d) => d === registered.vaccineId)) {
+          if (registered.date >= startTime && registered.date <= endTime)
+            return true;
+        }
+        return false;
+      }
+      if (registered.specialtyId) {
+        if (specialtyIds.find((d) => d === registered.specialtyId)) {
+          if (registered.date >= startTime && registered.date <= endTime)
+            return true;
+        }
+        return false;
+      }
+      if (registered.packageId) {
+        if (packageIds.find((d) => d === registered.packageId)) {
+          if (registered.date >= startTime && registered.date <= endTime)
+            return true;
+        }
+        return false;
+      }
+      return false;
+    },
+  })
+  async registerPendingCreated(@Args('option') option: GetRegisPendingInput) {
+    return pubSub.asyncIterator('registerPendingCreated');
+  }
+
+  private async emitRegisterPendingCreatedEvent(
+    register: Register,
+  ): Promise<void> {
+    await pubSub.publish('registerPendingCreated', {
+      registerPendingCreated: register,
+    });
   }
 
   // =============================== --> RESOLVE FIELD <--- ==================================

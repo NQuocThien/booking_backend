@@ -6,6 +6,7 @@ import { MedicalStaff } from './entities/medical-staff.entity';
 import { MedicalStaffSchema } from './schema/medical-staff.schema';
 import { MedicalSpecialtiesModule } from '../medical-specialties/medical-specialties.module';
 import { MedicalFacilitiesModule } from '../medical-facilities/medical-facilities.module';
+import { StaffLoaderService } from './staff-loader';
 
 @Module({
   imports: [
@@ -18,7 +19,7 @@ import { MedicalFacilitiesModule } from '../medical-facilities/medical-facilitie
     forwardRef(() => MedicalFacilitiesModule),
     forwardRef(() => MedicalSpecialtiesModule),
   ],
-  providers: [MedicalStaffResolver, MedicalStaffService],
-  exports: [MedicalStaffService],
+  providers: [MedicalStaffResolver, MedicalStaffService, StaffLoaderService],
+  exports: [MedicalStaffService, StaffLoaderService],
 })
 export class MedicalStaffModule {}

@@ -265,11 +265,14 @@ export class VaccinationResolver {
     @Parent() vaccination: Vaccination,
     @Args('startTime') startTime: string,
     @Args('endTime') endTime: string,
+    @Args('isPending', { nullable: true, defaultValue: false })
+    isPending: boolean,
   ): Promise<number> {
     const count = this.registerSrv.regisVaccinationCount(
       vaccination.id,
       startTime,
       endTime,
+      isPending,
     );
     return count;
   }

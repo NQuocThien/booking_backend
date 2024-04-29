@@ -279,8 +279,15 @@ export class PackageResolver {
     @Parent() p: Package,
     @Args('startTime') startTime: string,
     @Args('endTime') endTime: string,
+    @Args('isPending', { nullable: true, defaultValue: false })
+    isPending: boolean,
   ): Promise<number> {
-    const count = this.registerSrv.regisPackageCount(p.id, startTime, endTime);
+    const count = this.registerSrv.regisPackageCount(
+      p.id,
+      startTime,
+      endTime,
+      isPending,
+    );
     return count;
   }
 }

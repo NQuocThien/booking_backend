@@ -12,11 +12,14 @@ export class Notification {
   userId: string;
 
   @Field()
-  content?: string;
+  content: string;
 
   @Field()
   detailPath: String;
 
   @Field(() => ETypeOfNotification)
   status: ETypeOfNotification;
+
+  @Field()
+  createdAt: number;
 }

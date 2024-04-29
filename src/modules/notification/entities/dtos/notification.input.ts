@@ -1,7 +1,7 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { ETypeOfNotification } from 'src/contain';
 @InputType()
-export class CreateNotificationInput {
+export class NotificationInput {
   @Field()
   userId: string;
 
@@ -10,4 +10,7 @@ export class CreateNotificationInput {
 
   @Field()
   detailPath: String;
+
+  @Field(() => ETypeOfNotification)
+  status: ETypeOfNotification;
 }

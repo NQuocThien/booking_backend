@@ -5,13 +5,13 @@ import { EStatusService } from 'src/contain';
 @InputType()
 export class WorkScheduleInput {
   @Field(() => [ScheduleInput])
-  schedule: ScheduleInput[];
+  schedule: ScheduleInput[]; //
 
   @Field(() => [Date])
-  dayOff: [Date];
+  dayOff: [Date]; //
 
   @Field(() => EStatusService)
-  status: EStatusService;
+  status: EStatusService; // trạng thái
 
   @Field(() => Number)
   numberSlot: number;

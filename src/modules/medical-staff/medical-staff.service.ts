@@ -26,6 +26,9 @@ export class MedicalStaffService {
   async findById(id: String): Promise<MedicalStaff> {
     return await this.model.findById(id);
   }
+  async findByIds(ids: string[]): Promise<MedicalStaff[]> {
+    return await this.model.find({ _id: { $in: ids } });
+  }
   async findByUserId(id: String): Promise<MedicalStaff> {
     return await this.model.findOne({ userId: id });
   }
@@ -56,6 +59,9 @@ export class MedicalStaffService {
   }
   async deleteMedicalStaff(id: String) {
     return await this.model.findByIdAndDelete(id);
+  }
+  async findByUserIds(ids: string[]) {
+    return await this.model.find({ userId: { $in: ids } });
   }
   async findByMedicalFacilityId(
     medicalFacilityId: String,

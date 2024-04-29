@@ -30,8 +30,9 @@ export enum EStatusService {
 }
 
 export enum EStateRegister {
+  Pending = 'Chưa duyệt',
+  Approved = 'Đã duyệt',
   Success = 'Đã khám',
-  Pending = 'Chưa khám',
 }
 
 export enum ETypeOfService {
@@ -58,7 +59,7 @@ export enum EDayOfWeed {
 
 export enum EPermission {
   Magager = 'Quản lý',
-  MagagerBlog = 'Quản lý bài viết',
+  MagagerPending = 'Duyệt khám',
   ManagerSpecialty = 'Quản lý chuyên khoa',
   MagagerPackage = 'Quản lý gói khám',
   MagagerVaccine = 'Quản lý tim chủng',
@@ -98,9 +99,6 @@ registerEnumType(EPermission, {
 registerEnumType(EDayOfWeed, {
   name: 'EDayOfWeed',
 });
-// registerEnumType(ERole, {
-//   name: 'IRole',
-// });
 registerEnumType(EStatusService, {
   name: 'EStatusService',
 });

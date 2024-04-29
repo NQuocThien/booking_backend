@@ -3,6 +3,8 @@ import { Notification } from './entities/notification.entity';
 import { NotificationService } from './notification.service';
 import { CreateNotificationInput } from './entities/dtos/create-notification.input';
 import { UpdateNotificationInput } from './entities/dtos/update-notification.input';
+import { NotificationInput } from './entities/dtos/notification.input';
+import { ETypeOfNotification } from 'src/contain';
 
 @Resolver(() => Notification)
 export class NotificationResolver {
@@ -13,8 +15,8 @@ export class NotificationResolver {
     return this.notificationService.findAll();
   }
 
-  @Mutation(() => Notification, { name: 'createNotifition' })
-  async createNotifition(@Args('input') data: CreateNotificationInput) {
+  @Mutation(() => Notification, { name: 'createNotification' })
+  async createNotification(@Args('input') data: CreateNotificationInput) {
     return await this.notificationService.create(data);
   }
 
