@@ -15,12 +15,18 @@ import { GetAllRegisInYearInput } from './entities/dtos/get-all-register.input';
 import { GetRegisPendingInput } from './entities/dtos/get-regis-pending.input';
 import { GetRegisHistoryInput } from './entities/dtos/get-register-history.input copy';
 import { SessionInput } from '../contains/session/session.input';
+import { UpLoadFileRegisInput } from './entities/dtos/upload-file.input';
 @Injectable()
 export class RegisterService {
   constructor(
     @InjectModel(Register.name)
     private readonly model: Model<Register>,
   ) {}
+
+  async findById(id: string): Promise<Register> {
+    return await this.model.findById(id);
+  }
+
   async isExistInDay(
     date: string,
     session: SessionInput,
@@ -251,6 +257,19 @@ export class RegisterService {
       Object.assign(existingDoc, newDoc);
       const updatedDoc = await existingDoc.save();
       return updatedDoc;
+    } catch (error) {
+      console.error('Error updating document:', error);
+      return null;
+    }
+  }
+  async uploadFile(input: UpLoadFileRegisInput): Promise<Register> {
+    try {
+      const res = await this.model.findByIdAndUpdate(
+        input.id,
+        { files: input.files },
+        { new: true },
+      );
+      return res;
     } catch (error) {
       console.error('Error updating document:', error);
       return null;

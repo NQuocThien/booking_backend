@@ -41,6 +41,8 @@ import { Customer } from '../customer/entities/customer.entity';
 import { EStateRegister, ETypeOfService } from 'src/contain';
 import { NotificationService } from '../notification/notification.service';
 import { CreateNotificationInput } from '../notification/entities/dtos/create-notification.input';
+import { NotificationResolver } from '../notification/notification.resolver';
+import { UpLoadFileRegisInput } from './entities/dtos/upload-file.input';
 const pubSub = new PubSub();
 
 @Resolver(() => Register)
@@ -57,6 +59,8 @@ export class RegisterResolver {
     private readonly staffLoaderSrv: StaffLoaderService,
     private readonly customerSrv: CustomerService,
     private readonly notificationSrv: NotificationService,
+    private readonly notificationResolver: NotificationResolver,
+
     private readonly emailService: MailService,
   ) {}
   // =============================== --> QUERY <--- ==================================
@@ -65,6 +69,11 @@ export class RegisterResolver {
     @Args('input') input: GetRegisterByOptionInput,
   ): Promise<Register[]> {
     return await this.regisService.getAllRegisterByOption(input);
+  }
+
+  @Query(() => Register, { name: 'getRegisById' })
+  async getRegisById(@Args('id') id: string): Promise<Register> {
+    return await this.regisService.findById(id);
   }
 
   @Query(() => [Register], { name: 'getAllRegisPending' })
@@ -236,6 +245,13 @@ export class RegisterResolver {
     return await this.regisService.cancelRegis(id);
   }
 
+  @Mutation(() => Register, { name: 'uploadFileRegister' })
+  async uploadFileRegister(
+    @Args('input') input: UpLoadFileRegisInput,
+  ): Promise<Register> {
+    return await this.regisService.uploadFile(input);
+  }
+
   @Mutation(() => Register, { name: 'confirmRegister' })
   async confirmRegister(
     @Args('input') input: ConfirmRegisterInput,
@@ -299,7 +315,10 @@ export class RegisterResolver {
         );
       }
     }
-    this.notificationSrv.create(notification);
+    // subscription cho user
+    await this.notificationSrv
+      .create(notification)
+      .then((res) => this.notificationResolver.emitNotifyCreatedEvent(res));
     return regis;
   }
 

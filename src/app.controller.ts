@@ -37,4 +37,24 @@ export class AppController {
       console.error(e);
     }
   }
+  @Get('/documents/:filename')
+  async serverDocument(
+    @Param('filename') filename: string,
+    @Res() res: Response,
+  ) {
+    try {
+      let imagePath = path.join(process.cwd(), '/files/documents/');
+      imagePath = path.join(imagePath, filename);
+      // console.log('--> get image: ' + filename);
+      // Kiểm tra xem tệp có tồn tại không
+      if (!fs.existsSync(imagePath)) {
+        // Trả về lỗi 404 Not Found nếu tệp không tồn tại
+        return res.status(404).send('Image not found');
+      }
+      // Nếu tệp tồn tại, trả về nó bằng phản hồi HTTP
+      return res.sendFile(imagePath);
+    } catch (e) {
+      console.error(e);
+    }
+  }
 }

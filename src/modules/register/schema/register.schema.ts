@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Session } from 'src/modules/contains/session/session.schema';
+import { LinkImage } from 'src/modules/users/schema/linkImage.schema';
 @Schema({
   timestamps: true,
 })
@@ -36,5 +37,11 @@ export class Register {
 
   @Prop()
   createdAt: Date;
+
+  @Prop({
+    type: Array,
+    default: [],
+  })
+  files?: LinkImage[];
 }
 export const RegisterSchema = SchemaFactory.createForClass(Register);

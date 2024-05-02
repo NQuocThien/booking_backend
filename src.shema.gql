@@ -489,6 +489,8 @@ type Mutation {
   deleteVaccination(input: String!): Vaccination!
   login(loginUserInput: LoginUserInput!): LoginRespone!
   logout: LogoutUser!
+  seenAllNotification(userId: String!): String!
+  seenNotificationById(id: String!): String!
   signup(createUserInput: CreateUserInput!): User!
   signupUser(createUserInput: CreateUserByAdminInput!): User!
   updateBlog(input: UpdateBlogInput!): Blog!
@@ -508,6 +510,7 @@ type Mutation {
   updateUser(updateUserInput: UpdateUserInput!): User!
   updateUserWithPass(updateUserInput: UpdateUserWithPassInput!): User!
   updateVaccination(input: UpdateVaccineInput!): Vaccination!
+  uploadFileRegister(input: UpLoadFileRegisInput!): Register!
 }
 
 type Notification {
@@ -578,6 +581,7 @@ type Query {
   getAllMedicalStaff: [MedicalStaff!]!
   getAllMedicalStaffPaginationOfFacility(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "name", sortOrder: String, userId: String): [MedicalStaff!]!
   getAllNotification: [Notification!]!
+  getAllNotificationByUserId(userId: String!): [Notification!]!
   getAllPackage: [Package!]!
   getAllPackageByFacilityId(input: String!): [Package!]!
   getAllPackageOfFacility(staffId: String = "", userId: String = ""): [Package!]!
@@ -616,6 +620,7 @@ type Query {
   getProfileByCustomerId(id: String!): [Profile!]!
   getProfileById(id: String!): Profile!
   getProfiles(id: String!): Profile!
+  getRegisById(id: String!): Register!
   getRegisHistory(profileId: String!, staffId: String = "", userId: String = ""): [Register!]!
   getSetting: Setting!
   getTopMedicalFacilities(limit: Float! = 10, typeFacility: String!): [MedicalFacilities!]!
@@ -653,6 +658,7 @@ type Register {
   date: DateTime!
   doctor: Doctor
   doctorId: String
+  files: [LinkImage!]
   id: ID!
   package: Package
   packageId: String
@@ -700,8 +706,14 @@ type Setting {
 }
 
 type Subscription {
+  notifyCreated(userId: String!): Notification!
   registerCreated(option: GetRegisterByOptionInput!): Register!
   registerPendingCreated(option: GetRegisPendingInput!): Register!
+}
+
+input UpLoadFileRegisInput {
+  files: [LinkImageInput!]
+  id: String!
 }
 
 input UpdateBlogInput {

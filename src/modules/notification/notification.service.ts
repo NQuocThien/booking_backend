@@ -22,7 +22,7 @@ export class NotificationService {
     return this.doctorModel.findByIdAndDelete(id);
   }
 
-  async create(data: CreateNotificationInput) {
+  async create(data: CreateNotificationInput): Promise<Notification> {
     const input: NotificationInput = {
       content: data.content,
       detailPath: data.detailPath,
@@ -46,7 +46,40 @@ export class NotificationService {
       return null;
     }
   }
+  async seenAll(userId: string): Promise<void> {
+    try {
+      await this.doctorModel
+        .updateMany(
+          { userId: userId },
+          { $set: { status: ETypeOfNotification.Seen } },
+        )
+        .exec();
+    } catch (error) {
+      console.error('Error marking notifications as read:', error);
+      throw error;
+    }
+  }
+  async seenById(id: string): Promise<void> {
+    try {
+      await this.doctorModel
+        .findByIdAndUpdate(id, { $set: { status: ETypeOfNotification.Seen } })
+        .exec();
+    } catch (error) {
+      console.error('Error marking notifications as read:', error);
+      throw error;
+    }
+  }
   async findAll() {
     return await this.doctorModel.find();
+  }
+  async findByUserId(userId: string) {
+    const sortOptions: { [key: string]: 'asc' | 'desc' } = {};
+    const sortField = 'createdAt';
+    var sortOrder = 'desc';
+    sortOptions[sortField] = sortOrder === 'asc' ? 'asc' : 'desc';
+    return await this.doctorModel
+      .find({ userId: userId })
+      .sort(sortOptions)
+      .limit(10);
   }
 }

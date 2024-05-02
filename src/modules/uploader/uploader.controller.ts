@@ -24,6 +24,14 @@ export const imageFilter = (_, file, callback) => {
   }
   callback(null, true);
 };
+export const documentFilter = (_, file, callback) => {
+  if (
+    !file.originalname.match(/\.(doc|DOC|docx|DOCX|pdf|PDF|ppt|PPT|pptx|PPTX)$/)
+  ) {
+    return callback(new Error('Only powerpoint are allowed!'), false);
+  }
+  callback(null, true);
+};
 export const getDestination = (req, file, callback) => {
   // Bạn cần truyền loại hình ảnh từ phía client, ví dụ: req.body.imageType
   const imageType = req.headers.imagetype || '';
@@ -81,6 +89,35 @@ export class UploaderController {
     } catch (e) {
       console.error(e);
       throw new Error('Can not Upload ');
+    }
+  }
+  // ================================================================================================
+  @Post('webbookingDocumentUpload')
+  @UseInterceptors(
+    FilesInterceptor('file', 10, {
+      storage: diskStorage({
+        destination: `${process.env.FILE_PATH || 'files'}/documents`,
+        filename: editFileName,
+      }),
+      fileFilter: documentFilter,
+    }),
+  )
+  async uploadDocuments(
+    @UploadedFiles() files: Express.Multer.File[],
+  ): Promise<any> {
+    try {
+      const response = [];
+      files.forEach((file) => {
+        const fileResponse = {
+          originalname: file.originalname,
+          filename: file.filename,
+        };
+        response.push(fileResponse);
+      });
+      return response;
+    } catch (e) {
+      console.error(e);
+      throw new Error('Can not Upload document ');
     }
   }
 

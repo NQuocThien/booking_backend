@@ -6,6 +6,7 @@ import { Doctor } from 'src/modules/doctors/entities/doctor.entity';
 import { MedicalSpecialties } from 'src/modules/medical-specialties/entities/medical-specialties.entity';
 import { Package } from 'src/modules/package/entities/package.entity';
 import { Profile } from 'src/modules/profile/entity/profile.entity';
+import { LinkImage } from 'src/modules/users/dto/image';
 import { Vaccination } from 'src/modules/vaccination/entities/Vaccination.entity';
 
 // Đăng ký enum với GraphQL
@@ -52,6 +53,9 @@ export class Register {
 
   @Field()
   createdAt: Date;
+
+  @Field(() => [LinkImage], { nullable: true })
+  files: LinkImage[];
 
   @Field(() => Profile, { nullable: true })
   profile: Profile;
