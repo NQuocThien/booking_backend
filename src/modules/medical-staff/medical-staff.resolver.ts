@@ -38,7 +38,7 @@ export class MedicalStaffResolver {
   async getMedicalStaffByUserId(
     @Args('input') input: String,
   ): Promise<MedicalStaff> {
-    console.log('----> userid: ', input);
+    // console.log('----> userid: ', input);
     return await this.medicalStaffService.findByUserId(input);
   }
 

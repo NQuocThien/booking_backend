@@ -279,12 +279,15 @@ export class DoctorsResolver {
     @Args('endTime') endTime: string,
     @Args('isPending', { nullable: true, defaultValue: false })
     isPending: boolean,
+    @Args('isCancel', { nullable: true, defaultValue: false })
+    isCancel: boolean,
   ): Promise<number> {
     const count = this.registerSrv.regisDoctorCount(
       doctor.id,
       startTime,
       endTime,
       isPending,
+      isCancel,
     );
     return count;
   }

@@ -22,4 +22,7 @@ export class GetRegisPendingInput {
 
   @Field(() => ETypeOfService, { nullable: true, defaultValue: undefined })
   typeOfService: ETypeOfService | undefined;
+
+  @Field()
+  cancel: boolean;
 }

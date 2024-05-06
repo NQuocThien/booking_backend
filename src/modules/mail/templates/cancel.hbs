@@ -1,0 +1,37 @@
+<html lang='en'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>Hệ thống đăng ký khám chữa bệnh</title>
+    <style>
+      body { font-family: Arial, sans-serif; line-height: 1.6; display: flex;
+      justify-content: center; align-items: center; height: auto; margin: 0;
+      padding: 0; color: #000;} .email-container { max-width: 600px; padding:
+      20px; border: 1px solid #ccc; border-radius: 10px; background-color:
+      #f9f9f9; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); } h1 { color: #076d8b; }
+      h2{ text-align: center; color: #176a83; } ul { list-style-type: none;
+      padding: 0; color: #000; } li { margin-bottom: 10px; } strong {
+      font-weight: bold; } p{color: #000}
+    </style>
+  </head>
+  <body>
+    <div class='email-container'>
+      <h1>Hệ thống đăng ký khám chữa bệnh </h1>
+      <h2>Thông báo hủy đăng ký khám </h2>
+      <p>Xin Chào {{customerName}},</p>
+      <p>Cảm ơn bạn đã chọn dịch vụ của chúng tôi!{{content}}</p>
+      <p>Thông tin chi tiết đăng ký khám bệnh của bạn:</p>
+      <ul>
+        <li><strong>Tên hồ sơ:</strong> {{profileName}}</li>
+        <li><strong>Loại dịch vụ:</strong> {{typeService}}</li>
+        <li><strong>Dịch vụ:</strong> {{service}}</li>
+        <li><strong>Ngày khám:</strong> <strong>{{date}}</strong> </li>
+        <li><strong>Phiên khám:</strong>
+          <strong>{{startTime}}-{{endTime}}</strong>
+        </li>
+      </ul>
+      <p>Rất xin lỗi vì sự bất tiện này</p>
+      <p>Trân trọng,</p>
+    </div>
+  </body>
+</html>

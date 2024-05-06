@@ -131,6 +131,7 @@ export class MedicalFacilitiesService {
   ): Promise<MedicalFacilities[]> {
     var query: any = {};
     if (search) query.medicalFacilityName = { $regex: search, $options: 'i' };
+    query.status = { $eq: EStatusService.Open };
     if (typeOfService) {
       var ids: string[] = await this.getIdsHaveSrv(typeOfService);
       query._id = { $in: ids };

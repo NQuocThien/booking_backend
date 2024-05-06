@@ -6,6 +6,7 @@ import {
   ResolveField,
   Parent,
   Subscription,
+  Context,
 } from '@nestjs/graphql';
 import { RegisterService } from './register.service';
 import { Register } from './entities/register.entity';
@@ -43,6 +44,10 @@ import { NotificationService } from '../notification/notification.service';
 import { CreateNotificationInput } from '../notification/entities/dtos/create-notification.input';
 import { NotificationResolver } from '../notification/notification.resolver';
 import { UpLoadFileRegisInput } from './entities/dtos/upload-file.input';
+import { UseGuards } from '@nestjs/common';
+import { JWtAuthGuard } from '../auth/jwt-auth.guard';
+import { throwError } from 'rxjs';
+import { SessionInput } from '../contains/session/session.input';
 const pubSub = new PubSub();
 
 @Resolver(() => Register)
@@ -164,73 +169,77 @@ export class RegisterResolver {
   async createRegisterDoctor(
     @Args('input') input: CreateRegisterDoctorInput,
   ): Promise<Register> {
-    const isExist: Boolean = await this.regisService.isExistInDay(
+    const doctor = await this.doctorLoader.load(input.doctorId);
+    await this.checkVaildReigs(
+      ETypeOfService.Doctor,
+      input.profileId,
+      input.doctorId,
       input.date.toDateString(),
       input.session,
-      input.profileId,
+      doctor.workSchedule.numberSlot,
     );
-    if (!isExist) {
-      const res = await this.regisService.createRegisterDoctor(input);
-      this.registerLoader.clean(input.profileId);
-      this.emitRegisterPendingCreatedEvent(res);
-      return res;
-    }
-    throw new Error('!Regis Exist');
+    const res = await this.regisService.createRegisterDoctor(input);
+    this.registerLoader.clean(input.profileId);
+    this.emitRegisterPendingCreatedEvent(res);
+    return res;
   }
 
   @Mutation(() => Register, { name: 'createRegisterSpecialty' })
   async createRegisterSpecialty(
     @Args('input') input: CreateRegisterSpecialtyInput,
   ): Promise<Register> {
-    const isExist: Boolean = await this.regisService.isExistInDay(
+    const specialty = await this.specialtyLoader.load(input.specialtyId);
+    await this.checkVaildReigs(
+      ETypeOfService.Doctor,
+      input.profileId,
+      input.specialtyId,
       input.date.toDateString(),
       input.session,
-      input.profileId,
+      specialty?.workSchedule?.numberSlot,
     );
-    if (!isExist) {
-      const regiter = await this.regisService.createRegisterSpecialty(input);
-      this.registerLoader.clean(input.profileId);
-      this.emitRegisterPendingCreatedEvent(regiter);
-      return regiter;
-    }
-    throw new Error('!Regis Exist');
+    const regiter = await this.regisService.createRegisterSpecialty(input);
+    this.registerLoader.clean(input.profileId);
+    this.emitRegisterPendingCreatedEvent(regiter);
+    return regiter;
   }
 
   @Mutation(() => Register, { name: 'createRegisterPackage' })
   async createRegisterPackage(
     @Args('input') input: CreateRegisterPackageInput,
   ): Promise<Register> {
-    const isExist: Boolean = await this.regisService.isExistInDay(
+    const p = await this.packageLoader.load(input.packageId);
+    await this.checkVaildReigs(
+      ETypeOfService.Package,
+      input.profileId,
+      input.packageId,
       input.date.toDateString(),
       input.session,
-      input.profileId,
+      p.workSchedule.numberSlot,
     );
-    if (!isExist) {
-      const res = await this.regisService.createRegisterPackage(input);
-      this.registerLoader.clean(input.profileId);
-      this.emitRegisterPendingCreatedEvent(res);
+    const res = await this.regisService.createRegisterPackage(input);
+    this.registerLoader.clean(input.profileId);
+    this.emitRegisterPendingCreatedEvent(res);
 
-      return res;
-    }
-    throw new Error('!Regis Exist');
+    return res;
   }
 
   @Mutation(() => Register, { name: 'createRegisterVaccine' })
   async createRegisterVaccine(
     @Args('input') input: CreateRegisterVaccineInput,
   ): Promise<Register> {
-    const isExist: Boolean = await this.regisService.isExistInDay(
+    const vaccine = await this.vaccinationLoader.load(input.vaccineId);
+    await this.checkVaildReigs(
+      ETypeOfService.Doctor,
+      input.profileId,
+      input.vaccineId,
       input.date.toDateString(),
       input.session,
-      input.profileId,
+      vaccine?.workSchedule?.numberSlot,
     );
-    if (!isExist) {
-      const res = await this.regisService.createRegisterVaccine(input);
-      this.registerLoader.clean(input.profileId);
-      this.emitRegisterPendingCreatedEvent(res);
-      return res;
-    }
-    throw new Error('!Regis Exist');
+    const res = await this.regisService.createRegisterVaccine(input);
+    this.registerLoader.clean(input.profileId);
+    this.emitRegisterPendingCreatedEvent(res);
+    return res;
   }
 
   @Mutation(() => Register, { name: 'updateRegister' })
@@ -242,14 +251,32 @@ export class RegisterResolver {
 
   @Mutation(() => Register, { name: 'cancelRegister' })
   async cancelRegister(@Args('id') id: string): Promise<Register> {
-    return await this.regisService.cancelRegis(id);
+    const res = await this.regisService.cancelRegis(id);
+    console.log('test cancelled registration: ', res.profileId);
+    this.registerLoader.clean(res.profileId);
+    return res;
   }
 
+  @Mutation(() => Register, { name: 'cancelRegisterByAdmin' })
+  async cancelRegisterByAdmin(
+    @Args('id') id: string,
+    @Args('content') content: string,
+  ): Promise<Register> {
+    const res = await this.regisService.cancelRegis(id);
+    this.registerLoader.clean(res.profileId);
+    console.log('cancelRegisterByAdmin');
+    this.createNottifyAndEmailCancel(res, content);
+    return res;
+  }
+
+  @UseGuards(JWtAuthGuard)
   @Mutation(() => Register, { name: 'uploadFileRegister' })
   async uploadFileRegister(
     @Args('input') input: UpLoadFileRegisInput,
   ): Promise<Register> {
-    return await this.regisService.uploadFile(input);
+    const res = await this.regisService.uploadFile(input);
+    this.registerLoader.clean(res.profileId);
+    return res;
   }
 
   @Mutation(() => Register, { name: 'confirmRegister' })
@@ -258,67 +285,9 @@ export class RegisterResolver {
   ): Promise<Register> {
     const regis = await this.regisService.confirmRegister(input);
     this.callEmitRegisterCreatedEvent(regis);
-
-    const profile: Profile = await this.profileSvr.findById(regis.profileId);
-    const customer: Customer = await this.customerSrv.findById(
-      profile.customerId,
-    );
-    var service: string;
-    var notification: CreateNotificationInput = {
-      userId: '',
-      detailPath: '/account/ticket',
-      content: '',
-    };
-    if (regis.typeOfService === ETypeOfService.Doctor) {
-      service = (await this.doctorLoader.load(regis.doctorId)).doctorName;
-    }
-    if (regis.typeOfService === ETypeOfService.Package) {
-      service = (await this.packageLoader.load(regis.packageId)).packageName;
-    }
-    if (regis.typeOfService === ETypeOfService.Specialty) {
-      service = (await this.specialtyLoader.load(regis.specialtyId))
-        .specialtyName;
-    }
-    if (regis.typeOfService === ETypeOfService.Vaccine) {
-      service = (await this.vaccinationLoader.load(regis.vaccineId))
-        .vaccineName;
-    }
-
-    if (profile && customer) {
-      notification.userId = customer.userId;
-      const date: string = `${regis.date.getDate()} / ${
-        regis.date.getMonth() + 1
-      } / ${regis.date.getFullYear()}`;
-      if (regis.state === EStateRegister.Approved) {
-        notification.content = `Đã duyệt ${regis.typeOfService} "${service}"`;
-        this.emailService.sendUserConfirmation(
-          profile.email,
-          customer.fullname,
-          profile.fullname,
-          regis.typeOfService,
-          service,
-          date,
-          regis.session.startTime,
-          regis.session.endTime,
-        );
-      } else if (regis.state === EStateRegister.Success) {
-        notification.content = `Đã khám ${regis.typeOfService} "${service}"`;
-        this.emailService.sendUserSuccesss(
-          profile.email,
-          customer.fullname,
-          profile.fullname,
-          regis.typeOfService,
-          service,
-          date,
-          regis.session.startTime,
-          regis.session.endTime,
-        );
-      }
-    }
-    // subscription cho user
-    await this.notificationSrv
-      .create(notification)
-      .then((res) => this.notificationResolver.emitNotifyCreatedEvent(res));
+    this.registerLoader.clean(regis.profileId);
+    // tạo thông báo
+    await this.createNottifyAndEmail(regis);
     return regis;
   }
 
@@ -496,5 +465,245 @@ export class RegisterResolver {
     )
       return true;
     return false;
+  }
+  //======================================= TOOLS =================================================
+
+  checkSessionExist(ss1: SessionInput, ss2: SessionInput): boolean {
+    const ss1Start = new Date(`1970-01-01T${ss1.startTime}`);
+    const ss1End = new Date(`1970-01-01T${ss1.endTime}`);
+    const ss2Start = new Date(`1970-01-01T${ss2.startTime}`);
+    const ss2End = new Date(`1970-01-01T${ss2.endTime}`);
+    if (
+      (ss1Start < ss2Start && ss2Start < ss1End) ||
+      (ss1Start < ss2End && ss2End < ss1End)
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  async checkVaildReigs(
+    typeOfService: ETypeOfService,
+    profileId: string,
+    serviceId: string,
+    date: string,
+    session: SessionInput,
+    maxSlot?: number,
+  ) {
+    const allRegisDateSession = await this.regisService.getRegisDate(date);
+    const isExistProfileInSesssion = allRegisDateSession.find(
+      (r) =>
+        (r.profileId === profileId &&
+          this.checkSessionExist(r.session, session)) ||
+        (r.session.startTime === session.startTime &&
+          r.session.endTime === session.endTime),
+    );
+    const regisProfileInDay = allRegisDateSession.filter(
+      (r) => r.profileId === profileId,
+    ).length;
+    const isExistService = (): boolean => {
+      if (typeOfService === ETypeOfService.Doctor)
+        return !!allRegisDateSession.find(
+          (r) => r.profileId === profileId && r.doctorId === serviceId,
+        );
+      if (typeOfService === ETypeOfService.Package)
+        return !!allRegisDateSession.find(
+          (r) => r.profileId === profileId && r.packageId === serviceId,
+        );
+      if (typeOfService === ETypeOfService.Specialty)
+        return !!allRegisDateSession.find(
+          (r) => r.profileId === profileId && r.specialtyId === serviceId,
+        );
+      if (typeOfService === ETypeOfService.Vaccine)
+        return !!allRegisDateSession.find(
+          (r) => r.profileId === profileId && r.vaccineId === serviceId,
+        );
+    };
+    const countRegisOfSession = (): number => {
+      if (typeOfService === ETypeOfService.Doctor)
+        return allRegisDateSession.filter(
+          (r) =>
+            r.doctorId === serviceId &&
+            r.session.startTime === session.startTime &&
+            r.session.endTime === session.endTime,
+        ).length;
+      if (typeOfService === ETypeOfService.Package)
+        return allRegisDateSession.filter(
+          (r) =>
+            r.packageId === serviceId &&
+            r.session.startTime === session.startTime &&
+            r.session.endTime === session.endTime,
+        ).length;
+      if (typeOfService === ETypeOfService.Vaccine)
+        return allRegisDateSession.filter(
+          (r) =>
+            r.vaccineId === serviceId &&
+            r.session.startTime === session.startTime &&
+            r.session.endTime === session.endTime,
+        ).length;
+      if (typeOfService === ETypeOfService.Specialty)
+        return allRegisDateSession.filter(
+          (r) =>
+            r.specialtyId === serviceId &&
+            r.session.startTime === session.startTime &&
+            r.session.endTime === session.endTime,
+        ).length;
+    };
+    // ----------------------------------------------------------------
+    if (isExistProfileInSesssion) {
+      throw new Error('Phiên khám đã tồn tại'); // check
+    }
+    if (regisProfileInDay > 5) {
+      throw new Error('Quá lượt đăng ký tối đa trong ngày'); // check
+    }
+    if (isExistService()) {
+      throw new Error('Dịch vụ khám đã đăng ký trong ngày'); // check
+    }
+    if (maxSlot && countRegisOfSession() >= maxSlot) {
+      throw new Error('Phiên khám đã hết lượt');
+    }
+  }
+  async createNottifyAndEmailCancel(regis: Register, content: string) {
+    const profile: Profile = await this.profileSvr.findById(regis.profileId);
+    const customer: Customer = await this.customerSrv.findById(
+      profile.customerId,
+    );
+    var service: string;
+    var facilityName: string;
+
+    if (regis.typeOfService === ETypeOfService.Doctor) {
+      const doctor = await this.doctorLoader.load(regis.doctorId);
+      service = doctor.doctorName;
+      facilityName = (
+        await this.facilityLoaderSrv.load(doctor.medicalFactilitiesId)
+      ).medicalFacilityName;
+    }
+    if (regis.typeOfService === ETypeOfService.Package) {
+      const p = await this.packageLoader.load(regis.packageId);
+      service = p.packageName;
+      facilityName = (await this.facilityLoaderSrv.load(p.medicalFactilitiesId))
+        .medicalFacilityName;
+    }
+    if (regis.typeOfService === ETypeOfService.Specialty) {
+      const specialty = await this.specialtyLoader.load(regis.specialtyId);
+      service = specialty.specialtyName;
+      facilityName = (
+        await this.facilityLoaderSrv.load(specialty.medicalFactilityId)
+      ).medicalFacilityName;
+    }
+    if (regis.typeOfService === ETypeOfService.Vaccine) {
+      const vaccine = await this.vaccinationLoader.load(regis.vaccineId);
+      service = vaccine.vaccineName;
+      facilityName = (
+        await this.facilityLoaderSrv.load(vaccine.medicalFactilitiesId)
+      ).medicalFacilityName;
+    }
+
+    var notification: CreateNotificationInput = {
+      userId: '',
+      detailPath: `/account/ticket`,
+      content: '',
+    };
+
+    if (profile && customer) {
+      notification.userId = customer.userId;
+      const date: string = `${regis.date.getDate()}/${
+        regis.date.getMonth() + 1
+      }/${regis.date.getFullYear()}`;
+      if (regis.cancel === true) {
+        notification.content = `Đã hủy đăng ký của hồ sơ "${profile.fullname}" ${regis.typeOfService} "${service}" ngày "${regis.session.startTime}" ngày "${date}" bởi "${facilityName}" vì ${content}`;
+        this.emailService.sendMailCancel(
+          profile.email,
+          customer.fullname,
+          profile.fullname,
+          regis.typeOfService,
+          service,
+          date,
+          regis.session.startTime,
+          regis.session.endTime,
+          content,
+        );
+      }
+    }
+    // subscription cho user
+    await this.notificationSrv
+      .create(notification)
+      .then((res) => this.notificationResolver.emitNotifyCreatedEvent(res));
+  }
+  async createNottifyAndEmail(regis: Register) {
+    const profile: Profile = await this.profileSvr.findById(regis.profileId);
+    const customer: Customer = await this.customerSrv.findById(
+      profile.customerId,
+    );
+    var service: string;
+    var facilityName: string;
+    var notification: CreateNotificationInput = {
+      userId: '',
+      detailPath: `/account/ticket/${regis.id}`,
+      content: '',
+    };
+    if (regis.typeOfService === ETypeOfService.Doctor) {
+      const doctor = await this.doctorLoader.load(regis.doctorId);
+      service = doctor.doctorName;
+      facilityName = (
+        await this.facilityLoaderSrv.load(doctor.medicalFactilitiesId)
+      ).medicalFacilityName;
+    }
+    if (regis.typeOfService === ETypeOfService.Package) {
+      const p = await this.packageLoader.load(regis.packageId);
+      service = p.packageName;
+      facilityName = (await this.facilityLoaderSrv.load(p.medicalFactilitiesId))
+        .medicalFacilityName;
+    }
+    if (regis.typeOfService === ETypeOfService.Specialty) {
+      const specialty = await this.specialtyLoader.load(regis.specialtyId);
+      service = specialty.specialtyName;
+      facilityName = (
+        await this.facilityLoaderSrv.load(specialty.medicalFactilityId)
+      ).medicalFacilityName;
+    }
+    if (regis.typeOfService === ETypeOfService.Vaccine) {
+      const vaccine = await this.vaccinationLoader.load(regis.vaccineId);
+      service = vaccine.vaccineName;
+      facilityName = (
+        await this.facilityLoaderSrv.load(vaccine.medicalFactilitiesId)
+      ).medicalFacilityName;
+    }
+
+    if (profile && customer) {
+      notification.userId = customer.userId;
+      const date: string = `${regis.date.getDate()}/${
+        regis.date.getMonth() + 1
+      }/${regis.date.getFullYear()}`;
+      if (regis.state === EStateRegister.Approved) {
+        notification.content = `Đã duyệt đăng ký ${regis.typeOfService} "${service}" bệnh nhân đến "${facilityName}" trước "${regis.session.startTime}" ngày "${date}"`;
+        this.emailService.sendUserConfirmation(
+          profile.email,
+          customer.fullname,
+          profile.fullname,
+          regis.typeOfService,
+          service,
+          date,
+          regis.session.startTime,
+          regis.session.endTime,
+        );
+      } else if (regis.state === EStateRegister.Success) {
+        notification.content = `Hoàn thành ${regis.typeOfService} "${service}" cảm ơn bạn đã chọn dịch vụ của "${facilityName}"`;
+        this.emailService.sendUserSuccesss(
+          profile.email,
+          customer.fullname,
+          profile.fullname,
+          regis.typeOfService,
+          service,
+          date,
+          regis.session.startTime,
+          regis.session.endTime,
+        );
+      }
+    }
+    // subscription cho user
+    await this.notificationSrv
+      .create(notification)
+      .then((res) => this.notificationResolver.emitNotifyCreatedEvent(res));
   }
 }

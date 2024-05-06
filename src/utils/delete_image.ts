@@ -50,3 +50,21 @@ export default async function deleteImage(
       .catch((e) => console.log('\t --> error:', e.message));
   }
 }
+export async function deleteDocument(linkDocument: LinkImage) {
+  if (linkDocument?.url) {
+    var documentDirectory = `${process.env.FILE_PATH || 'files'}/documents`;
+    const items = linkDocument.url.split('/');
+    const filename = items[items.length - 1];
+    const imagePath = `${documentDirectory}/${filename}`;
+    await fsPromises
+      .stat(imagePath)
+      .then((imageStat) => {
+        console.log('\t --> Document found:', imageStat.isFile());
+        if (imageStat.isFile()) {
+          fsPromises.unlink(imagePath);
+          console.log('\t --> deleted old Document:', linkDocument.filename);
+        }
+      })
+      .catch((e) => console.log('\t --> error:', e.message));
+  }
+}

@@ -7,6 +7,9 @@ export class Evaluate {
   userId: string;
 
   @Prop()
+  customerName: string;
+
+  @Prop()
   registerId?: string;
 
   @Prop()
@@ -14,5 +17,26 @@ export class Evaluate {
 
   @Prop()
   rating: Number;
+
+  @Prop()
+  typeOfService: string;
+
+  @Prop()
+  specialtyId?: String;
+
+  @Prop()
+  doctorId?: String;
+
+  @Prop()
+  packageId?: String;
+
+  @Prop()
+  vaccineId?: String;
+
+  @Prop()
+  createdAt?: Number;
+
+  @Prop()
+  updatedAt?: Number;
 }
 export const EvaluateSchema = SchemaFactory.createForClass(Evaluate);

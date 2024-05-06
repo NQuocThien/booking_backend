@@ -7,7 +7,7 @@ export class CreateRegisterPackageInput {
   profileId: string;
 
   @Field()
-  packageId?: String;
+  packageId?: string;
 
   @Field(() => SessionInput)
   session: SessionInput;

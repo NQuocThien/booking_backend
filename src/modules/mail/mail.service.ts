@@ -57,4 +57,32 @@ export class MailService {
       },
     });
   }
+  async sendMailCancel(
+    email: string,
+    customerName: string,
+    profileName: string,
+    typeService: string,
+    service: string,
+    date: string,
+    startTime: string,
+    endTime: string,
+    content: string,
+  ) {
+    await this.mailerService.sendMail({
+      to: email,
+      // from: '"Support Team" <support@example.com>', // override default from
+      subject: 'Thông báo trạng thái đăng ký BookingCare',
+      template: './cancel', // `.hbs` extension is appended automatically
+      context: {
+        customerName: customerName,
+        profileName: profileName,
+        typeService: typeService,
+        service: service,
+        date: date,
+        startTime: startTime,
+        endTime: endTime,
+        content: content,
+      },
+    });
+  }
 }

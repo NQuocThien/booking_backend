@@ -16,6 +16,8 @@ import { GetRegisPendingInput } from './entities/dtos/get-regis-pending.input';
 import { GetRegisHistoryInput } from './entities/dtos/get-register-history.input copy';
 import { SessionInput } from '../contains/session/session.input';
 import { UpLoadFileRegisInput } from './entities/dtos/upload-file.input';
+import { LinkImage } from '../users/dto/image';
+import { deleteDocument } from 'src/utils/delete_image';
 @Injectable()
 export class RegisterService {
   constructor(
@@ -31,6 +33,7 @@ export class RegisterService {
     date: string,
     session: SessionInput,
     profileId: string,
+    maxslot?: number,
   ): Promise<Boolean> {
     const startOfDay = new Date(date);
     startOfDay.setHours(0, 0, 0, 0);
@@ -45,6 +48,21 @@ export class RegisterService {
         },
       })
       .exec();
+    if (maxslot) {
+      const allRegisSession = await this.model
+        .count({
+          date: {
+            $gte: startOfDay,
+            $lte: endOfDay,
+          },
+          'session.startTime': { $eq: session.startTime },
+          'session.endTime': { $eq: session.endTime },
+        })
+        .exec();
+      if (allRegisSession > maxslot) {
+        throw new Error('Phiên khám đã đầy!');
+      }
+    }
     if (regis.length > 5) return true;
     if (
       regis.find(
@@ -57,6 +75,21 @@ export class RegisterService {
     return false;
   }
 
+  async getRegisDate(date: string): Promise<Register[]> {
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+    const regis = await this.model
+      .find({
+        date: {
+          $gte: startOfDay,
+          $lte: endOfDay,
+        },
+      })
+      .exec();
+    return regis;
+  }
   async createRegisterDoctor(
     data: CreateRegisterDoctorInput,
   ): Promise<Register> {
@@ -117,6 +150,7 @@ export class RegisterService {
     query.$or.push({ vaccineId: { $in: input.vaccineIds } });
 
     query.state = { $eq: EStateRegister.Pending };
+    query.cancel = { $eq: input.cancel };
     const data = await this.model
       .find({
         ...query,
@@ -242,21 +276,13 @@ export class RegisterService {
 
   async cancelRegis(id: string): Promise<Register> {
     try {
-      const existingDoc = await this.model.findByIdAndUpdate(
+      const updateDoc = await this.model.findByIdAndUpdate(
         id,
         { cancel: true },
         { new: true },
       );
-      if (!existingDoc) {
-        return null;
-      }
-      const newDoc = {
-        ...existingDoc,
-        cancel: true,
-      };
-      Object.assign(existingDoc, newDoc);
-      const updatedDoc = await existingDoc.save();
-      return updatedDoc;
+
+      return updateDoc;
     } catch (error) {
       console.error('Error updating document:', error);
       return null;
@@ -264,12 +290,23 @@ export class RegisterService {
   }
   async uploadFile(input: UpLoadFileRegisInput): Promise<Register> {
     try {
-      const res = await this.model.findByIdAndUpdate(
-        input.id,
-        { files: input.files },
-        { new: true },
+      const oldDoc = await this.model.findById(input.id);
+      if (!oldDoc) {
+        return null;
+      }
+      const fileDeleted: LinkImage[] = oldDoc.files.filter(
+        (f) => !input.files.find((olf) => olf.url === f.url),
       );
-      return res;
+      // console.log(' -->  file old: ', oldDoc.files);
+      // console.log(' -->  file new: ', input.files);
+      // console.log(' -->  file delete: ', fileDeleted);
+      for (var doc of fileDeleted) {
+        deleteDocument(doc);
+      }
+      Object.assign(oldDoc, { files: input.files });
+
+      const updatedDoc = await oldDoc.save();
+      return updatedDoc;
     } catch (error) {
       console.error('Error updating document:', error);
       return null;
@@ -309,6 +346,7 @@ export class RegisterService {
     startTime: string,
     endTime: string,
     isPending: boolean = false,
+    isCancel: boolean = false,
   ): Promise<number> {
     const startDate = new Date(startTime);
     const endDate = new Date(endTime);
@@ -321,6 +359,7 @@ export class RegisterService {
       $gte: startDate,
       $lte: endDate,
     };
+    query.cancel = { $eq: isCancel };
     if (isPending) query.state = { $eq: EStateRegister.Pending };
     else query.state = { $ne: EStateRegister.Pending };
 
@@ -334,6 +373,7 @@ export class RegisterService {
     startTime: string,
     endTime: string,
     isPending: boolean = false,
+    isCancel: boolean = false,
   ): Promise<number> {
     const startDate = new Date(startTime);
     const endDate = new Date(endTime);
@@ -346,6 +386,7 @@ export class RegisterService {
       $gte: startDate,
       $lte: endDate,
     };
+    query.cancel = { $eq: isCancel };
     if (isPending) query.state = { $eq: EStateRegister.Pending };
     else query.state = { $ne: EStateRegister.Pending };
 
@@ -359,6 +400,7 @@ export class RegisterService {
     startTime: string,
     endTime: string,
     isPending: boolean = false,
+    isCancel: boolean = false,
   ): Promise<number> {
     const startDate = new Date(startTime);
     const endDate = new Date(endTime);
@@ -371,9 +413,9 @@ export class RegisterService {
       $gte: startDate,
       $lte: endDate,
     };
+    query.cancel = isCancel;
     if (isPending) query.state = { $eq: EStateRegister.Pending };
     else query.state = { $ne: EStateRegister.Pending };
-
     const count = await this.model
       .count({
         ...query,
@@ -386,6 +428,7 @@ export class RegisterService {
     startTime: string,
     endTime: string,
     isPending: boolean = false,
+    isCancel: boolean = false,
   ): Promise<number> {
     const startDate = new Date(startTime);
     const endDate = new Date(endTime);
@@ -398,6 +441,7 @@ export class RegisterService {
       $gte: startDate,
       $lte: endDate,
     };
+    query.cancel = { $eq: isCancel };
     if (isPending) query.state = { $eq: EStateRegister.Pending };
     else query.state = { $ne: EStateRegister.Pending };
 

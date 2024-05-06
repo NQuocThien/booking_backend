@@ -7,7 +7,7 @@ export class CreateRegisterVaccineInput {
   profileId: string;
 
   @Field()
-  vaccineId?: String;
+  vaccineId?: string;
 
   @Field(() => SessionInput)
   session: SessionInput;

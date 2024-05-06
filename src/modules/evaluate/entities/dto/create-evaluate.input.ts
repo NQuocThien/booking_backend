@@ -1,35 +1,34 @@
-import {
-  ObjectType,
-  Field,
-  ID,
-  registerEnumType,
-  InputType,
-} from '@nestjs/graphql';
-import { EAcademicTitle, EDegree, EGender, EStatusService } from 'src/contain';
+import { Field, InputType } from '@nestjs/graphql';
+import { ETypeOfService } from 'src/contain';
 @InputType()
 export class CreateEvaluateInput {
   @Field()
   userId: string;
 
   @Field()
-  registerId?: string;
+  registerId: string;
 
   @Field()
-  comment: String;
+  customerName: string;
+
+  @Field(() => ETypeOfService)
+  typeOfService: ETypeOfService;
+
+  @Field({ nullable: true })
+  specialtyId: string;
+
+  @Field({ nullable: true })
+  doctorId: string;
+
+  @Field({ nullable: true })
+  packageId?: string;
+
+  @Field({ nullable: true })
+  vaccineId?: string;
+
+  @Field()
+  comment: string;
 
   @Field()
   rating: number;
 }
-
-registerEnumType(EDegree, {
-  name: 'EDegree',
-});
-registerEnumType(EAcademicTitle, {
-  name: 'EAcademicTitle',
-});
-registerEnumType(EGender, {
-  name: 'EGender',
-});
-registerEnumType(EStatusService, {
-  name: 'EStatusService',
-});

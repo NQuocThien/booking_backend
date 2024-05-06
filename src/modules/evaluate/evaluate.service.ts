@@ -4,6 +4,7 @@ import { Evaluate } from './entities/evaluate.entity';
 import { Model } from 'mongoose';
 import { CreateEvaluateInput } from './entities/dto/create-evaluate.input';
 import { UpdateEvaluateInput } from './entities/dto/update-evaluate.input';
+import { GetEvaluateOptionInput } from './entities/dto/get-evaluate-option.input';
 
 @Injectable()
 export class EvaluateService {
@@ -16,6 +17,14 @@ export class EvaluateService {
     return this.doctorModel.findById(id);
   }
 
+  async findByOption(option: GetEvaluateOptionInput): Promise<Evaluate[]> {
+    return this.doctorModel.find({ ...option });
+  }
+
+  async findOneByRegisId(id: String): Promise<Evaluate> {
+    return this.doctorModel.findOne({ registerId: id }).exec();
+  }
+
   async delete(id: String): Promise<Evaluate> {
     return this.doctorModel.findByIdAndDelete(id);
   }
@@ -23,19 +32,16 @@ export class EvaluateService {
   async create(data: CreateEvaluateInput) {
     return await this.doctorModel.create(data);
   }
+
   async updateById(data: UpdateEvaluateInput) {
     try {
       const existingDoc = await this.doctorModel.findById(data.id);
 
       if (!existingDoc) {
-        // console.log('Document not found for ID:', data.id);
         return null;
       }
-      // Cập nhật dữ liệu từ input vào existingDoc
       Object.assign(existingDoc, data);
-      // Lưu tài liệu đã cập nhật
       const updatedDoc = await existingDoc.save();
-      // console.log('---> Updated document:', updatedDoc);
       return updatedDoc;
     } catch (error) {
       return null;
