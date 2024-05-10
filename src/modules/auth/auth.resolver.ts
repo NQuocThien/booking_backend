@@ -8,9 +8,28 @@ import { User } from '../users/entities/user.entity';
 import { CreateUserInput } from './dto/create-user.input';
 import { LogoutUser } from './dto/logout-user';
 import { CreateUserByAdminInput } from './dto/create-user-by-admin.input';
+import { CreateDoctorAndUserInput } from './dto/create-doctor-and-user.input';
+import { JWtAuthGuard } from './jwt-auth.guard';
+import { Roles } from './roles.decorator';
+import { Role } from './entities/role.enum';
+import { Doctor } from '../doctors/entities/doctor.entity';
+import { MedicalFacilitiesService } from '../medical-facilities/medical-facilities.service';
+import { FacilitiesLoaderService } from '../medical-facilities/facility-loader';
+import { MedicalStaffService } from '../medical-staff/medical-staff.service';
+import { EPermission } from 'src/contain';
+import { UsersService } from '../users/users.service';
+import { UpdateUserAndDoctorInput } from './dto/update-doctor-and-user.input';
+import { CreatUserAndStaffInput } from './dto/create-staff-and-user.input';
+import { MedicalStaff } from '../medical-staff/entities/medical-staff.entity';
+import { UpdateUserAndStaffInput } from './dto/update-staff-and-user.input';
 @Resolver()
 export class AuthResolver {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private readonly facilityLoaderSrv: FacilitiesLoaderService,
+    private readonly staffSrv: MedicalStaffService,
+    private readonly userSrv: UsersService,
+  ) {}
   @Mutation(() => LoginRespone)
   @UseGuards(GqlAuthGruard)
   login(
@@ -30,7 +49,110 @@ export class AuthResolver {
   signupUser(@Args('createUserInput') LoginUserInput: CreateUserByAdminInput) {
     return this.authService.signupUser(LoginUserInput);
   }
-
+  //---------------------------------------------------------------
+  @UseGuards(JWtAuthGuard)
+  @Roles(Role.Facility, Role.Staff)
+  @Mutation(() => Doctor, { name: 'signupAndCreateDoctor' })
+  async signupAndCreateDoctor(
+    @Args('input') input: CreateDoctorAndUserInput,
+    @Context() context,
+  ): Promise<Doctor> {
+    const username = context.req.user.username;
+    const currentUser = await this.userSrv.findOne(username);
+    const facility = await this.facilityLoaderSrv.load(
+      input.medicalFactilitiesId,
+    );
+    if (facility)
+      if (facility.userId === currentUser.id)
+        return this.authService.signupAndCreateDoctor(input);
+      else if (currentUser.roles.includes(Role.Staff)) {
+        const staff = await this.staffSrv.findByUserId(currentUser.id);
+        if (
+          staff.medicalFacilityId === facility.id &&
+          staff.permissions.includes(EPermission.Magager)
+        ) {
+          return this.authService.signupAndCreateDoctor(input);
+        }
+      }
+  }
+  //---------------------------------------------------------------
+  //---------------------------------------------------------------
+  @UseGuards(JWtAuthGuard)
+  @Roles(Role.Facility, Role.Staff)
+  @Mutation(() => Doctor, { name: 'updateUserAndDoctor' })
+  async updateUserAndDoctor(
+    @Args('input') input: UpdateUserAndDoctorInput,
+    @Context() context,
+  ): Promise<Doctor> {
+    const username = context.req.user.username;
+    const currentUser = await this.userSrv.findOne(username);
+    const facility = await this.facilityLoaderSrv.load(
+      input.medicalFactilitiesId,
+    );
+    if (facility)
+      if (facility.userId === currentUser.id)
+        return this.authService.updateUserAndDoctor(input);
+      else if (currentUser.roles.includes(Role.Staff)) {
+        const staff = await this.staffSrv.findByUserId(currentUser.id);
+        if (
+          staff.medicalFacilityId === facility.id &&
+          staff.permissions.includes(EPermission.Magager)
+        ) {
+          return this.authService.updateUserAndDoctor(input);
+        }
+      }
+  }
+  //---------------------------------------------------------------
+  //---------------------------------------------------------------
+  @UseGuards(JWtAuthGuard)
+  @Roles(Role.Facility, Role.Staff)
+  @Mutation(() => MedicalStaff, { name: 'createUserAndStaff' })
+  async createUserAndStaff(
+    @Args('input') input: CreatUserAndStaffInput,
+    @Context() context,
+  ): Promise<MedicalStaff> {
+    const username = context.req.user.username;
+    const currentUser = await this.userSrv.findOne(username);
+    const facility = await this.facilityLoaderSrv.load(input.medicalFacilityId);
+    if (facility)
+      if (facility.userId === currentUser.id)
+        return this.authService.signupAndCreateStaff(input);
+      else if (currentUser.roles.includes(Role.Staff)) {
+        const staff = await this.staffSrv.findByUserId(currentUser.id);
+        if (
+          staff.medicalFacilityId === facility.id &&
+          staff.permissions.includes(EPermission.Magager)
+        ) {
+          return this.authService.signupAndCreateStaff(input);
+        }
+      }
+  }
+  //---------------------------------------------------------------
+  //---------------------------------------------------------------
+  @UseGuards(JWtAuthGuard)
+  @Roles(Role.Facility, Role.Staff)
+  @Mutation(() => MedicalStaff, { name: 'updateUserAndStaff' })
+  async updateUserAndStaff(
+    @Args('input') input: UpdateUserAndStaffInput,
+    @Context() context,
+  ): Promise<MedicalStaff> {
+    const username = context.req.user.username;
+    const currentUser = await this.userSrv.findOne(username);
+    const facility = await this.facilityLoaderSrv.load(input.medicalFacilityId);
+    if (facility)
+      if (facility.userId === currentUser.id)
+        return this.authService.updateUserAndStaff(input);
+      else if (currentUser.roles.includes(Role.Staff)) {
+        const staff = await this.staffSrv.findByUserId(currentUser.id);
+        if (
+          staff.medicalFacilityId === facility.id &&
+          staff.permissions.includes(EPermission.Magager)
+        ) {
+          return this.authService.updateUserAndStaff(input);
+        }
+      }
+  }
+  //---------------------------------------------------------------
   @Mutation(() => LogoutUser)
   async logout(@Context() context) {
     context.user = null;

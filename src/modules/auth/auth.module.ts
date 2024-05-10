@@ -9,8 +9,10 @@ import { JwtModule } from '@nestjs/jwt/dist';
 import { JwtStrategy } from './jwt.strategy';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserSchema } from '../users/schema/user.schema';
-// import { ProfileModule } from '../profile/profile.module';
 import { CustomerModule } from '../customer/customer.module';
+import { DoctorsModule } from '../doctors/doctors.module';
+import { MedicalFacilitiesModule } from '../medical-facilities/medical-facilities.module';
+import { MedicalStaffModule } from '../medical-staff/medical-staff.module';
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -26,6 +28,9 @@ import { CustomerModule } from '../customer/customer.module';
       signOptions: { expiresIn: '4h' },
       secret: 'hiden-me',
     }),
+    DoctorsModule,
+    MedicalFacilitiesModule,
+    MedicalStaffModule,
   ],
   providers: [
     AuthService,

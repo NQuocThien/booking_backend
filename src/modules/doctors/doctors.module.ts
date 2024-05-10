@@ -9,6 +9,7 @@ import { MedicalFacilitiesModule } from '../medical-facilities/medical-facilitie
 import { MedicalStaffModule } from '../medical-staff/medical-staff.module';
 import { DoctorLoaderService } from './doctor-loader.service';
 import { RegisterModule } from '../register/register.module';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { RegisterModule } from '../register/register.module';
     forwardRef(() => MedicalFacilitiesModule),
     forwardRef(() => RegisterModule),
     MedicalStaffModule,
+    // forwardRef(() => AuthModule),
   ],
   providers: [DoctorsResolver, DoctorsService, DoctorLoaderService],
   exports: [DoctorsService, DoctorLoaderService],

@@ -6,7 +6,6 @@ import {
   ResolveField,
   Parent,
   Subscription,
-  Context,
 } from '@nestjs/graphql';
 import { RegisterService } from './register.service';
 import { Register } from './entities/register.entity';
@@ -28,14 +27,11 @@ import { MedicalSpecialtiesLoaderService } from '../medical-specialties/medical-
 import { PackageLoaderService } from '../package/package-loader.service';
 import { DoctorLoaderService } from '../doctors/doctor-loader.service';
 import { VaccinationLoaderService } from '../vaccination/vaccination-loader.service';
-import { MedicalFacilitiesService } from '../medical-facilities/medical-facilities.service';
 import { RegisterLoaderService } from './register-loader.service';
 import { GetRegisPendingInput } from './entities/dtos/get-regis-pending.input';
-import { start } from 'repl';
 import { GetRegisHistoryInput } from './entities/dtos/get-register-history.input copy';
 import { FacilitiesLoaderService } from '../medical-facilities/facility-loader';
 import { StaffLoaderService } from '../medical-staff/staff-loader';
-import { profile } from 'console';
 import { MailService } from '../mail/mail.service';
 import { CustomerService } from '../customer/customer.service';
 import { Customer } from '../customer/entities/customer.entity';
@@ -46,7 +42,6 @@ import { NotificationResolver } from '../notification/notification.resolver';
 import { UpLoadFileRegisInput } from './entities/dtos/upload-file.input';
 import { UseGuards } from '@nestjs/common';
 import { JWtAuthGuard } from '../auth/jwt-auth.guard';
-import { throwError } from 'rxjs';
 import { SessionInput } from '../contains/session/session.input';
 const pubSub = new PubSub();
 
@@ -179,6 +174,7 @@ export class RegisterResolver {
       doctor.workSchedule.numberSlot,
     );
     const res = await this.regisService.createRegisterDoctor(input);
+    this.createNottifyAndEmail(res);
     this.registerLoader.clean(input.profileId);
     this.emitRegisterPendingCreatedEvent(res);
     return res;
@@ -198,6 +194,7 @@ export class RegisterResolver {
       specialty?.workSchedule?.numberSlot,
     );
     const regiter = await this.regisService.createRegisterSpecialty(input);
+    this.createNottifyAndEmail(regiter);
     this.registerLoader.clean(input.profileId);
     this.emitRegisterPendingCreatedEvent(regiter);
     return regiter;
@@ -237,6 +234,7 @@ export class RegisterResolver {
       vaccine?.workSchedule?.numberSlot,
     );
     const res = await this.regisService.createRegisterVaccine(input);
+    this.createNottifyAndEmail(res);
     this.registerLoader.clean(input.profileId);
     this.emitRegisterPendingCreatedEvent(res);
     return res;
@@ -252,7 +250,6 @@ export class RegisterResolver {
   @Mutation(() => Register, { name: 'cancelRegister' })
   async cancelRegister(@Args('id') id: string): Promise<Register> {
     const res = await this.regisService.cancelRegis(id);
-    console.log('test cancelled registration: ', res.profileId);
     this.registerLoader.clean(res.profileId);
     return res;
   }
@@ -264,7 +261,6 @@ export class RegisterResolver {
   ): Promise<Register> {
     const res = await this.regisService.cancelRegis(id);
     this.registerLoader.clean(res.profileId);
-    console.log('cancelRegisterByAdmin');
     this.createNottifyAndEmailCancel(res, content);
     return res;
   }
@@ -449,9 +445,7 @@ export class RegisterResolver {
   @ResolveField(() => MedicalSpecialties, { name: 'specialty' })
   async specialty(@Parent() regis: Register): Promise<MedicalSpecialties> {
     if (regis?.specialtyId) {
-      // console.log('Call Specialties:', regis.specialtyId);
       const data = await this.specialtyLoader.load(regis.specialtyId);
-      // console.log('Call Specialties data', data);
 
       return data;
     } else return null;
@@ -565,6 +559,7 @@ export class RegisterResolver {
   }
   async createNottifyAndEmailCancel(regis: Register, content: string) {
     const profile: Profile = await this.profileSvr.findById(regis.profileId);
+    const isShare = !!regis.createdBy;
     const customer: Customer = await this.customerSrv.findById(
       profile.customerId,
     );
@@ -612,6 +607,13 @@ export class RegisterResolver {
       }/${regis.date.getFullYear()}`;
       if (regis.cancel === true) {
         notification.content = `Đã hủy đăng ký của hồ sơ "${profile.fullname}" ${regis.typeOfService} "${service}" ngày "${regis.session.startTime}" ngày "${date}" bởi "${facilityName}" vì ${content}`;
+        notification.detailPath = '/account/ticket';
+        if (isShare)
+          this.createNottifyAndEmailByCustomerKey(
+            regis,
+            notification.content,
+            notification.detailPath,
+          );
         this.emailService.sendMailCancel(
           profile.email,
           customer.fullname,
@@ -635,13 +637,15 @@ export class RegisterResolver {
     const customer: Customer = await this.customerSrv.findById(
       profile.customerId,
     );
+    const isShare = !!regis?.createdBy;
     var service: string;
     var facilityName: string;
     var notification: CreateNotificationInput = {
       userId: '',
-      detailPath: `/account/ticket/${regis.id}`,
+      detailPath: '',
       content: '',
     };
+    // service + facilityName
     if (regis.typeOfService === ETypeOfService.Doctor) {
       const doctor = await this.doctorLoader.load(regis.doctorId);
       service = doctor.doctorName;
@@ -669,7 +673,7 @@ export class RegisterResolver {
         await this.facilityLoaderSrv.load(vaccine.medicalFactilitiesId)
       ).medicalFacilityName;
     }
-
+    // gán
     if (profile && customer) {
       notification.userId = customer.userId;
       const date: string = `${regis.date.getDate()}/${
@@ -677,6 +681,13 @@ export class RegisterResolver {
       }/${regis.date.getFullYear()}`;
       if (regis.state === EStateRegister.Approved) {
         notification.content = `Đã duyệt đăng ký ${regis.typeOfService} "${service}" bệnh nhân đến "${facilityName}" trước "${regis.session.startTime}" ngày "${date}"`;
+        notification.detailPath = '/account/ticket';
+        if (isShare)
+          this.createNottifyAndEmailByCustomerKey(
+            regis,
+            notification.content,
+            notification.detailPath,
+          );
         this.emailService.sendUserConfirmation(
           profile.email,
           customer.fullname,
@@ -689,6 +700,13 @@ export class RegisterResolver {
         );
       } else if (regis.state === EStateRegister.Success) {
         notification.content = `Hoàn thành ${regis.typeOfService} "${service}" cảm ơn bạn đã chọn dịch vụ của "${facilityName}"`;
+        notification.detailPath = `/account/ticket/${regis.id}`;
+        if (isShare)
+          this.createNottifyAndEmailByCustomerKey(
+            regis,
+            notification.content,
+            notification.detailPath,
+          );
         this.emailService.sendUserSuccesss(
           profile.email,
           customer.fullname,
@@ -699,11 +717,44 @@ export class RegisterResolver {
           regis.session.startTime,
           regis.session.endTime,
         );
+      } else if (regis.state === EStateRegister.Pending) {
+        notification.content = `Bạn đã đăng ký ${regis.typeOfService} "${service}" với hồ sơ "${profile.fullname}" vui lòng chờ thông báo xác nhận của "${facilityName}"`;
+        notification.detailPath = '/account/ticket';
+        if (isShare)
+          this.createNottifyAndEmailByCustomerKey(
+            regis,
+            notification.content,
+            notification.detailPath,
+          );
       }
     }
     // subscription cho user
     await this.notificationSrv
       .create(notification)
       .then((res) => this.notificationResolver.emitNotifyCreatedEvent(res));
+  }
+  async createNottifyAndEmailByCustomerKey(
+    regis: Register,
+    content: string,
+    detailPath: string,
+  ) {
+    if (regis.createdBy) {
+      const customer: Customer = await this.customerSrv.findByCustomerKey(
+        regis.createdBy,
+      );
+      var notification: CreateNotificationInput = {
+        userId: '',
+        detailPath: detailPath,
+        content: content,
+      };
+
+      if (customer) {
+        notification.userId = customer.userId;
+      }
+      // subscription cho user
+      await this.notificationSrv
+        .create(notification)
+        .then((res) => this.notificationResolver.emitNotifyCreatedEvent(res));
+    }
   }
 }

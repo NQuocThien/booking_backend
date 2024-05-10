@@ -43,6 +43,9 @@ export class Profile {
   @Field()
   relationship: string; // mqh
 
+  @Field(() => [String], { nullable: true })
+  shares: string[]; // mqh
+
   @Field(() => [Register], { nullable: true })
   register: Register; //
 

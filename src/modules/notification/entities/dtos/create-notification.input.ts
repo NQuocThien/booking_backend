@@ -9,5 +9,5 @@ export class CreateNotificationInput {
   content?: string;
 
   @Field()
-  detailPath: String;
+  detailPath: string;
 }

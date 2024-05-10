@@ -14,4 +14,7 @@ export class CreateRegisterPackageInput {
 
   @Field()
   date: Date;
+
+  @Field({ nullable: true })
+  createBy: string;
 }

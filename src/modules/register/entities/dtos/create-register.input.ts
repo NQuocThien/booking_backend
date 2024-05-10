@@ -15,6 +15,9 @@ registerEnumType(ETypeOfService, {
 });
 @InputType()
 export class CreateRegisterInput {
+  @Field({ nullable: true })
+  createdBy: string;
+
   @Field()
   profileId: string;
 

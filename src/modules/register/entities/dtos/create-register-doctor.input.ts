@@ -14,4 +14,7 @@ export class CreateRegisterDoctorInput {
 
   @Field()
   date: Date;
+
+  @Field({ nullable: true })
+  createBy: string;
 }

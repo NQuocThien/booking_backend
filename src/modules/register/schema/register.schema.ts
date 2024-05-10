@@ -38,6 +38,9 @@ export class Register {
   @Prop()
   createdAt: Date;
 
+  @Prop(() => String)
+  createdBy: string;
+
   @Prop({
     type: Array,
     default: [],

@@ -4,6 +4,7 @@ import { Profile } from './entity/profile.entity';
 import { Model } from 'mongoose';
 import { CreateProfileInput } from './entity/dtos/create-profile.input';
 import { UpdateProfileInput } from './entity/dtos/update-profile.input';
+import { Customer } from '../customer/entities/customer.entity';
 
 @Injectable()
 export class ProfileService {
@@ -42,9 +43,42 @@ export class ProfileService {
       return null;
     }
   }
+  async shareProfile(profileId: string, customerKey: string): Promise<Profile> {
+    try {
+      const existingDoc = await this.model.findById(profileId);
+      if (!existingDoc) {
+        return null;
+      }
+      var newShares: string[] = [];
+      if (existingDoc?.shares) {
+        if (existingDoc?.shares.includes(customerKey))
+          throw new Error('Khách hàng đã tồn tại');
+        newShares = [...existingDoc?.shares, customerKey];
+      } else {
+        newShares = [customerKey];
+      }
+
+      const updatedDoc = await this.model.findByIdAndUpdate(
+        profileId,
+        { shares: newShares },
+        { new: true },
+      );
+
+      return updatedDoc;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
   async getProfileByCustomerId(customerId: string): Promise<Profile[]> {
     var profiles: Profile[] = [];
     const profileLoad = await this.model.find({ customerId: customerId });
+    return profileLoad;
+  }
+  async getProfileByCustomerKey(customerKey: string): Promise<Profile[]> {
+    const profileLoad = await this.model.find({
+      shares: { $elemMatch: { $eq: customerKey } },
+    });
     return profileLoad;
   }
   async getProfileById(profileId: string): Promise<Profile> {

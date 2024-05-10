@@ -14,4 +14,7 @@ export class CreateRegisterVaccineInput {
 
   @Field()
   date: Date;
+
+  @Field({ nullable: true })
+  createBy: string;
 }

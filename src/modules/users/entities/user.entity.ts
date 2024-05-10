@@ -8,7 +8,7 @@ import { Doctor } from 'src/modules/doctors/entities/doctor.entity';
 @ObjectType()
 export class User {
   @Field((type) => ID)
-  id: String;
+  id: string;
 
   @Field({ nullable: true })
   active: boolean;

@@ -98,6 +98,7 @@ export class RegisterService {
       state: EStateRegister.Pending,
       typeOfService: ETypeOfService.Doctor,
       cancel: false,
+      createdBy: data.createBy,
     };
     return await this.model.create(datainput);
   }
@@ -246,6 +247,7 @@ export class RegisterService {
       state: EStateRegister.Pending,
       typeOfService: ETypeOfService.Specialty,
       cancel: false,
+      createdBy: data.createBy,
     };
     return await this.model.create(datainput);
   }
@@ -253,13 +255,17 @@ export class RegisterService {
   async createRegisterPackage(
     data: CreateRegisterPackageInput,
   ): Promise<Register> {
-    const datainput: CreateRegisterInput = {
+    var datainput: CreateRegisterInput = {
       ...data,
       state: EStateRegister.Pending,
       typeOfService: ETypeOfService.Package,
       cancel: false,
+      createdBy: data.createBy,
     };
-    return await this.model.create(datainput);
+    console.log('-> input: ', datainput);
+    const res = await this.model.create(datainput);
+    console.log('-> created: ', res);
+    return res;
   }
 
   async createRegisterVaccine(
@@ -270,8 +276,10 @@ export class RegisterService {
       state: EStateRegister.Pending,
       typeOfService: ETypeOfService.Vaccine,
       cancel: false,
+      createdBy: data.createBy,
     };
-    return await this.model.create(datainput);
+    const res = await this.model.create(datainput);
+    return res;
   }
 
   async cancelRegis(id: string): Promise<Register> {

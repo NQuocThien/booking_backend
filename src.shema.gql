@@ -26,6 +26,18 @@ input ConfirmRegisterInput {
   state: EStateRegister!
 }
 
+input CreatUserAndStaffInput {
+  email: String!
+  gender: EGender!
+  medicalFacilityId: String!
+  numberPhone: String!
+  password: String!
+  permissions: [EPermission!]!
+  specialtyId: [String!]
+  staffName: String!
+  username: String!
+}
+
 input CreateBlogInput {
   content: String!
   keywords: String!
@@ -47,6 +59,23 @@ input CreateCustomerInput {
   gender: EGender!
   numberPhone: String!
   userId: String!
+}
+
+input CreateDoctorAndUserInput {
+  academicTitle: EAcademicTitle
+  avatar: LinkImageInput!
+  degree: EDegree!
+  discription: String!
+  doctorName: String!
+  email: String!
+  gender: EGender!
+  medicalFactilitiesId: String!
+  numberPhone: String!
+  password: String!
+  price: Float!
+  specialistId: String!
+  username: String!
+  workSchedule: WorkScheduleInput!
 }
 
 input CreateDoctorInput {
@@ -150,6 +179,7 @@ input CreateProfileInput {
 }
 
 input CreateRegisterDoctorInput {
+  createBy: String
   date: DateTime!
   doctorId: String!
   profileId: String!
@@ -157,6 +187,7 @@ input CreateRegisterDoctorInput {
 }
 
 input CreateRegisterPackageInput {
+  createBy: String
   date: DateTime!
   packageId: String!
   profileId: String!
@@ -164,6 +195,7 @@ input CreateRegisterPackageInput {
 }
 
 input CreateRegisterSpecialtyInput {
+  createBy: String
   date: DateTime!
   profileId: String!
   session: SessionInput!
@@ -171,6 +203,7 @@ input CreateRegisterSpecialtyInput {
 }
 
 input CreateRegisterVaccineInput {
+  createBy: String
   date: DateTime!
   profileId: String!
   session: SessionInput!
@@ -202,6 +235,7 @@ input CreateVaccineInput {
 
 type Customer {
   address: String!
+  customerKey: String!
   dateOfBirth: DateTime!
   email: String!
   ethnic: String!
@@ -209,6 +243,7 @@ type Customer {
   gender: String!
   id: ID!
   numberPhone: String!
+  profileShares: [Profile!]
   profiles: [Profile!]
   userId: String!
 }
@@ -498,6 +533,7 @@ type Mutation {
   createRegisterPackage(input: CreateRegisterPackageInput!): Register!
   createRegisterSpecialty(input: CreateRegisterSpecialtyInput!): Register!
   createRegisterVaccine(input: CreateRegisterVaccineInput!): Register!
+  createUserAndStaff(input: CreatUserAndStaffInput!): MedicalStaff!
   createVaccination(input: CreateVaccineInput!): Vaccination!
   deleteDoctor(id: String!): Doctor!
   deleteEvaluate(id: String!): Evaluate!
@@ -514,7 +550,9 @@ type Mutation {
   logout: LogoutUser!
   seenAllNotification(userId: String!): String!
   seenNotificationById(id: String!): String!
+  shareProfile(customerKey: String!, profileId: String!): Profile!
   signup(createUserInput: CreateUserInput!): User!
+  signupAndCreateDoctor(input: CreateDoctorAndUserInput!): Doctor!
   signupUser(createUserInput: CreateUserByAdminInput!): User!
   updateBlog(input: UpdateBlogInput!): Blog!
   updateCustomer(input: UpdateCustomerInput!): Customer!
@@ -531,6 +569,8 @@ type Mutation {
   updateRoles(updateRolesInput: UpdateRolesInput!): User!
   updateSetting(updateSettingInput: UpdateSettingInput!): Setting!
   updateUser(updateUserInput: UpdateUserInput!): User!
+  updateUserAndDoctor(input: UpdateUserAndDoctorInput!): Doctor!
+  updateUserAndStaff(input: UpdateUserAndStaffInput!): MedicalStaff!
   updateUserWithPass(updateUserInput: UpdateUserWithPassInput!): User!
   updateVaccination(input: UpdateVaccineInput!): Vaccination!
   uploadFileRegister(input: UpLoadFileRegisInput!): Register!
@@ -574,6 +614,7 @@ type Profile {
   numberPhone: String!
   register: [Register!]
   relationship: String!
+  shares: [String!]
 }
 
 type Query {
@@ -643,6 +684,7 @@ type Query {
   getMedicalStaffByUserId(input: String!): MedicalStaff!
   getPackageById(input: String!): Package!
   getProfileByCustomerId(id: String!): [Profile!]!
+  getProfileByCustomerKey(customerKey: String!): [Profile!]!
   getProfileById(id: String!): Profile!
   getProfiles(id: String!): Profile!
   getRegisById(id: String!): Register!
@@ -680,6 +722,7 @@ type Query {
 type Register {
   cancel: Boolean!
   createdAt: DateTime!
+  createdBy: String
   date: DateTime!
   doctor: Doctor
   doctorId: String
@@ -884,6 +927,38 @@ input UpdateSettingInput {
   """Example field (placeholder)"""
   exampleField: Int
   id: Int!
+}
+
+input UpdateUserAndDoctorInput {
+  academicTitle: EAcademicTitle
+  avatar: LinkImageInput!
+  degree: EDegree!
+  discription: String!
+  doctorName: String!
+  email: String!
+  gender: EGender!
+  id: String!
+  medicalFactilitiesId: String!
+  numberPhone: String!
+  password: String!
+  price: Float!
+  specialistId: String!
+  userId: String!
+  username: String!
+  workSchedule: WorkScheduleInput!
+}
+
+input UpdateUserAndStaffInput {
+  email: String!
+  gender: EGender!
+  id: String!
+  medicalFacilityId: String!
+  numberPhone: String!
+  password: String!
+  permissions: [EPermission!]!
+  specialtyId: [String!]
+  staffName: String!
+  userId: String!
 }
 
 input UpdateUserInput {

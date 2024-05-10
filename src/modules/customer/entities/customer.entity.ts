@@ -7,6 +7,9 @@ export class Customer {
   id: string;
 
   @Field()
+  customerKey: string;
+
+  @Field()
   userId: string;
 
   @Field()
@@ -32,4 +35,7 @@ export class Customer {
 
   @Field(() => [Profile], { nullable: true })
   profiles: Profile[];
+
+  @Field(() => [Profile], { nullable: true })
+  profileShares: Profile[];
 }

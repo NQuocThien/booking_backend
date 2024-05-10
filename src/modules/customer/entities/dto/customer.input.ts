@@ -1,14 +1,17 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { EGender } from 'src/contain';
 @InputType()
-export class CreateCustomerInput {
+export class CustomerInput {
+  @Field()
+  customerKey: string;
+
   @Field()
   userId: string;
 
   @Field()
   fullname: string;
 
-  @Field(() => EGender)
+  @Field(() => String)
   gender: EGender;
 
   @Field()

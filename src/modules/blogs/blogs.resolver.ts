@@ -74,8 +74,6 @@ export class BlogsResolver {
     const doctorIds = await this.doctorSrv.findAllUserIds(facilityId);
     const ids: string[] = Array.from(new Set([...staffUserIds, ...doctorIds]));
     const usernames = await this.userSrv.getUserNameByIds(ids);
-    console.log('test: ', usernames, ids, doctorIds, staffUserIds);
-
     const blogs = await this.blogSrv.getAllBlogOfFaciityPagination(
       search,
       page,

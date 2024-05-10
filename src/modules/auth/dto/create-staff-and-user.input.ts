@@ -1,18 +1,18 @@
 import { InputType, Field, registerEnumType } from '@nestjs/graphql';
 import { EGender, EPermission } from 'src/contain';
 @InputType()
-export class UpdateMedicalStaffInput {
+export class CreatUserAndStaffInput {
   @Field()
-  id: String;
+  username: string;
 
   @Field()
-  userId: string;
+  password: string;
 
   @Field()
-  medicalFacilityId: String;
+  medicalFacilityId: string;
 
-  @Field(() => String)
-  staffName: String;
+  @Field()
+  staffName: string;
 
   @Field(() => EGender)
   gender: EGender;
@@ -21,7 +21,7 @@ export class UpdateMedicalStaffInput {
   numberPhone: String;
 
   @Field()
-  email: String;
+  email: string;
 
   @Field(() => [EPermission])
   permissions: EPermission[];
@@ -29,7 +29,3 @@ export class UpdateMedicalStaffInput {
   @Field(() => [String], { nullable: true })
   specialtyId?: [String];
 }
-
-registerEnumType(EGender, {
-  name: 'EGender',
-});

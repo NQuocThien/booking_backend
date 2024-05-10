@@ -16,6 +16,9 @@ import { Register } from '../register/entities/register.entity';
 import { Customer } from '../customer/entities/customer.entity';
 import { ProfileLoaderService } from './profile-loader.service';
 import { RegisterLoaderService } from '../register/register-loader.service';
+import { NotificationService } from '../notification/notification.service';
+import { NotificationResolver } from '../notification/notification.resolver';
+import { CreateNotificationInput } from '../notification/entities/dtos/create-notification.input';
 
 @Resolver(() => Profile)
 export class ProfileResolver {
@@ -24,26 +27,23 @@ export class ProfileResolver {
     private readonly regisService: RegisterService,
     private readonly customerSvr: CustomerService,
     private readonly profileLoader: ProfileLoaderService,
+    private readonly notificationResolver: NotificationResolver,
     private readonly registeredSrvLoader: RegisterLoaderService,
   ) {}
+  // =================================================================>>>  QUERY
 
-  @Mutation(() => Profile, { name: 'createProfile' })
-  async create(@Args('input') input: CreateProfileInput): Promise<Profile> {
-    return this.profileService.create(input);
-  }
-
-  @Mutation(() => Profile, { name: 'updateProfile' })
-  async update(@Args('input') input: UpdateProfileInput): Promise<Profile> {
-    return this.profileService.update(input);
-  }
-
-  @Mutation(() => Profile, { name: 'deleteProfile' })
-  async delete(@Args('id') id: String): Promise<Profile> {
-    return this.profileService.delete(id);
-  }
   @Query(() => [Profile], { name: 'getProfileByCustomerId' })
   async getProfileByCustomerId(@Args('id') id: string): Promise<Profile[]> {
     const result = await this.profileService.getProfileByCustomerId(id);
+    return result;
+  }
+
+  @Query(() => [Profile], { name: 'getProfileByCustomerKey' })
+  async getProfileByCustomerKey(
+    @Args('customerKey') customerKey: string,
+  ): Promise<Profile[]> {
+    const result =
+      await this.profileService.getProfileByCustomerKey(customerKey);
     return result;
   }
   @Query(() => Profile, { name: 'getProfileById' })
@@ -61,6 +61,55 @@ export class ProfileResolver {
     const result = await this.profileLoader.load(id);
     return result;
   }
+  // =================================================================>>>  MUTATION
+  @Mutation(() => Profile, { name: 'deleteProfile' })
+  async delete(@Args('id') id: String): Promise<Profile> {
+    return this.profileService.delete(id);
+  }
+
+  @Mutation(() => Profile, { name: 'createProfile' })
+  async create(@Args('input') input: CreateProfileInput): Promise<Profile> {
+    return this.profileService.create(input);
+  }
+
+  @Mutation(() => Profile, { name: 'updateProfile' })
+  async update(@Args('input') input: UpdateProfileInput): Promise<Profile> {
+    return this.profileService.update(input);
+  }
+
+  @Mutation(() => Profile, { name: 'shareProfile' })
+  async shareProfile(
+    @Args('profileId') profileId: string,
+    @Args('customerKey') customerKey: string,
+  ): Promise<Profile> {
+    const profileShare = await this.profileService.shareProfile(
+      profileId,
+      customerKey,
+    );
+    const customerFrom = await this.customerSvr.findCustomerById(
+      profileShare?.customerId,
+    );
+    const customerTo = await this.customerSvr.findByCustomerKey(customerKey);
+
+    const notificationFrom: CreateNotificationInput = {
+      userId: (await customerFrom).userId,
+      detailPath: '',
+      content: `Bạn đã chia sẽ hồ sơ "${profileShare?.fullname}" cho ${
+        (await customerTo).fullname
+      }`,
+    };
+    const notificationTo: CreateNotificationInput = {
+      userId: (await customerTo).userId,
+      detailPath: '/account/profile',
+      content: `Bạn đã được chia sẽ hồ sơ "${profileShare?.fullname}" bởi  ${
+        (await customerFrom).fullname
+      }`,
+    };
+    this.notificationResolver.createNotification(notificationFrom);
+    this.notificationResolver.createNotification(notificationTo);
+    return profileShare;
+  }
+  // =================================================================>>>  RESOLVE FIELD
   @ResolveField(() => [Register], { name: 'register' })
   async register(@Parent() profile: Profile): Promise<Register[]> {
     const data = await this.registeredSrvLoader.load(profile.id);

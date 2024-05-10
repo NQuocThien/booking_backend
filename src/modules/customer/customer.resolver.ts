@@ -74,4 +74,9 @@ export class CustomerResolver {
   async profiles(@Parent() cus: Customer): Promise<Profile[]> {
     return this.profileSv.getProfileByCustomerId(cus.id);
   }
+
+  @ResolveField(() => [Profile], { name: 'profileShares' })
+  async profileShares(@Parent() cus: Customer): Promise<Profile[]> {
+    return this.profileSv.getProfileByCustomerKey(cus.customerKey);
+  }
 }

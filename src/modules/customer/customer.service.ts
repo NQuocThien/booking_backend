@@ -5,6 +5,8 @@ import { Model } from 'mongoose';
 import { CreateCustomerInput } from './entities/dto/create-customer.input';
 import { UpdateCustomerInput } from './entities/dto/update-customer.input';
 import * as DataLoader from 'dataloader';
+import { CustomerInput } from './entities/dto/customer.input';
+import { generateShortCode } from 'src/utils/contain';
 @Injectable()
 export class CustomerService {
   constructor(
@@ -64,8 +66,21 @@ export class CustomerService {
     const result = (await this.customerLoader.load(customerId)) || null;
     return result;
   }
+
+  async findCustomerById(customerId: string): Promise<Customer> {
+    const result = await this.customerModel.findById(customerId);
+    return result;
+  }
+  async findByCustomerKey(customerKey: string): Promise<Customer> {
+    const result = this.customerModel.findOne({ customerKey: customerKey });
+    return result;
+  }
   async createCustomer(createCustomerInput: CreateCustomerInput) {
-    return this.customerModel.create(createCustomerInput);
+    const inputCustomer: CustomerInput = {
+      ...createCustomerInput,
+      customerKey: `kh--${generateShortCode()}`,
+    };
+    return this.customerModel.create(inputCustomer);
   }
   async updateCustomer(input: UpdateCustomerInput) {
     try {

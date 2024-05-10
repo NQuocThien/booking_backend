@@ -4,9 +4,9 @@ import { ProfileService } from './profile.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Profile, ProfileSchema } from './schemas/profile.schema';
 import { CustomerModule } from '../customer/customer.module';
-import { Register } from '../register/entities/register.entity';
 import { RegisterModule } from '../register/register.module';
 import { ProfileLoaderService } from './profile-loader.service';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
   imports: [
@@ -18,6 +18,7 @@ import { ProfileLoaderService } from './profile-loader.service';
     ]),
     forwardRef(() => CustomerModule),
     forwardRef(() => RegisterModule),
+    NotificationModule,
   ],
   providers: [ProfileResolver, ProfileService, ProfileLoaderService],
   exports: [ProfileService],

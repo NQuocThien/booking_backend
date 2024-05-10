@@ -10,12 +10,25 @@ import { CustomerService } from '../customer/customer.service';
 import { CreateUserByAdminInput } from './dto/create-user-by-admin.input';
 import { Role } from './entities/role.enum';
 import { ErrorMes } from './entities/mess.enum';
+import { DoctorsService } from '../doctors/doctors.service';
+import { CreateDoctorAndUserInput } from './dto/create-doctor-and-user.input';
+import { CreateDoctorInput } from '../doctors/entities/dtos/create-doctor.input';
+import { UpdateUserAndDoctorInput } from './dto/update-doctor-and-user.input';
+import { UpdateDoctorInput } from '../doctors/entities/dtos/update-doctor.input';
+import { CreatUserAndStaffInput } from './dto/create-staff-and-user.input';
+import { MedicalStaff } from '../medical-staff/entities/medical-staff.entity';
+import { MedicalStaffService } from '../medical-staff/medical-staff.service';
+import { CreateMedicalStaffInput } from '../medical-staff/entities/dto/create-medical-staff.input';
+import { UpdateMedicalStaffInput } from '../medical-staff/entities/dto/update-medical-staff.input';
+import { UpdateUserAndStaffInput } from './dto/update-staff-and-user.input';
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UsersService,
     private jwtService: JwtService,
     private cusSv: CustomerService,
+    private docSrv: DoctorsService,
+    private staffSrv: MedicalStaffService,
   ) {}
   async validateUser(username: string, password: string): Promise<any> {
     const user = await this.userService.findOne(username);
@@ -71,6 +84,133 @@ export class AuthService {
       password: password,
       roles: roles,
     });
+  }
+  async signupAndCreateDoctor(input: CreateDoctorAndUserInput) {
+    const user = await this.userService.findOne(input.username);
+    if (user) throw new Error(`User already exists ! `);
+
+    const password = await bcrypt.hash(input.password, 10);
+    const roles: Role[] = [Role.Doctor];
+    const userCreated = await this.userService.createByAdmin({
+      username: input.username,
+      active: true,
+      email: input.email,
+      password: password,
+      roles: roles,
+    });
+    if (userCreated) {
+      const inputCreateDoctor: CreateDoctorInput = {
+        userId: userCreated.id,
+        academicTitle: input.academicTitle,
+        degree: input.degree,
+        doctorName: input.doctorName,
+        email: input.email,
+        gender: input.gender,
+        numberPhone: input.numberPhone,
+        price: input.price,
+        specialistId: input.specialistId,
+        workSchedule: input.workSchedule,
+        avatar: input.avatar,
+        discription: input.discription,
+        medicalFactilitiesId: input.medicalFactilitiesId,
+      };
+      const doctor = this.docSrv.create(inputCreateDoctor);
+      return doctor;
+    }
+  }
+  async updateUserAndDoctor(input: UpdateUserAndDoctorInput) {
+    const user = await this.userService.findOneById(input.userId);
+    if (!user) throw new Error(`User no exists ! `);
+
+    const password = await bcrypt.hash(input.password, 10);
+    const userUpdated = await this.userService.updateUser({
+      id: user.id,
+      email: input.email,
+      password: password,
+      active: true,
+      avatar: user.avatar,
+    });
+    if (userUpdated) {
+      const inputCreateDoctor: UpdateDoctorInput = {
+        id: input.id,
+        userId: userUpdated.id,
+        academicTitle: input.academicTitle,
+        degree: input.degree,
+        doctorName: input.doctorName,
+        email: input.email,
+        gender: input.gender,
+        numberPhone: input.numberPhone,
+        price: input.price,
+        specialistId: input.specialistId,
+        workSchedule: input.workSchedule,
+        avatar: input.avatar,
+        discription: input.discription,
+        medicalFactilitiesId: input.medicalFactilitiesId,
+      };
+      const doctor = this.docSrv.updateById(inputCreateDoctor);
+      return doctor;
+    }
+  }
+  // ----------------------------------------------------------------STAFF ----
+  async signupAndCreateStaff(
+    input: CreatUserAndStaffInput,
+  ): Promise<MedicalStaff> {
+    const user = await this.userService.findOne(input.username);
+    if (user) throw new Error(`User already exists ! `);
+
+    const password = await bcrypt.hash(input.password, 10);
+    const roles: Role[] = [Role.Staff];
+    const userCreated = await this.userService.createByAdmin({
+      username: input.username,
+      active: true,
+      email: input.email,
+      password: password,
+      roles: roles,
+    });
+    if (userCreated) {
+      const inputCreateStaff: CreateMedicalStaffInput = {
+        userId: userCreated.id,
+        email: input.email,
+        gender: input.gender,
+        medicalFacilityId: input.medicalFacilityId,
+        numberPhone: input.numberPhone,
+        permissions: input.permissions,
+        staffName: input.staffName,
+        specialtyId: input.specialtyId,
+      };
+      const staff = await this.staffSrv.createMedicalStaff(inputCreateStaff);
+      return staff;
+    }
+  }
+  async updateUserAndStaff(
+    input: UpdateUserAndStaffInput,
+  ): Promise<MedicalStaff> {
+    const user = await this.userService.findOneById(input.userId);
+    if (!user) throw new Error(`User no exists ! `);
+
+    const password = await bcrypt.hash(input.password, 10);
+    const userUpdated = await this.userService.updateUser({
+      id: user.id,
+      email: input.email,
+      password: password,
+      active: true,
+      avatar: user.avatar,
+    });
+    if (userUpdated) {
+      const inputUpdateStaff: UpdateMedicalStaffInput = {
+        id: input.id,
+        userId: userUpdated.id,
+        email: input.email,
+        gender: input.gender,
+        numberPhone: input.numberPhone,
+        medicalFacilityId: input.medicalFacilityId,
+        permissions: input.permissions,
+        staffName: input.staffName,
+        specialtyId: input.specialtyId,
+      };
+      const staff = this.staffSrv.updateMedicalStaff(inputUpdateStaff);
+      return staff;
+    }
   }
   async logout() {
     var reponse: LogoutUser = new LogoutUser();

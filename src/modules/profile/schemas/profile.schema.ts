@@ -38,5 +38,8 @@ export class Profile {
 
   @Prop()
   relationship: string; // mqh
+
+  @Prop(() => [String])
+  shares?: string[];
 }
 export const ProfileSchema = SchemaFactory.createForClass(Profile);

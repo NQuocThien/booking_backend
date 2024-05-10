@@ -68,7 +68,6 @@ export class BlogsService {
     } else query.status = { $ne: EnumBlogStatus.Deleted };
     if (search) query.title = { $regex: search, $options: 'i' };
     if (isClient) query.status = { $eq: EnumBlogStatus.Public };
-    // if (type) query.type = { $eq: type };
     const sortOptions: { [key: string]: 'asc' | 'desc' } = {};
     sortOptions[sortField] = sortOrder === 'asc' ? 'asc' : 'desc';
     const skip = (page - 1) * limit;

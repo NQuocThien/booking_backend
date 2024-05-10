@@ -83,6 +83,7 @@ export class UploaderController {
           originalname: file.originalname,
           filename: file.filename,
         };
+        console.log('--> Uploaded image: ', fileResponse.filename);
         response.push(fileResponse);
       });
       return response;
@@ -124,11 +125,14 @@ export class UploaderController {
   @Delete('webbookingImageDelete/:filename')
   async deleteImage(@Param('filename') filename: string) {
     try {
-      const imageDirectory = `${process.env.FILE_PATH || 'files'}/images`;
+      const imageDirectory = `${
+        process.env.FILE_PATH || 'files'
+      }/images/doctors`;
       const imagePath = `${imageDirectory}/${filename}`;
       const fileStats = await fsPromises.stat(imagePath);
       if (fileStats.isFile()) {
         await fsPromises.unlink(imagePath);
+        console.log('\t---> image detected: ', imagePath);
       } else {
         throw new NotFoundException('Image not found', filename);
       }

@@ -10,6 +10,7 @@ import { DoctorsService } from '../doctors/doctors.service';
 import { UserSlimEntity } from '../contains/user-slim/user-slim.entity';
 import { Role } from '../auth/entities/role.enum';
 import { UserSlimInput } from '../contains/user-slim/user-slim.input';
+import { UpdateUserGeneralInput } from './dto/update-user-general.input';
 
 @Injectable()
 export class UsersService {
@@ -54,6 +55,16 @@ export class UsersService {
   }
 
   async updateUserById(updateUserInput: UpdateUserInput): Promise<User> {
+    const { id, ...userBody } = updateUserInput;
+    const userUpdated = await this.userModel.findByIdAndUpdate(
+      updateUserInput.id,
+      userBody,
+      { new: true },
+    );
+
+    return userUpdated;
+  }
+  async updateUser(updateUserInput: UpdateUserGeneralInput): Promise<User> {
     const { id, ...userBody } = updateUserInput;
     const userUpdated = await this.userModel.findByIdAndUpdate(
       updateUserInput.id,
