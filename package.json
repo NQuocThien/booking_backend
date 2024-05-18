@@ -58,7 +58,8 @@
     "preview-email": "^3.0.19",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
-    "typeorm": "^0.3.17"
+    "typeorm": "^0.3.17",
+    "unorm": "^1.6.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

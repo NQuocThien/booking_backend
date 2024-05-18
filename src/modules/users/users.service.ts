@@ -76,9 +76,7 @@ export class UsersService {
   }
 
   async deleteUserById(id: string): Promise<User> {
-    // log('user input 1: ', userBody)
-    const userDeleted = await this.userModel.findByIdAndRemove(id);
-    log('----> User Deleted:', userDeleted.id);
+    const userDeleted = await this.userModel.findByIdAndDelete(id);
     return userDeleted;
   }
   async updateRoles(id: string, newRoles: string[]): Promise<User> {
@@ -109,7 +107,6 @@ export class UsersService {
       );
     return userHandled;
   }
-  // Trong UserService hoặc nơi cần thực hiện truy vấn
   async getAllUsersPagination(
     search: string,
     page: number,

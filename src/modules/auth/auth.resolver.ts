@@ -102,6 +102,31 @@ export class AuthResolver {
         }
       }
   }
+  // ----------------------------------------------------------------
+  @UseGuards(JWtAuthGuard)
+  @Roles(Role.Facility, Role.Staff)
+  @Mutation(() => Doctor, { name: 'deleteUserAndDoctor' })
+  async deleteUserAndDoctor(
+    @Args('doctorId') doctorId: string,
+    @Args('medicalFactilitiesId') medicalFactilitiesId: string,
+    @Context() context,
+  ): Promise<Doctor> {
+    const username = context.req.user.username;
+    const currentUser = await this.userSrv.findOne(username);
+    const facility = await this.facilityLoaderSrv.load(medicalFactilitiesId);
+    if (facility)
+      if (facility.userId === currentUser.id)
+        return this.authService.deleteUserAndDoctor(doctorId);
+      else if (currentUser.roles.includes(Role.Staff)) {
+        const staff = await this.staffSrv.findByUserId(currentUser.id);
+        if (
+          staff.medicalFacilityId === facility.id &&
+          staff.permissions.includes(EPermission.Magager)
+        ) {
+          return this.authService.deleteUserAndDoctor(doctorId);
+        }
+      }
+  }
   //---------------------------------------------------------------
   //---------------------------------------------------------------
   @UseGuards(JWtAuthGuard)

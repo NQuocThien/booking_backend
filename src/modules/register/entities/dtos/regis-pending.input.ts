@@ -1,12 +1,18 @@
 import { Field, ID, InputType, ObjectType } from '@nestjs/graphql';
 import { ETypeOfService } from 'src/contain';
 @InputType()
-export class GetRegisPendingInput {
-  @Field(() => String, { nullable: true })
-  userId: string;
+export class RegisPendingInput {
+  @Field(() => [String])
+  doctorIds: string[];
 
-  @Field(() => String, { nullable: true })
-  facilityIdFromStaff: string;
+  @Field(() => [String])
+  packageIds: string[];
+
+  @Field(() => [String])
+  vaccineIds: string[];
+
+  @Field(() => [String])
+  specialtyIds?: string[];
 
   @Field(() => String)
   startTime: string;

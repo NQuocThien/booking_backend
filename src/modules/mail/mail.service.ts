@@ -4,7 +4,10 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class MailService {
   constructor(private mailerService: MailerService) {}
-
+  isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
   async sendUserConfirmation(
     email: string,
     customerName: string,
@@ -15,21 +18,22 @@ export class MailService {
     startTime: string,
     endTime: string,
   ) {
-    await this.mailerService.sendMail({
-      to: email,
-      // from: '"Support Team" <support@example.com>', // override default from
-      subject: 'Thông báo trạng thái đăng ký BookingCare',
-      template: './confirmation', // `.hbs` extension is appended automatically
-      context: {
-        customerName: customerName,
-        profileName: profileName,
-        typeService: typeService,
-        service: service,
-        date: date,
-        startTime: startTime,
-        endTime: endTime,
-      },
-    });
+    this.isValidEmail(email) &&
+      (await this.mailerService.sendMail({
+        to: email,
+        // from: '"Support Team" <support@example.com>', // override default from
+        subject: 'Thông báo trạng thái đăng ký BookingCare',
+        template: './confirmation', // `.hbs` extension is appended automatically
+        context: {
+          customerName: customerName,
+          profileName: profileName,
+          typeService: typeService,
+          service: service,
+          date: date,
+          startTime: startTime,
+          endTime: endTime,
+        },
+      }));
   }
   async sendUserSuccesss(
     email: string,
@@ -41,21 +45,22 @@ export class MailService {
     startTime: string,
     endTime: string,
   ) {
-    await this.mailerService.sendMail({
-      to: email,
-      // from: '"Support Team" <support@example.com>', // override default from
-      subject: 'Thông báo trạng thái đăng ký BookingCare',
-      template: './success', // `.hbs` extension is appended automatically
-      context: {
-        customerName: customerName,
-        profileName: profileName,
-        typeService: typeService,
-        service: service,
-        date: date,
-        startTime: startTime,
-        endTime: endTime,
-      },
-    });
+    this.isValidEmail(email) &&
+      (await this.mailerService.sendMail({
+        to: email,
+        // from: '"Support Team" <support@example.com>', // override default from
+        subject: 'Thông báo trạng thái đăng ký BookingCare',
+        template: './success', // `.hbs` extension is appended automatically
+        context: {
+          customerName: customerName,
+          profileName: profileName,
+          typeService: typeService,
+          service: service,
+          date: date,
+          startTime: startTime,
+          endTime: endTime,
+        },
+      }));
   }
   async sendMailCancel(
     email: string,
@@ -68,21 +73,22 @@ export class MailService {
     endTime: string,
     content: string,
   ) {
-    await this.mailerService.sendMail({
-      to: email,
-      // from: '"Support Team" <support@example.com>', // override default from
-      subject: 'Thông báo trạng thái đăng ký BookingCare',
-      template: './cancel', // `.hbs` extension is appended automatically
-      context: {
-        customerName: customerName,
-        profileName: profileName,
-        typeService: typeService,
-        service: service,
-        date: date,
-        startTime: startTime,
-        endTime: endTime,
-        content: content,
-      },
-    });
+    this.isValidEmail(email) &&
+      (await this.mailerService.sendMail({
+        to: email,
+        // from: '"Support Team" <support@example.com>', // override default from
+        subject: 'Thông báo trạng thái đăng ký BookingCare',
+        template: './cancel', // `.hbs` extension is appended automatically
+        context: {
+          customerName: customerName,
+          profileName: profileName,
+          typeService: typeService,
+          service: service,
+          date: date,
+          startTime: startTime,
+          endTime: endTime,
+          content: content,
+        },
+      }));
   }
 }

@@ -102,7 +102,7 @@ export class RegisterLoaderService {
     const data = await this.loaderDoctorIds.load(id);
     return data;
   }
-  async cleanDoctorIdsBFacilityId(id: string) {
+  async cleanDoctorIdsByFacilityId(id: string) {
     this.loaderDoctorIds.clear(id);
   }
 

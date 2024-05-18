@@ -27,6 +27,12 @@ export class ProfileService {
     // console.log('---> result: ', result.length);
     return result;
   }
+  async findByFullName(s: string): Promise<string[]> {
+    const result = await this.model.find({ $text: { $search: s } }, '_id');
+
+    const ids = result.map((doc) => doc._id.toString());
+    return ids;
+  }
   async delete(id: String): Promise<Profile> {
     return this.model.findByIdAndRemove(id);
   }

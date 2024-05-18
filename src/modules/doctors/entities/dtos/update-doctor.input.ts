@@ -7,11 +7,11 @@ export class UpdateDoctorInput {
   @Field()
   id: String;
 
-  @Field()
-  userId: string;
+  @Field({ nullable: true })
+  userId?: string;
 
   @Field()
-  medicalFactilitiesId?: string;
+  medicalFactilitiesId: string;
 
   @Field()
   doctorName: String;

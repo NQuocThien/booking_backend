@@ -6,6 +6,9 @@ export class ConfirmRegisterInput {
   @Field()
   registerId: String;
 
+  @Field({ nullable: true })
+  note: string;
+
   @Field(() => EStateRegister)
   state: EStateRegister;
 }

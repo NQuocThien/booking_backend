@@ -19,6 +19,7 @@ import { RegisterLoaderService } from '../register/register-loader.service';
 import { NotificationService } from '../notification/notification.service';
 import { NotificationResolver } from '../notification/notification.resolver';
 import { CreateNotificationInput } from '../notification/entities/dtos/create-notification.input';
+import { EStateRegister } from 'src/contain';
 
 @Resolver(() => Profile)
 export class ProfileResolver {
@@ -111,14 +112,32 @@ export class ProfileResolver {
   }
   // =================================================================>>>  RESOLVE FIELD
   @ResolveField(() => [Register], { name: 'register' })
-  async register(@Parent() profile: Profile): Promise<Register[]> {
+  async register(
+    @Parent() profile: Profile,
+    @Args('stateRegis', { nullable: true, defaultValue: undefined })
+    stateRegis: EStateRegister,
+    @Args('cancel', { nullable: true, defaultValue: undefined })
+    cancel: boolean,
+  ): Promise<Register[]> {
     const data = await this.registeredSrvLoader.load(profile.id);
-    const dataSorted = data.sort((r1, r2) => {
+    var result: Register[];
+    var dataSorted = data.sort((r1, r2) => {
       const time1 = new Date(r1.createdAt);
       const time2 = new Date(r2.createdAt);
       return time2.getTime() - time1.getTime();
-    });
-    return dataSorted;
+    }); // sắp xếp theo thời gian tạo
+    result = dataSorted;
+    if (stateRegis !== undefined) {
+      const dataFilterState = result.filter((r) => r.state === stateRegis);
+      result = dataFilterState;
+      // console.log('test stateRegis: ', stateRegis);
+    }
+    if (cancel !== undefined) {
+      const dataFilterCanncel = result.filter((r) => r.cancel === cancel);
+      result = dataFilterCanncel;
+      console.log('test cancel: ', cancel);
+    }
+    return result;
   }
   @ResolveField(() => Customer, { name: 'customer' })
   async customer(@Parent() profile: Profile): Promise<Customer | null> {

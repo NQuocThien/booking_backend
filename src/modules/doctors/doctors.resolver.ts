@@ -19,6 +19,7 @@ import { MedicalStaffService } from '../medical-staff/medical-staff.service';
 import { MedicalFacilities } from '../medical-facilities/entities/mecical-facilies.entity';
 import { RegisterService } from '../register/register.service';
 import { FacilitiesLoaderService } from '../medical-facilities/facility-loader';
+import { RegisterLoaderService } from '../register/register-loader.service';
 
 @Resolver(() => Doctor)
 export class DoctorsResolver {
@@ -29,8 +30,9 @@ export class DoctorsResolver {
     private readonly facilityLoaderSvr: FacilitiesLoaderService,
     private readonly staffSvr: MedicalStaffService,
     private readonly registerSrv: RegisterService,
+    private readonly registerLoaderSrv: RegisterLoaderService,
   ) {}
-
+  // ======================================>> QUERY <<===========================================================
   @Query(() => [Doctor], { name: 'getAllDoctor' })
   async getAllDoctor(): Promise<Doctor[]> {
     return this.doctorService.findAll();
@@ -225,10 +227,13 @@ export class DoctorsResolver {
   async getDoctorbyUserId(@Args('id') id: String): Promise<Doctor> {
     return this.doctorService.findOneByUserId(id);
   }
+  // ======================================>> MUTATION <<===========================================================
 
   @Mutation(() => Doctor, { name: 'createDoctor' })
   async createDoctor(@Args('createDoctorInput') data: CreateDoctorInput) {
-    return await this.doctorService.create(data);
+    const res = await this.doctorService.create(data);
+    res && this.registerLoaderSrv.cleanDoctorIdsByFacilityId(res.id);
+    return res;
   }
 
   @Mutation(() => Doctor, { name: 'updateDoctor' })
@@ -242,7 +247,9 @@ export class DoctorsResolver {
     } catch (e) {
       console.log('Error Delete Image');
     }
-    return await this.doctorService.updateById(data);
+    const res = await this.doctorService.updateById(data);
+    res && this.registerLoaderSrv.cleanDoctorIdsByFacilityId(res.id);
+    return res;
   }
 
   @Mutation(() => Doctor, { name: 'deleteDoctor' })
@@ -255,6 +262,7 @@ export class DoctorsResolver {
     }
     return this.doctorService.delete(id);
   }
+  // ======================================>> RESOLVE FIELD <<===========================================================
 
   @ResolveField(() => MedicalSpecialties, { name: 'specialty' })
   async specialty(@Parent() doctor: Doctor): Promise<MedicalSpecialties> {

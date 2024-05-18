@@ -36,6 +36,9 @@ export class Register {
   state: string;
 
   @Prop()
+  note?: string;
+
+  @Prop()
   createdAt: Date;
 
   @Prop(() => String)

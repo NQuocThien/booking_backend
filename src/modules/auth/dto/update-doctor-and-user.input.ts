@@ -4,8 +4,8 @@ import { WorkScheduleInput } from 'src/modules/contains/work-schedule/work-sched
 import { LinkImageInput } from 'src/modules/users/dto/linkimage.input';
 @InputType()
 export class UpdateUserAndDoctorInput {
-  @Field()
-  userId: string;
+  @Field({ nullable: true })
+  userId?: string;
 
   @Field()
   id: string;
@@ -13,8 +13,8 @@ export class UpdateUserAndDoctorInput {
   @Field()
   username: string;
 
-  @Field()
-  password: string;
+  @Field({ nullable: true })
+  password?: string;
 
   @Field()
   medicalFactilitiesId?: string;

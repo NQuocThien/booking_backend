@@ -22,6 +22,7 @@ type Blog {
 }
 
 input ConfirmRegisterInput {
+  note: String
   registerId: String!
   state: EStateRegister!
 }
@@ -415,13 +416,11 @@ input GetEvaluateOptionInput {
 
 input GetRegisPendingInput {
   cancel: Boolean!
-  doctorIds: [String!]!
   endTime: String!
-  packageIds: [String!]!
-  specialtyIds: [String!]!
+  facilityIdFromStaff: String
   startTime: String!
   typeOfService: ETypeOfService
-  vaccineIds: [String!]!
+  userId: String
 }
 
 input GetRegisterByOptionInput {
@@ -545,6 +544,7 @@ type Mutation {
   deleteProfile(id: String!): Profile!
   deleteUnDeleteBlog(id: String!): Blog!
   deleteUser(id: String!): User!
+  deleteUserAndDoctor(doctorId: String!, medicalFactilitiesId: String!): Doctor!
   deleteVaccination(input: String!): Vaccination!
   login(loginUserInput: LoginUserInput!): LoginRespone!
   logout: LogoutUser!
@@ -612,7 +612,7 @@ type Profile {
   job: String!
   medicalInsurance: String
   numberPhone: String!
-  register: [Register!]
+  register(cancel: Boolean, stateRegis: String): [Register!]
   relationship: String!
   shares: [String!]
 }
@@ -656,7 +656,8 @@ type Query {
   getAllProfile: [Profile!]!
   getAllRegisCountByOption(input: GetRegisterByOptionInput!): Register!
   getAllRegisOfService(input: GetRegisterByOptionInput!): [Register!]!
-  getAllRegisPending(input: GetRegisPendingInput!): [Register!]!
+  getAllRegisPending(input: GetRegisPendingInput!, limit: Float! = 10, page: Float! = 1, search: String): [Register!]!
+  getAllRegisPendingCount(input: GetRegisPendingInput!): Float!
   getAllRegisterByOption(input: GetRegisterByOptionInput!): [Register!]!
   getAllStaffPagination(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "name", sortOrder: String): [MedicalStaff!]!
   getAllUsersPagination(limit: Float! = 10, page: Float! = 1, search: String, sortField: String = "username", sortOrder: String): [User!]!
@@ -719,6 +720,17 @@ type Query {
   users: [User!]!
 }
 
+input RegisPendingInput {
+  cancel: Boolean!
+  doctorIds: [String!]!
+  endTime: String!
+  packageIds: [String!]!
+  specialtyIds: [String!]!
+  startTime: String!
+  typeOfService: ETypeOfService
+  vaccineIds: [String!]!
+}
+
 type Register {
   cancel: Boolean!
   createdAt: DateTime!
@@ -728,6 +740,7 @@ type Register {
   doctorId: String
   files: [LinkImage!]
   id: ID!
+  note: String
   package: Package
   packageId: String
   profile: Profile
@@ -776,7 +789,7 @@ type Setting {
 type Subscription {
   notifyCreated(userId: String!): Notification!
   registerCreated(option: GetRegisterByOptionInput!): Register!
-  registerPendingCreated(option: GetRegisPendingInput!): Register!
+  registerPendingCreated(option: RegisPendingInput!): Register!
 }
 
 input UpLoadFileRegisInput {
@@ -825,7 +838,7 @@ input UpdateDoctorInput {
   numberPhone: String!
   price: Float!
   specialistId: String!
-  userId: String!
+  userId: String
   workSchedule: WorkScheduleInput!
 }
 
@@ -940,10 +953,10 @@ input UpdateUserAndDoctorInput {
   id: String!
   medicalFactilitiesId: String!
   numberPhone: String!
-  password: String!
+  password: String
   price: Float!
   specialistId: String!
-  userId: String!
+  userId: String
   username: String!
   workSchedule: WorkScheduleInput!
 }

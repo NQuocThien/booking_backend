@@ -43,6 +43,13 @@ export class PackageService {
       medicalFactilitiesId: medicalFacilityId,
     });
   }
+  async findByMedicalFacilityIds(
+    medicalFacilityIds: string[],
+  ): Promise<Package[]> {
+    return await this.model.find({
+      medicalFactilitiesId: { $in: medicalFacilityIds },
+    });
+  }
   async create(input: CreatePackageInput): Promise<Package> {
     return await this.model.create(input);
   }

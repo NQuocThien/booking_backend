@@ -6,7 +6,7 @@ export class Profile {
   @Prop()
   customerId: string;
 
-  @Prop()
+  @Prop({ text: true })
   fullname: string;
 
   @Prop()

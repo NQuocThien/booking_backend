@@ -50,6 +50,9 @@ export class Register {
   @Field(() => String)
   state: EStateRegister;
 
+  @Field({ nullable: true })
+  note: string;
+
   @Field()
   createdAt: Date;
 

@@ -21,6 +21,7 @@ import { MedicalStaffService } from '../medical-staff/medical-staff.service';
 import { CreateMedicalStaffInput } from '../medical-staff/entities/dto/create-medical-staff.input';
 import { UpdateMedicalStaffInput } from '../medical-staff/entities/dto/update-medical-staff.input';
 import { UpdateUserAndStaffInput } from './dto/update-staff-and-user.input';
+import { Doctor } from '../doctors/entities/doctor.entity';
 @Injectable()
 export class AuthService {
   constructor(
@@ -120,20 +121,40 @@ export class AuthService {
   }
   async updateUserAndDoctor(input: UpdateUserAndDoctorInput) {
     const user = await this.userService.findOneById(input.userId);
-    if (!user) throw new Error(`User no exists ! `);
+    if (input.password) {
+      if (!user) throw new Error(`User no exists ! `);
 
-    const password = await bcrypt.hash(input.password, 10);
-    const userUpdated = await this.userService.updateUser({
-      id: user.id,
-      email: input.email,
-      password: password,
-      active: true,
-      avatar: user.avatar,
-    });
-    if (userUpdated) {
+      const password = await bcrypt.hash(input.password, 10);
+      const userUpdated = await this.userService.updateUser({
+        id: user.id,
+        email: input.email,
+        password: password,
+        active: true,
+        avatar: user.avatar,
+      });
+      if (userUpdated) {
+        const inputCreateDoctor: UpdateDoctorInput = {
+          id: input.id,
+          userId: userUpdated.id,
+          academicTitle: input.academicTitle,
+          degree: input.degree,
+          doctorName: input.doctorName,
+          email: input.email,
+          gender: input.gender,
+          numberPhone: input.numberPhone,
+          price: input.price,
+          specialistId: input.specialistId,
+          workSchedule: input.workSchedule,
+          avatar: input.avatar,
+          discription: input.discription,
+          medicalFactilitiesId: input.medicalFactilitiesId,
+        };
+        const doctor = this.docSrv.updateById(inputCreateDoctor);
+        return doctor;
+      }
+    } else {
       const inputCreateDoctor: UpdateDoctorInput = {
         id: input.id,
-        userId: userUpdated.id,
         academicTitle: input.academicTitle,
         degree: input.degree,
         doctorName: input.doctorName,
@@ -150,6 +171,14 @@ export class AuthService {
       const doctor = this.docSrv.updateById(inputCreateDoctor);
       return doctor;
     }
+  }
+  async deleteUserAndDoctor(doctorId: string): Promise<Doctor> {
+    const doc = await this.docSrv.delete(doctorId);
+    if (doc) {
+      // console.log('doctor deleted successfully');
+      this.userService.deleteUserById(doc.userId);
+    }
+    return doc;
   }
   // ----------------------------------------------------------------STAFF ----
   async signupAndCreateStaff(

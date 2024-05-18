@@ -12,17 +12,19 @@ import { CreateRegisterInput } from './entities/dtos/create-register.input';
 import { GetRegisterByOptionInput } from './entities/dtos/get-register-option.input';
 import { ConfirmRegisterInput } from './entities/dtos/confirm-register.input';
 import { GetAllRegisInYearInput } from './entities/dtos/get-all-register.input';
-import { GetRegisPendingInput } from './entities/dtos/get-regis-pending.input';
 import { GetRegisHistoryInput } from './entities/dtos/get-register-history.input copy';
 import { SessionInput } from '../contains/session/session.input';
 import { UpLoadFileRegisInput } from './entities/dtos/upload-file.input';
 import { LinkImage } from '../users/dto/image';
 import { deleteDocument } from 'src/utils/delete_image';
+import { RegisPendingInput } from './entities/dtos/regis-pending.input';
+import { ProfileService } from '../profile/profile.service';
 @Injectable()
 export class RegisterService {
   constructor(
     @InjectModel(Register.name)
     private readonly model: Model<Register>,
+    private readonly profileSrv: ProfileService,
   ) {}
 
   async findById(id: string): Promise<Register> {
@@ -132,7 +134,49 @@ export class RegisterService {
     return data;
   }
 
-  async getAllRegisPending(input: GetRegisPendingInput): Promise<Register[]> {
+  async getAllRegisPending(
+    input: RegisPendingInput,
+    page: number,
+    limit: number,
+    search: string = undefined,
+  ): Promise<Register[]> {
+    const startOfDay = new Date(input.startTime);
+    const endOfDay = new Date(input.endTime);
+
+    startOfDay.setHours(0, 0, 0, 0);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const query: any = { $or: [] };
+    if (search) {
+      const ids = await this.profileSrv.findByFullName(search);
+      console.log('test search: ', ids, search);
+      query.profileId = { $in: ids };
+    }
+    query.date = {
+      $gte: startOfDay,
+      $lte: endOfDay,
+    };
+    if (input.typeOfService) query.typeOfService = { $eq: input.typeOfService };
+    query.$or.push({ doctorId: { $in: input.doctorIds } });
+    query.$or.push({ packageId: { $in: input.packageIds } });
+    query.$or.push({ specialtyId: { $in: input.specialtyIds } });
+    query.$or.push({ vaccineId: { $in: input.vaccineIds } });
+
+    query.state = { $eq: EStateRegister.Pending };
+    query.cancel = { $eq: input.cancel };
+
+    const skip = (page - 1) * limit;
+    const data = await this.model
+      .find({
+        ...query,
+      })
+      .limit(limit)
+      .skip(skip)
+      .exec();
+    return data;
+  }
+
+  async getAllRegisPendingCount(input: RegisPendingInput): Promise<number> {
     const startOfDay = new Date(input.startTime);
     const endOfDay = new Date(input.endTime);
 
@@ -156,8 +200,7 @@ export class RegisterService {
       .find({
         ...query,
       })
-      .exec();
-    // console.log('test get pending: ', data, query);
+      .count();
     return data;
   }
 
@@ -336,18 +379,21 @@ export class RegisterService {
     }
   }
   async confirmRegister(input: ConfirmRegisterInput): Promise<Register> {
-    try {
-      const existingDoc = await this.model.findById(input.registerId);
-      if (existingDoc) {
-        existingDoc.state = input.state;
-        const updatedDoc = await existingDoc.save();
-        return updatedDoc;
+    var existingDoc = await this.model.findById(input.registerId);
+    if (existingDoc) {
+      if (existingDoc.cancel) {
+        throw new Error(
+          'Không thể thực hiện thao tác do yêu cầu đăng ký đã hủy',
+        );
       }
-      return null;
-    } catch (error) {
-      console.error('Error updating document:', error);
-      return null;
+      existingDoc.state = input.state;
+      if (input.note) {
+        existingDoc.note = input.note;
+      }
+      const updatedDoc = await existingDoc.save();
+      return updatedDoc;
     }
+    return null;
   }
   async regisDoctorCount(
     doctorId: string,

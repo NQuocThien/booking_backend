@@ -18,7 +18,7 @@ export class DoctorsService {
     return this.doctorModel.findById(id);
   }
   async delete(id: String): Promise<Doctor> {
-    return this.doctorModel.findByIdAndDelete(id);
+    return this.doctorModel.findByIdAndDelete(id, { new: true });
   }
 
   async create(data: CreateDoctorInput) {

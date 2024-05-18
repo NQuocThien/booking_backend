@@ -43,8 +43,14 @@ import { UpLoadFileRegisInput } from './entities/dtos/upload-file.input';
 import { UseGuards } from '@nestjs/common';
 import { JWtAuthGuard } from '../auth/jwt-auth.guard';
 import { SessionInput } from '../contains/session/session.input';
+import { RegisPendingInput } from './entities/dtos/regis-pending.input';
 const pubSub = new PubSub();
-
+interface IServiceIds {
+  doctorsIds: string[];
+  packagesIds: string[];
+  vaccinesIds: string[];
+  specialtiesIds: string[];
+}
 @Resolver(() => Register)
 export class RegisterResolver {
   constructor(
@@ -79,8 +85,74 @@ export class RegisterResolver {
   @Query(() => [Register], { name: 'getAllRegisPending' })
   async getAllRegisPending(
     @Args('input') input: GetRegisPendingInput,
-  ): Promise<any> {
-    return await this.regisService.getAllRegisPending(input);
+    @Args('page', { defaultValue: 1 }) page: number,
+    @Args('limit', { defaultValue: 10 }) limit: number,
+    @Args('search', { nullable: true, defaultValue: undefined }) search: string,
+  ): Promise<Register[]> {
+    if (input.userId) {
+      const facility = await this.facilityLoaderSrv.loadByUserId(input.userId);
+      if (facility) {
+        const serviceIds = await this.getServiceIds(facility.id);
+        const pendingInput: RegisPendingInput = {
+          ...input,
+          doctorIds: serviceIds.doctorsIds,
+          packageIds: serviceIds.packagesIds,
+          vaccineIds: serviceIds.vaccinesIds,
+          specialtyIds: serviceIds.specialtiesIds,
+        };
+        return await this.regisService.getAllRegisPending(
+          pendingInput,
+          page,
+          limit,
+          search,
+        );
+      }
+    } else if (input.facilityIdFromStaff) {
+      const serviceIds = await this.getServiceIds(input.facilityIdFromStaff);
+      const pendingInput: RegisPendingInput = {
+        ...input,
+        doctorIds: serviceIds.doctorsIds,
+        packageIds: serviceIds.packagesIds,
+        vaccineIds: serviceIds.vaccinesIds,
+        specialtyIds: serviceIds.specialtiesIds,
+      };
+      return await this.regisService.getAllRegisPending(
+        pendingInput,
+        page,
+        limit,
+      );
+    }
+    throw new Error('Không có quyền truy cập');
+  }
+  @Query(() => Number, { name: 'getAllRegisPendingCount' })
+  async getAllRegisPendingCount(
+    @Args('input') input: GetRegisPendingInput,
+  ): Promise<number> {
+    if (input.userId) {
+      const facility = await this.facilityLoaderSrv.loadByUserId(input.userId);
+      if (facility) {
+        const serviceIds = await this.getServiceIds(facility.id);
+        const pendingInput: RegisPendingInput = {
+          ...input,
+          doctorIds: serviceIds.doctorsIds,
+          packageIds: serviceIds.packagesIds,
+          vaccineIds: serviceIds.vaccinesIds,
+          specialtyIds: serviceIds.specialtiesIds,
+        };
+        return await this.regisService.getAllRegisPendingCount(pendingInput);
+      }
+    } else if (input.facilityIdFromStaff) {
+      const serviceIds = await this.getServiceIds(input.facilityIdFromStaff);
+      const pendingInput: RegisPendingInput = {
+        ...input,
+        doctorIds: serviceIds.doctorsIds,
+        packageIds: serviceIds.packagesIds,
+        vaccineIds: serviceIds.vaccinesIds,
+        specialtyIds: serviceIds.specialtiesIds,
+      };
+      return await this.regisService.getAllRegisPendingCount(pendingInput);
+    }
+    throw new Error('Không có quyền truy cập');
   }
 
   @Query(() => [Register], { name: 'getAllRegisOfService' })
@@ -99,20 +171,14 @@ export class RegisterResolver {
     if (userId !== '') {
       const facility = await this.facilityLoaderSrv.loadByUserId(userId);
       if (facility) {
-        const doctorIds: string[] =
-          await this.registerLoader.loadDoctorIdsByFacilityId(facility.id);
-        const packageIds: string[] =
-          await this.registerLoader.loadPackageIdsByFacilityId(facility.id);
-        const vaccinatioIds: string[] =
-          await this.registerLoader.loadVaccinationIdsByFacilityId(facility.id);
-        const specialtyIds: string[] =
-          await this.registerLoader.loadSpecialtyIdsByFacilityId(facility.id);
+        const serviceIds: IServiceIds = await this.getServiceIds(facility.id);
+
         const input: GetRegisHistoryInput = {
           profileId: profileId,
-          doctorIds: doctorIds,
-          packageIds: packageIds,
-          specialtyIds: specialtyIds,
-          vaccineIds: vaccinatioIds,
+          doctorIds: serviceIds.doctorsIds,
+          packageIds: serviceIds.packagesIds,
+          specialtyIds: serviceIds.specialtiesIds,
+          vaccineIds: serviceIds.vaccinesIds,
         };
         return await this.regisService.getRegisHistory(input, 'date', 'desc');
       }
@@ -120,29 +186,18 @@ export class RegisterResolver {
       if (staffId !== '') {
         const staff = await this.staffLoaderSrv.load(staffId);
         if (staff) {
-          const doctorIds: string[] =
-            await this.registerLoader.loadDoctorIdsByFacilityId(
-              staff.medicalFacilityId,
-            );
-          const packageIds: string[] =
-            await this.registerLoader.loadPackageIdsByFacilityId(
-              staff.medicalFacilityId,
-            );
-          const vaccinatioIds: string[] =
-            await this.registerLoader.loadVaccinationIdsByFacilityId(
-              staff.medicalFacilityId,
-            );
-          const specialtyIds: string[] =
-            await this.registerLoader.loadSpecialtyIdsByFacilityId(
-              staff.medicalFacilityId,
-            );
+          const serviceIds: IServiceIds = await this.getServiceIds(
+            staff.medicalFacilityId,
+          );
+
           const input: GetRegisHistoryInput = {
             profileId: profileId,
-            doctorIds: doctorIds,
-            packageIds: packageIds,
-            specialtyIds: specialtyIds,
-            vaccineIds: vaccinatioIds,
+            doctorIds: serviceIds.doctorsIds,
+            packageIds: serviceIds.packagesIds,
+            specialtyIds: serviceIds.specialtiesIds,
+            vaccineIds: serviceIds.vaccinesIds,
           };
+
           return await this.regisService.getRegisHistory(input, 'date', 'desc');
         }
       }
@@ -279,12 +334,21 @@ export class RegisterResolver {
   async confirmRegister(
     @Args('input') input: ConfirmRegisterInput,
   ): Promise<Register> {
-    const regis = await this.regisService.confirmRegister(input);
-    this.callEmitRegisterCreatedEvent(regis);
-    this.registerLoader.clean(regis.profileId);
-    // tạo thông báo
-    await this.createNottifyAndEmail(regis);
-    return regis;
+    // throw new Error('test error');
+    var res: Register;
+    await this.regisService
+      .confirmRegister(input)
+      .then((regis) => {
+        this.callEmitRegisterCreatedEvent(regis);
+        this.registerLoader.clean(regis.profileId);
+        // tạo thông báo
+        this.createNottifyAndEmail(regis);
+        res = regis;
+      })
+      .catch((e) => {
+        throw new Error(e);
+      });
+    return res;
   }
 
   // =============================== --> SUBSCRIPTION <--- ==================================
@@ -405,7 +469,7 @@ export class RegisterResolver {
       return false;
     },
   })
-  async registerPendingCreated(@Args('option') option: GetRegisPendingInput) {
+  async registerPendingCreated(@Args('option') option: RegisPendingInput) {
     return pubSub.asyncIterator('registerPendingCreated');
   }
 
@@ -487,10 +551,10 @@ export class RegisterResolver {
     const allRegisDateSession = await this.regisService.getRegisDate(date);
     const isExistProfileInSesssion = allRegisDateSession.find(
       (r) =>
-        (r.profileId === profileId &&
-          this.checkSessionExist(r.session, session)) ||
-        (r.session.startTime === session.startTime &&
-          r.session.endTime === session.endTime),
+        r.profileId === profileId &&
+        (this.checkSessionExist(r.session, session) ||
+          (r.session.startTime === session.startTime &&
+            r.session.endTime === session.endTime)),
     );
     const regisProfileInDay = allRegisDateSession.filter(
       (r) => r.profileId === profileId,
@@ -756,5 +820,22 @@ export class RegisterResolver {
         .create(notification)
         .then((res) => this.notificationResolver.emitNotifyCreatedEvent(res));
     }
+  }
+  async getServiceIds(facilityId: string): Promise<IServiceIds> {
+    const doctorIds: string[] =
+      await this.registerLoader.loadDoctorIdsByFacilityId(facilityId);
+    const packageIds: string[] =
+      await this.registerLoader.loadPackageIdsByFacilityId(facilityId);
+    const vaccinatioIds: string[] =
+      await this.registerLoader.loadVaccinationIdsByFacilityId(facilityId);
+    const specialtyIds: string[] =
+      await this.registerLoader.loadSpecialtyIdsByFacilityId(facilityId);
+
+    return {
+      doctorsIds: doctorIds,
+      packagesIds: packageIds,
+      vaccinesIds: vaccinatioIds,
+      specialtiesIds: specialtyIds,
+    };
   }
 }
