@@ -4,16 +4,16 @@ import { EStateRegister } from 'src/contain';
 @InputType()
 export class GetRegisterByOptionInput {
   @Field({ nullable: true })
-  doctorId?: String;
+  doctorId?: string;
 
   @Field({ nullable: true })
-  packageId?: String;
+  packageId?: string;
 
   @Field({ nullable: true })
-  vaccineId?: String;
+  vaccineId?: string;
 
   @Field({ nullable: true })
-  specialtyId?: String;
+  specialtyId?: string;
 
   @Field({ nullable: true })
   pedding: boolean;

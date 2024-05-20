@@ -44,6 +44,8 @@ import { UseGuards } from '@nestjs/common';
 import { JWtAuthGuard } from '../auth/jwt-auth.guard';
 import { SessionInput } from '../contains/session/session.input';
 import { RegisPendingInput } from './entities/dtos/regis-pending.input';
+import { Workbook } from 'exceljs';
+import * as path from 'path';
 const pubSub = new PubSub();
 interface IServiceIds {
   doctorsIds: string[];
@@ -334,14 +336,12 @@ export class RegisterResolver {
   async confirmRegister(
     @Args('input') input: ConfirmRegisterInput,
   ): Promise<Register> {
-    // throw new Error('test error');
     var res: Register;
     await this.regisService
       .confirmRegister(input)
       .then((regis) => {
         this.callEmitRegisterCreatedEvent(regis);
         this.registerLoader.clean(regis.profileId);
-        // tạo thông báo
         this.createNottifyAndEmail(regis);
         res = regis;
       })
@@ -350,7 +350,142 @@ export class RegisterResolver {
       });
     return res;
   }
+  @Mutation(() => [Register], { name: 'confirmRegisters' })
+  async confirmRegisters(
+    @Args('input', { type: () => [ConfirmRegisterInput] })
+    input: ConfirmRegisterInput[],
+  ): Promise<Register[]> {
+    const res = await this.regisService.confirmRegisters(input);
+    if (res) {
+      res.map((r) => {
+        this.callEmitRegisterCreatedEvent(r);
+        this.registerLoader.clean(r.profileId);
+        this.createNottifyAndEmail(r);
+      });
+    }
+    return res;
+  }
 
+  // --->> EXCEL <<----
+
+  @Mutation(() => String, { name: 'generateExcelRegisByOption' })
+  async generateExcelRegisByOption(
+    @Args('input') input: GetRegisterByOptionInput,
+  ): Promise<string> {
+    const listRegis: Register[] =
+      await this.regisService.getAllRegisterByOption(input);
+    const listProfileId: string[] = listRegis.map((r) => r.profileId);
+    const listProfile = await this.profileSvr.findByIds(listProfileId);
+    const data = listRegis.map((r) => {
+      const p = listProfile.find((pr) => pr.id === r.profileId);
+      if (p)
+        return {
+          regisId: r.id,
+          fullname: p.fullname,
+          dateOfBirth: p.dataOfBirth,
+          numberPhone: p.numberPhone,
+          gender: p.gender,
+          state: r.state,
+          date: r.date,
+          session: `${r.session.startTime}-${r.session.endTime}`,
+          note: r.note,
+        };
+    }); // --> end map
+
+    // ---> Render file Excel
+    var type: string;
+    if (input.doctorId) {
+      const service: string = (await this.doctorLoader.load(input.doctorId))
+        .doctorName;
+      type = `${ETypeOfService.Doctor} - ${service}`;
+    } else if (input.packageId) {
+      const service: string = (await this.packageLoader.load(input.packageId))
+        .packageName;
+      type = `${ETypeOfService.Package} - ${service}`;
+    } else if (input.specialtyId) {
+      const service: string = (
+        await this.specialtyLoader.load(input.specialtyId)
+      ).specialtyName;
+      type = `${ETypeOfService.Specialty} - ${service}`;
+    } else if (input.vaccineId) {
+      const service: string = (
+        await this.vaccinationLoader.load(input.vaccineId)
+      ).vaccineName;
+      type = `${ETypeOfService.Vaccine} - ${service}`;
+    }
+    const workbook = new Workbook();
+    const worksheet = workbook.addWorksheet('Registration');
+    worksheet.columns = [
+      { header: '#', key: 'index', width: 5 },
+      { header: 'Mã đăng ký', key: 'id', width: 20 },
+      { header: 'Tên bệnh nhân', key: 'fullname', width: 30 },
+      { header: 'Giới tính', key: 'gender', width: 15 },
+      { header: 'Ngày sinh', key: 'dateOfBirth', width: 20 },
+      { header: 'Số điện thoại', key: 'numberPhone', width: 20 },
+      { header: 'Phiên khám', key: 'session', width: 20 },
+      { header: 'Đã khám', key: 'state', width: 10 },
+      { header: 'Ghi chú', key: 'note', width: 50 },
+    ];
+    data.map((d, i) => {
+      if (d)
+        worksheet.addRow({
+          index: `${i + 1} .`,
+          id: d.regisId,
+          fullname: d.fullname,
+          gender: d.gender,
+          dateOfBirth: d.dateOfBirth,
+          numberPhone: d.numberPhone,
+          session: d.session,
+          state: d.state === EStateRegister.Success ? 'x' : '',
+          note: d.note,
+        });
+    });
+    const inputDate = new Date(input.date);
+    worksheet.spliceRows(1, 0, [
+      `Danh sách đăng ký ${type} ngày (${inputDate.getFullYear()}-${
+        inputDate.getMonth() + 1
+      } ${inputDate.getDate()} )`,
+    ]);
+
+    worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
+      row.eachCell((cell, colNumber) => {
+        cell.font = {
+          size: 12,
+          bold: false,
+          name: 'Arial',
+        };
+        cell.alignment = { vertical: 'middle', horizontal: 'left' };
+      });
+    });
+
+    const firstRow = worksheet.getRow(1);
+    const seccontRow = worksheet.getRow(2);
+    firstRow.eachCell((cell, colNumber) => {
+      cell.font = {
+        size: 14,
+        bold: true,
+        color: { argb: 'FF0000FF' },
+        name: 'Arial',
+      };
+      cell.alignment = { vertical: 'middle', horizontal: 'left' };
+    });
+    seccontRow.eachCell((cell, colNumber) => {
+      cell.font = {
+        size: 12,
+        bold: true,
+        name: 'Arial',
+      };
+      cell.alignment = { vertical: 'middle', horizontal: 'left' };
+    });
+
+    // Tạo timestamp để đảm bảo tên file là duy nhất
+    const timestamp = new Date().getTime().toString().slice(6, -1);
+    const fileName = `registration-${timestamp}.xlsx`;
+    const filePath = path.join(process.env.SAVER_FILE_EXCEL, fileName);
+    await workbook.xlsx.writeFile(filePath);
+
+    return fileName;
+  }
   // =============================== --> SUBSCRIPTION <--- ==================================
 
   @Subscription(() => Register, {

@@ -395,6 +395,28 @@ export class RegisterService {
     }
     return null;
   }
+  async confirmRegisters(input: ConfirmRegisterInput[]): Promise<Register[]> {
+    const updatePromises = await input.map((item) =>
+      this.model.findByIdAndUpdate(
+        item.registerId,
+        {
+          state: item.state,
+          note: item.note,
+        },
+        { new: true },
+      ),
+    );
+    var dateUpdated: Register[];
+    await Promise.all(updatePromises)
+      .then((updatedDocs) => {
+        dateUpdated = updatedDocs;
+      })
+      .catch((err) => {
+        console.error('Error updating users:', err);
+      });
+
+    return dateUpdated;
+  }
   async regisDoctorCount(
     doctorId: string,
     startTime: string,

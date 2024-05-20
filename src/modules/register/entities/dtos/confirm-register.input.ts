@@ -4,7 +4,7 @@ import { EStateRegister } from 'src/contain';
 @InputType()
 export class ConfirmRegisterInput {
   @Field()
-  registerId: String;
+  registerId: string;
 
   @Field({ nullable: true })
   note: string;

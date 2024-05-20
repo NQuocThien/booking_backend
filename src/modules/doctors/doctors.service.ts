@@ -7,7 +7,9 @@ import { UpdateDoctorInput } from './entities/dtos/update-doctor.input';
 import { deleteDatePast } from 'src/utils/contain';
 import { EStatusService } from 'src/contain';
 import { FilterDoctorInput } from './entities/dtos/filter-doctor.input';
-
+import { Workbook } from 'exceljs';
+import * as path from 'path';
+import { config } from 'dotenv';
 @Injectable()
 export class DoctorsService {
   constructor(
@@ -153,6 +155,28 @@ export class DoctorsService {
     const count = await this.doctorModel.countDocuments(query);
     return count;
   }
+
+  async generateExcel(): Promise<string> {
+    const workbook = new Workbook();
+    const worksheet = workbook.addWorksheet('Registration');
+    const file = process.env.SAVER_FILE_EXCEL;
+    worksheet.columns = [
+      { header: 'ID', key: 'id', width: 10 },
+      { header: 'Name', key: 'name', width: 30 },
+      { header: 'Email', key: 'email', width: 30 },
+    ];
+
+    worksheet.addRow({ id: 1, name: 'John Doe', email: 'john@example.com' });
+    worksheet.addRow({ id: 2, name: 'Jane Doe', email: 'jane@example.com' });
+
+    // Tạo timestamp để đảm bảo tên file là duy nhất
+    const timestamp = new Date().getTime().toString().slice(6, -1);
+    const fileName = `excel-${timestamp}.xlsx`;
+    const filePath = path.join(process.env.SAVER_FILE_EXCEL, fileName);
+    await workbook.xlsx.writeFile(filePath);
+    return fileName;
+  }
+
   renderQuery(
     filter: FilterDoctorInput,
     facilityId: string = undefined,

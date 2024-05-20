@@ -27,6 +27,7 @@ import { NotificationModule } from './modules/notification/notification.module';
 import { BlogsModule } from './modules/blogs/blogs.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { MailModule } from './modules/mail/mail.module';
+import { ApolloServerPluginLandingPageLocalDefault } from 'apollo-server-core';
 
 dotenv.config();
 @Module({
@@ -41,6 +42,9 @@ dotenv.config();
         'graphql-ws': true,
         'subscriptions-transport-ws': true,
       },
+      // playground: false,
+      // plugins: [],
+      context: ({ req, res }) => ({ req, res }),
     }),
     // ServeStaticModule.forRoot({
     //   rootPath: join(__dirname, '../files'),

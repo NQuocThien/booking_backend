@@ -5,6 +5,7 @@ import {
   Query,
   ResolveField,
   Parent,
+  Context,
 } from '@nestjs/graphql';
 import { DoctorsService } from './doctors.service';
 import { CreateDoctorInput } from './entities/dtos/create-doctor.input';
@@ -20,7 +21,7 @@ import { MedicalFacilities } from '../medical-facilities/entities/mecical-facili
 import { RegisterService } from '../register/register.service';
 import { FacilitiesLoaderService } from '../medical-facilities/facility-loader';
 import { RegisterLoaderService } from '../register/register-loader.service';
-
+import { Response } from 'express';
 @Resolver(() => Doctor)
 export class DoctorsResolver {
   constructor(
@@ -261,6 +262,12 @@ export class DoctorsResolver {
       console.log('Error Delete Image');
     }
     return this.doctorService.delete(id);
+  }
+
+  @Mutation(() => String, { name: 'generateExcel' })
+  async generateExcel(): Promise<string> {
+    const url = await this.doctorService.generateExcel();
+    return url;
   }
   // ======================================>> RESOLVE FIELD <<===========================================================
 

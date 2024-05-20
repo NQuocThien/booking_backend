@@ -518,6 +518,7 @@ type Mutation {
   cancelRegister(id: String!): Register!
   cancelRegisterByAdmin(content: String!, id: String!): Register!
   confirmRegister(input: ConfirmRegisterInput!): Register!
+  confirmRegisters(input: [ConfirmRegisterInput!]!): [Register!]!
   createBlog(input: CreateBlogInput!): Blog!
   createCustomer(input: CreateCustomerInput!): Customer!
   createDoctor(createDoctorInput: CreateDoctorInput!): Doctor!
@@ -546,6 +547,8 @@ type Mutation {
   deleteUser(id: String!): User!
   deleteUserAndDoctor(doctorId: String!, medicalFactilitiesId: String!): Doctor!
   deleteVaccination(input: String!): Vaccination!
+  generateExcel: String!
+  generateExcelRegisByOption(input: GetRegisterByOptionInput!): String!
   login(loginUserInput: LoginUserInput!): LoginRespone!
   logout: LogoutUser!
   seenAllNotification(userId: String!): String!

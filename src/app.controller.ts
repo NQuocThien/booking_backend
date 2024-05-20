@@ -20,23 +20,19 @@ export class AppController {
   ) {
     try {
       let imagePath = path.join(process.cwd(), '/files/images/');
-      // Nếu có tham số folder, thêm vào đường dẫn
       if (folder) {
         imagePath = path.join(imagePath, folder);
       }
       imagePath = path.join(imagePath, filename);
-      // console.log('--> get image: ' + filename);
-      // Kiểm tra xem tệp có tồn tại không
       if (!fs.existsSync(imagePath)) {
-        // Trả về lỗi 404 Not Found nếu tệp không tồn tại
         return res.status(404).send('Image not found');
       }
-      // Nếu tệp tồn tại, trả về nó bằng phản hồi HTTP
       return res.sendFile(imagePath);
     } catch (e) {
       console.error(e);
     }
   }
+
   @Get('/documents/:filename')
   async serverDocument(
     @Param('filename') filename: string,
@@ -45,16 +41,36 @@ export class AppController {
     try {
       let imagePath = path.join(process.cwd(), '/files/documents/');
       imagePath = path.join(imagePath, filename);
-      // console.log('--> get image: ' + filename);
-      // Kiểm tra xem tệp có tồn tại không
       if (!fs.existsSync(imagePath)) {
-        // Trả về lỗi 404 Not Found nếu tệp không tồn tại
         return res.status(404).send('Image not found');
       }
-      // Nếu tệp tồn tại, trả về nó bằng phản hồi HTTP
       return res.sendFile(imagePath);
     } catch (e) {
       console.error(e);
+    }
+  }
+
+  @Get('/download/doctor/:filename')
+  async getExcel(@Res() res: Response, @Param('filename') filename: string) {
+    try {
+      const filePath = path.join(process.cwd(), 'files', 'exports', filename);
+      const fileStream = fs.createReadStream(filePath);
+      res.setHeader(
+        'Content-Type',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      );
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="${filename}"`,
+      );
+
+      fileStream.pipe(res);
+      fileStream.on('end', () => {
+        fs.unlinkSync(filePath);
+      });
+    } catch (error) {
+      console.error('Error occurred while sending Excel file:', error);
+      res.status(500).send('Error occurred while sending Excel file');
     }
   }
 }
