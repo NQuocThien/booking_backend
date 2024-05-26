@@ -380,6 +380,18 @@ type Evaluate {
   vaccineId: String
 }
 
+type Exception {
+  dates: [DateTime!]!
+  numbeSlot: Float
+  open: Boolean!
+}
+
+input ExceptionInput {
+  dates: [DateTime!]!
+  numbeSlot: Float
+  open: Boolean!
+}
+
 input FilterDoctorInput {
   academicTitle: EAcademicTitle
   degree: EDegree
@@ -436,6 +448,12 @@ input GetRegisterByOptionInput {
   pedding: Boolean
   specialtyId: String
   vaccineId: String
+}
+
+input GetRegisterHaveInput {
+  date: DateTime!
+  serviceId: String!
+  type: ETypeOfService!
 }
 
 type LinkImage {
@@ -668,7 +686,7 @@ type Query {
   getAllPackageSelect(input: String!): [Package!]!
   getAllProfile: [Profile!]!
   getAllRegisCountByOption(input: GetRegisterByOptionInput!): Register!
-  getAllRegisOfService(input: GetRegisterByOptionInput!): [Register!]!
+  getAllRegisOfService(input: GetRegisterHaveInput!): [Register!]!
   getAllRegisPending(input: GetRegisPendingInput!, limit: Float! = 10, missed: Boolean = false, page: Float! = 1, search: String): [Register!]!
   getAllRegisPendingCount(input: GetRegisPendingInput!): Float!
   getAllRegisterByOption(input: GetRegisterByOptionInput!): [Register!]!
@@ -790,11 +808,13 @@ input ScheduleInput {
 
 type Session {
   endTime: String!
+  exceptions: [Exception!]
   startTime: String!
 }
 
 input SessionInput {
   endTime: String!
+  exceptions: [ExceptionInput!]
   startTime: String!
 }
 

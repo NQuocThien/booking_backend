@@ -1,11 +1,13 @@
-import { Prop, Schema } from '@nestjs/mongoose';
-import { Session } from '../session/session.schema';
-import { EDayOfWeed } from 'src/contain';
-@Schema()
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+@Schema({ _id: false })
 export class Exception {
-  @Prop({ type: EDayOfWeed })
-  dayOfWeek: EDayOfWeed;
+  @Prop(() => [Date])
+  dates: Date[];
 
-  @Prop({ type: [Session], default: null })
-  sessions: Session[];
+  @Prop()
+  open: Boolean;
+
+  @Prop()
+  numbeSlotUpdateVaccination: Number;
 }
+export const ExceptionSchema = SchemaFactory.createForClass(Exception);

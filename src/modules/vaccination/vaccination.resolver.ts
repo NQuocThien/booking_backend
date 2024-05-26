@@ -247,7 +247,8 @@ export class VaccinationResolver {
   async updateVaccination(
     @Args('input') input: UpdateVaccineInput,
   ): Promise<Vaccination> {
-    return await this.vaccinationService.update(input);
+    const res = await this.vaccinationService.update(input);
+    return res;
   }
 
   @Mutation(() => Vaccination, { name: 'deleteVaccination' })

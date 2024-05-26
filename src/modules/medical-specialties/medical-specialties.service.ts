@@ -89,7 +89,6 @@ export class MedicalSpecialtiesService {
     if (isClient) {
       query['workSchedule.status'] = EStatusService.Open;
     }
-    console.log(query);
     const count = await this.medicalSpecialtiesModel.countDocuments(query);
     return count;
   }

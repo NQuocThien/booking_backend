@@ -48,12 +48,19 @@ import { Workbook } from 'exceljs';
 import * as path from 'path';
 import { CreateBlockInput } from '../contains/blocks/blocks.input';
 import { MedicalFacilities } from '../medical-facilities/entities/mecical-facilies.entity';
+import { GetRegisterHaveInput } from './entities/dtos/get-register-have.input';
+import { formatDate } from 'src/utils/contain';
 const pubSub = new PubSub();
 interface IServiceIds {
   doctorsIds: string[];
   packagesIds: string[];
   vaccinesIds: string[];
   specialtiesIds: string[];
+}
+enum eEx {
+  close,
+  end,
+  block,
 }
 @Resolver(() => Register)
 export class RegisterResolver {
@@ -116,11 +123,7 @@ export class RegisterResolver {
           allRegisPending,
           serviceIds,
         );
-        console.log('test allRegisPending', allRegisPending);
-        console.log(
-          'test allRegisPendingAddWarning',
-          allRegisPendingAddWarning,
-        );
+
         return allRegisPendingAddWarning;
       }
     } else if (input.facilityIdFromStaff) {
@@ -180,7 +183,7 @@ export class RegisterResolver {
 
   @Query(() => [Register], { name: 'getAllRegisOfService' })
   async getAllRegisOfService(
-    @Args('input') input: GetRegisterByOptionInput,
+    @Args('input') input: GetRegisterHaveInput,
   ): Promise<any> {
     return await this.regisService.getAllRegisOfService(input);
   }
@@ -248,7 +251,6 @@ export class RegisterResolver {
     @Args('sortOrder', { nullable: true, defaultValue: 'desc' })
     sortOrder: string,
   ): Promise<Customer[]> {
-    // console.log('facilityId : ', facilityId, userId);
     if (userId) {
       // by facility
       const facility = await this.facilityLoaderSrv.loadByUserId(userId);
@@ -278,7 +280,6 @@ export class RegisterResolver {
       }
     } else {
       if (facilityId) {
-        // console.log('facilityId : ', facilityId);
         const serviceIds = await this.getServiceIds(facilityId);
         const allRegis =
           await this.regisService.getAllReistrationByIdService(serviceIds);
@@ -908,39 +909,133 @@ export class RegisterResolver {
     serviceId: string,
     profileId: string,
     createBy: string = undefined,
-  ): Promise<Boolean> => {
+    count: number,
+    session: SessionInput,
+    date: string,
+  ): Promise<eEx> => {
+    const day = new Date(date).getDay();
+    const dayOfWeek = ['Chủ nhật', '2', '3', '4', '5', '6', '7'][day];
     if (typeOfService === ETypeOfService.Doctor) {
       const doctor = await this.doctorLoader.load(serviceId);
+      const sessionMains = doctor.workSchedule.schedule.find(
+        (s) => s.dayOfWeek === dayOfWeek,
+      ).sessions;
+      for (var ss of sessionMains) {
+        if (
+          ss.startTime === session.startTime &&
+          ss.endTime === session.endTime
+        ) {
+          if (ss?.exceptions) {
+            for (var ex of ss.exceptions) {
+              if (
+                ex.dates.find(
+                  (e) => formatDate(e.toDateString()) === formatDate(date),
+                )
+              ) {
+                if (count >= ex.numbeSlot) return eEx.end;
+                if (ex.open === false) return eEx.close;
+              }
+            }
+          }
+        }
+      }
       const facility = await this.facilityLoaderSrv.load(
         doctor.medicalFactilitiesId,
       );
+
       const isblock = await this.isBlock(facility, profileId, createBy);
-      if (isblock) return true;
+      if (isblock) return eEx.block;
     }
     if (typeOfService === ETypeOfService.Package) {
       const p = await this.packageLoader.load(serviceId);
+      const sessionMains = p.workSchedule.schedule.find(
+        (s) => s.dayOfWeek === dayOfWeek,
+      ).sessions;
+      for (var ss of sessionMains) {
+        if (
+          ss.startTime === session.startTime &&
+          ss.endTime === session.endTime
+        ) {
+          if (ss?.exceptions) {
+            for (var ex of ss.exceptions) {
+              if (
+                ex.dates.find(
+                  (e) => formatDate(e.toDateString()) === formatDate(date),
+                )
+              ) {
+                if (count >= ex.numbeSlot) return eEx.end;
+                if (ex.open === false) return eEx.close;
+              }
+            }
+          }
+        }
+      }
       const facility = await this.facilityLoaderSrv.load(
         p.medicalFactilitiesId,
       );
       const isblock = await this.isBlock(facility, profileId, createBy);
-      if (isblock) return true;
+      if (isblock) return eEx.block;
     }
     if (typeOfService === ETypeOfService.Specialty) {
       const specialty = await this.specialtyLoader.load(serviceId);
+      const sessionMains = specialty.workSchedule.schedule.find(
+        (s) => s.dayOfWeek === dayOfWeek,
+      ).sessions;
+      for (var ss of sessionMains) {
+        if (
+          ss.startTime === session.startTime &&
+          ss.endTime === session.endTime
+        ) {
+          if (ss?.exceptions) {
+            for (var ex of ss.exceptions) {
+              if (
+                ex.dates.find(
+                  (e) => formatDate(e.toDateString()) === formatDate(date),
+                )
+              ) {
+                if (count >= ex.numbeSlot) return eEx.end;
+                if (ex.open === false) return eEx.close;
+              }
+            }
+          }
+        }
+      }
       const facility = await this.facilityLoaderSrv.load(
         specialty.medicalFactilityId,
       );
       const isblock = await this.isBlock(facility, profileId, createBy);
 
-      if (isblock) return true;
+      if (isblock) return eEx.block;
     }
     if (typeOfService === ETypeOfService.Vaccine) {
       const p = await this.vaccinationLoader.load(serviceId);
+      const sessionMains = p.workSchedule.schedule.find(
+        (s) => s.dayOfWeek === dayOfWeek,
+      ).sessions;
+      for (var ss of sessionMains) {
+        if (
+          ss.startTime === session.startTime &&
+          ss.endTime === session.endTime
+        ) {
+          if (ss?.exceptions) {
+            for (var ex of ss.exceptions) {
+              if (
+                ex.dates.find(
+                  (e) => formatDate(e.toDateString()) === formatDate(date),
+                )
+              ) {
+                if (count >= ex.numbeSlot) return eEx.end;
+                if (ex.open === false) return eEx.close;
+              }
+            }
+          }
+        }
+      }
       const facility = await this.facilityLoaderSrv.load(
         p.medicalFactilitiesId,
       );
       const isblock = await this.isBlock(facility, profileId, createBy);
-      if (isblock) return true;
+      if (isblock) return eEx.block;
     }
   };
 
@@ -1017,11 +1112,15 @@ export class RegisterResolver {
       serviceId,
       profileId,
       createBy,
+      countRegisOfSession(),
+      session,
+      date,
     );
 
     // ---------------------------------------------------------------
-
-    if (checkBlock) throw new Error('Cơ sở y tế đã chặn đăng ký');
+    if (checkBlock === eEx.block) throw new Error('Cơ sở y tế đã chặn đăng ký');
+    if (checkBlock === eEx.close) throw new Error('Phiên khám đã tạm đóng');
+    if (checkBlock === eEx.end) throw new Error('Phiên khám đã đầy');
     if (isExistProfileInSesssion) {
       throw new Error('Phiên khám đã tồn tại'); // check
     }

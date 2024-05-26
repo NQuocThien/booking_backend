@@ -1,4 +1,5 @@
 import { Prop, Schema } from '@nestjs/mongoose';
+import { Exception, ExceptionSchema } from '../exception/exception.schema';
 @Schema({ _id: false })
 export class Session {
   @Prop()
@@ -6,8 +7,7 @@ export class Session {
 
   @Prop()
   endTime: string;
-  // ngoại lệ
-  // ngày
-  // trangthai
-  // soluong
+
+  @Prop({ type: [ExceptionSchema], default: [] })
+  exceptions: Exception[];
 }

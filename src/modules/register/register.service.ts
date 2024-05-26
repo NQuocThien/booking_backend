@@ -3,7 +3,7 @@ import { Register } from './entities/register.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UpdateRegisterInput } from './entities/dtos/update-register.input';
-import { EStateRegister, ETypeOfService } from 'src/contain';
+import { EStateRegister, EStatusService, ETypeOfService } from 'src/contain';
 import { CreateRegisterDoctorInput } from './entities/dtos/create-register-doctor.input';
 import { CreateRegisterSpecialtyInput } from './entities/dtos/create-register-specialty.input';
 import { CreateRegisterPackageInput } from './entities/dtos/create-register-package.Input';
@@ -19,6 +19,7 @@ import { LinkImage } from '../users/dto/image';
 import { deleteDocument } from 'src/utils/delete_image';
 import { RegisPendingInput } from './entities/dtos/regis-pending.input';
 import { ProfileService } from '../profile/profile.service';
+import { GetRegisterHaveInput } from './entities/dtos/get-register-have.input';
 
 interface IServiceIds {
   doctorsIds: string[];
@@ -256,30 +257,32 @@ export class RegisterService {
     return data;
   }
 
-  async getAllRegisOfService(
-    input: GetRegisterByOptionInput,
-  ): Promise<Register[]> {
+  async getAllRegisOfService(input: GetRegisterHaveInput): Promise<Register[]> {
     const startOfDay = new Date(input.date);
     const endOfDay = new Date(input.date);
 
     startOfDay.setHours(0, 0, 0, 0);
     endOfDay.setHours(23, 59, 59, 999);
 
-    const query: any = { $or: [] };
+    const query: any = {};
     query.date = {
       $gte: startOfDay,
       $lte: endOfDay,
     };
-    query.$or.push({ doctorId: { $eq: input.doctorId } });
-    query.$or.push({ packageId: { $eq: input.packageId } });
-    query.$or.push({ specialtyId: { $eq: input.specialtyId } });
-    query.$or.push({ vaccineId: { $eq: input.vaccineId } });
+    if (input.type === ETypeOfService.Doctor)
+      query.doctorId = { $eq: input.serviceId };
+    if (input.type === ETypeOfService.Package)
+      query.packageId = { $eq: input.serviceId };
+    if (input.type === ETypeOfService.Specialty)
+      query.specialtyId = { $eq: input.serviceId };
+    if (input.type === ETypeOfService.Vaccine)
+      query.vaccineId = { $eq: input.serviceId };
+    query.cancel = { $eq: false };
     const data = await this.model
       .find({
         ...query,
       })
       .exec();
-    // console.log('test get pending: ', data, query);
     return data;
   }
 

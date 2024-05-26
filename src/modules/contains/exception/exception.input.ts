@@ -1,15 +1,13 @@
-import { Field, InputType, registerEnumType } from '@nestjs/graphql';
-import { SessionInput } from '../session/session.input';
-import { EDayOfWeed } from 'src/contain';
+import { Field, InputType } from '@nestjs/graphql';
 
 @InputType()
 export class ExceptionInput {
-  @Field(() => EDayOfWeed)
-  dayOfWeek: EDayOfWeed; // thứ trong tuần (thứ 2)
+  @Field(() => [Date])
+  dates: Date[];
 
-  @Field(() => [SessionInput])
-  sessions: [SessionInput]; //
+  @Field()
+  open: Boolean;
+
+  @Field({ nullable: true })
+  numbeSlot: Number;
 }
-registerEnumType(EDayOfWeed, {
-  name: 'EDayOfWeed',
-});
