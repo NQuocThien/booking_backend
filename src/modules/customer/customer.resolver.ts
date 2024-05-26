@@ -40,7 +40,7 @@ export class CustomerResolver {
     @Args('search', { nullable: true }) search: string,
     @Args('page', { defaultValue: 1 }) page: number,
     @Args('limit', { defaultValue: 10 }) limit: number,
-    @Args('sortField', { nullable: true, defaultValue: 'name' })
+    @Args('sortField', { nullable: true, defaultValue: 'fullname' })
     sortField: string,
     @Args('sortOrder', { nullable: true }) sortOrder: string,
   ): Promise<Customer[]> {
@@ -55,6 +55,30 @@ export class CustomerResolver {
       return user;
     }
   }
+  // @Query(() => [Customer], { name: 'getAllCustomerPaginationForClient' })
+  // // @UseGuards(JWtAuthGuard)
+  // async getAllCustomerPaginationForClient(
+  //   @Args('userId', { nullable: true, defaultValue: undefined }) userId: string,
+  //   @Args('facilityId', { nullable: true, defaultValue: undefined })
+  //   facilityId: string,
+  //   @Args('search', { nullable: true }) search: string,
+  //   @Args('page', { defaultValue: 1 }) page: number,
+  //   @Args('limit', { defaultValue: 10 }) limit: number,
+  //   @Args('sortField', { nullable: true, defaultValue: 'name' })
+  //   sortField: string,
+  //   @Args('sortOrder', { nullable: true }) sortOrder: string,
+  // ): Promise<Customer[]> {
+  //   {
+  //     const user = await this.customerService.getAllCustomerPagination(
+  //       search,
+  //       page,
+  //       limit,
+  //       sortField,
+  //       sortOrder,
+  //     );
+  //     return user;
+  //   }
+  // }
 
   @Mutation(() => Customer, { name: 'createCustomer' })
   async createCustomer(@Args('input') input: CreateCustomerInput) {

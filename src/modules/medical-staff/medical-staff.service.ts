@@ -124,15 +124,16 @@ export class MedicalStaffService {
     search: string,
     facilityId: string,
   ): Promise<number> {
-    const query = search
-      ? {
-          staffName: {
-            $regex: new RegExp(search, 'i'),
-            medicalFacilityId: facilityId,
-          },
-        }
-      : { medicalFactilitiesId: facilityId };
-    const count = await this.model.countDocuments(query);
+    const query: any = {};
+
+    // if (search)
+    //   query.staffName = {
+    //     $regex: new RegExp(search, 'i'),
+    //   };
+    const count = await this.model.count({
+      ...query,
+      medicalFacilityId: facilityId,
+    });
     return count;
   }
 }

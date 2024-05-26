@@ -46,6 +46,8 @@ import { SessionInput } from '../contains/session/session.input';
 import { RegisPendingInput } from './entities/dtos/regis-pending.input';
 import { Workbook } from 'exceljs';
 import * as path from 'path';
+import { CreateBlockInput } from '../contains/blocks/blocks.input';
+import { MedicalFacilities } from '../medical-facilities/entities/mecical-facilies.entity';
 const pubSub = new PubSub();
 interface IServiceIds {
   doctorsIds: string[];
@@ -90,6 +92,7 @@ export class RegisterResolver {
     @Args('page', { defaultValue: 1 }) page: number,
     @Args('limit', { defaultValue: 10 }) limit: number,
     @Args('search', { nullable: true, defaultValue: undefined }) search: string,
+    @Args('missed', { nullable: true, defaultValue: false }) missed: boolean,
   ): Promise<Register[]> {
     if (input.userId) {
       const facility = await this.facilityLoaderSrv.loadByUserId(input.userId);
@@ -102,12 +105,23 @@ export class RegisterResolver {
           vaccineIds: serviceIds.vaccinesIds,
           specialtyIds: serviceIds.specialtiesIds,
         };
-        return await this.regisService.getAllRegisPending(
+        const allRegisPending = await this.regisService.getAllRegisPending(
           pendingInput,
           page,
           limit,
           search,
+          missed,
         );
+        const allRegisPendingAddWarning = await this.checkWarningRegis(
+          allRegisPending,
+          serviceIds,
+        );
+        console.log('test allRegisPending', allRegisPending);
+        console.log(
+          'test allRegisPendingAddWarning',
+          allRegisPendingAddWarning,
+        );
+        return allRegisPendingAddWarning;
       }
     } else if (input.facilityIdFromStaff) {
       const serviceIds = await this.getServiceIds(input.facilityIdFromStaff);
@@ -118,11 +132,18 @@ export class RegisterResolver {
         vaccineIds: serviceIds.vaccinesIds,
         specialtyIds: serviceIds.specialtiesIds,
       };
-      return await this.regisService.getAllRegisPending(
+      const allRegisPending = await this.regisService.getAllRegisPending(
         pendingInput,
         page,
         limit,
+        search,
+        missed,
       );
+      const allRegisPendingAddWarning = await this.checkWarningRegis(
+        allRegisPending,
+        serviceIds,
+      );
+      return allRegisPendingAddWarning;
     }
     throw new Error('Không có quyền truy cập');
   }
@@ -211,7 +232,129 @@ export class RegisterResolver {
   async getAllRegisCountByOption(
     @Args('input') input: GetRegisterByOptionInput,
   ): Promise<any> {
-    // return await this.regisService.getAllRegisPending(input);
+    return null;
+  }
+
+  @Query(() => [Customer], { name: 'getAllCustomerFromRegis' })
+  async getAllCustomerFromRegis(
+    @Args('userId', { nullable: true, defaultValue: undefined }) userId: string,
+    @Args('facilityId', { nullable: true, defaultValue: undefined })
+    facilityId: string,
+    @Args('page', { defaultValue: 1 })
+    page: number,
+    @Args('limit', { defaultValue: 10 }) limit: number,
+    @Args('search', { nullable: true, defaultValue: undefined }) search: string,
+
+    @Args('sortOrder', { nullable: true, defaultValue: 'desc' })
+    sortOrder: string,
+  ): Promise<Customer[]> {
+    // console.log('facilityId : ', facilityId, userId);
+    if (userId) {
+      // by facility
+      const facility = await this.facilityLoaderSrv.loadByUserId(userId);
+
+      if (facility) {
+        const serviceIds = await this.getServiceIds(facility.id);
+        const allRegis =
+          await this.regisService.getAllReistrationByIdService(serviceIds);
+        let profileIds = allRegis.map((r) => r.profileId);
+        profileIds = [...new Set(profileIds)];
+        const profiles = await this.profileSvr.findByIds(profileIds);
+        let customerIds = profiles.map((p) => p.customerId);
+        customerIds = [...new Set(customerIds)];
+
+        let customerKeys = allRegis.map((r) => r.createdBy && r.createdBy);
+        customerKeys = [...new Set(customerKeys)];
+        const customers = await this.customerSrv.findByIdsAndKeys(
+          customerIds,
+          customerKeys,
+          page,
+          limit,
+          search,
+          undefined,
+          sortOrder,
+        );
+        return customers;
+      }
+    } else {
+      if (facilityId) {
+        // console.log('facilityId : ', facilityId);
+        const serviceIds = await this.getServiceIds(facilityId);
+        const allRegis =
+          await this.regisService.getAllReistrationByIdService(serviceIds);
+        let profileIds = allRegis.map((r) => r.profileId);
+        profileIds = [...new Set(profileIds)];
+        const profiles = await this.profileSvr.findByIds(profileIds);
+        let customerIds = profiles.map((p) => p.customerId);
+        customerIds = [...new Set(customerIds)];
+
+        let customerKeys = allRegis.map((r) => r.createdBy && r.createdBy);
+        customerKeys = [...new Set(customerKeys)];
+        const customers = await this.customerSrv.findByIdsAndKeys(
+          customerIds,
+          customerKeys,
+          page,
+          limit,
+          search,
+          undefined,
+          sortOrder,
+        );
+        return customers;
+      }
+    }
+    return null;
+  }
+
+  @Query(() => Number, { name: 'getAllCustomerFromRegisCount' })
+  async getAllCustomerFromRegisCount(
+    @Args('userId', { nullable: true, defaultValue: undefined }) userId: string,
+    @Args('facilityId', { nullable: true, defaultValue: undefined })
+    facilityId: string,
+    @Args('search', { nullable: true, defaultValue: '' }) search: string,
+  ): Promise<number> {
+    if (userId) {
+      // by facility
+      const facility = await this.facilityLoaderSrv.loadByUserId(userId);
+      if (facility) {
+        const serviceIds = await this.getServiceIds(facility.id);
+        const allRegis =
+          await this.regisService.getAllReistrationByIdService(serviceIds);
+        let profileIds = allRegis.map((r) => r.profileId);
+        profileIds = [...new Set(profileIds)];
+        const profiles = await this.profileSvr.findByIds(profileIds);
+        let customerIds = profiles.map((p) => p.customerId);
+        customerIds = [...new Set(customerIds)];
+
+        let customerKeys = allRegis.map((r) => r.createdBy && r.createdBy);
+        customerKeys = [...new Set(customerKeys)];
+        const customers = await this.customerSrv.findByIdsAndKeysCount(
+          customerIds,
+          customerKeys,
+          search,
+        );
+        return customers;
+      }
+    } else {
+      if (facilityId) {
+        const serviceIds = await this.getServiceIds(facilityId);
+        const allRegis =
+          await this.regisService.getAllReistrationByIdService(serviceIds);
+        let profileIds = allRegis.map((r) => r.profileId);
+        profileIds = [...new Set(profileIds)];
+        const profiles = await this.profileSvr.findByIds(profileIds);
+        let customerIds = profiles.map((p) => p.customerId);
+        customerIds = [...new Set(customerIds)];
+
+        let customerKeys = allRegis.map((r) => r.createdBy && r.createdBy);
+        customerKeys = [...new Set(customerKeys)];
+        const customers = await this.customerSrv.findByIdsAndKeysCount(
+          customerIds,
+          customerKeys,
+          search,
+        );
+        return customers;
+      }
+    }
     return null;
   }
 
@@ -229,6 +372,7 @@ export class RegisterResolver {
       input.date.toDateString(),
       input.session,
       doctor.workSchedule.numberSlot,
+      input.createBy,
     );
     const res = await this.regisService.createRegisterDoctor(input);
     this.createNottifyAndEmail(res);
@@ -243,12 +387,13 @@ export class RegisterResolver {
   ): Promise<Register> {
     const specialty = await this.specialtyLoader.load(input.specialtyId);
     await this.checkVaildReigs(
-      ETypeOfService.Doctor,
+      ETypeOfService.Specialty,
       input.profileId,
       input.specialtyId,
       input.date.toDateString(),
       input.session,
       specialty?.workSchedule?.numberSlot,
+      input.createBy,
     );
     const regiter = await this.regisService.createRegisterSpecialty(input);
     this.createNottifyAndEmail(regiter);
@@ -269,8 +414,10 @@ export class RegisterResolver {
       input.date.toDateString(),
       input.session,
       p.workSchedule.numberSlot,
+      input.createBy,
     );
     const res = await this.regisService.createRegisterPackage(input);
+    this.createNottifyAndEmail(res);
     this.registerLoader.clean(input.profileId);
     this.emitRegisterPendingCreatedEvent(res);
 
@@ -283,12 +430,13 @@ export class RegisterResolver {
   ): Promise<Register> {
     const vaccine = await this.vaccinationLoader.load(input.vaccineId);
     await this.checkVaildReigs(
-      ETypeOfService.Doctor,
+      ETypeOfService.Vaccine,
       input.profileId,
       input.vaccineId,
       input.date.toDateString(),
       input.session,
       vaccine?.workSchedule?.numberSlot,
+      input.createBy,
     );
     const res = await this.regisService.createRegisterVaccine(input);
     this.createNottifyAndEmail(res);
@@ -321,6 +469,52 @@ export class RegisterResolver {
     this.createNottifyAndEmailCancel(res, content);
     return res;
   }
+
+  // @Mutation(() => Boolean, { name: 'blockCustomerByProfileId' })
+  // async blockCustomerByProfileId(
+  //   @Args('userId', { nullable: true, defaultValue: undefined }) userId: string,
+  //   @Args('facilityId', { nullable: true, defaultValue: undefined })
+  //   facilityId: string,
+  //   @Args('profileId')
+  //   profileId: string,
+  //   @Args('content')
+  //   content: string,
+  // ): Promise<Boolean> {
+  //   if (userId) {
+  //     const facility = await this.facilityLoaderSrv.loadByUserId(userId);
+  //     if (facility) {
+  //       const profile = await this.profileSvr.findById(profileId);
+  //       if (profile) {
+  //         const blockInput: CreateBlockInput = {
+  //           seen: false,
+  //           content: content,
+  //           facilityId: facility.id,
+  //         };
+  //         await this.customerSrv.addBlockCustomer(
+  //           profile.customerId,
+  //           blockInput,
+  //         );
+  //       }
+  //     }
+  //   } else {
+  //     if (facilityId) {
+  //       const profile = await this.profileSvr.findById(profileId);
+  //       if (profile) {
+  //         const blockInput: CreateBlockInput = {
+  //           seen: false,
+  //           content: content,
+  //           facilityId: facilityId,
+  //         };
+  //         await this.customerSrv.addBlockCustomer(
+  //           profile.customerId,
+  //           blockInput,
+  //         );
+  //       }
+  //     }
+  //   }
+
+  //   return true;
+  // }
 
   @UseGuards(JWtAuthGuard)
   @Mutation(() => Register, { name: 'uploadFileRegister' })
@@ -650,6 +844,14 @@ export class RegisterResolver {
     } else return null;
   }
 
+  @ResolveField(() => Customer, { name: 'createRegisBy' })
+  async createRegisBy(@Parent() regis: Register): Promise<Customer> {
+    if (regis?.createdBy) {
+      const data = await this.customerSrv.findByCustomerKey(regis.createdBy);
+      return data;
+    } else return null;
+  }
+
   isEqualDate(a: Date, b: Date): boolean {
     if (
       a.getDay() === b.getDay() &&
@@ -675,6 +877,73 @@ export class RegisterResolver {
     return false;
   }
 
+  isBlock = async (
+    facility: MedicalFacilities,
+    profileId: string,
+    createBy: string = undefined,
+  ): Promise<Boolean> => {
+    if (facility && createBy) {
+      const customer = await this.customerSrv.findByCustomerKey(createBy);
+      if (customer) {
+        const find = facility.blocks.find((b) => b.customerId === customer.id);
+        if (find) return true;
+      }
+    } else {
+      if (facility) {
+        const profile = await this.profileSvr.findById(profileId);
+        const customer = await this.customerSrv.findById(profile.customerId);
+        if (customer) {
+          const find = facility.blocks.find(
+            (b) => b.customerId === customer.id,
+          );
+          if (find) return true;
+        }
+      }
+    }
+    return false;
+  };
+
+  checkBlock = async (
+    typeOfService: ETypeOfService,
+    serviceId: string,
+    profileId: string,
+    createBy: string = undefined,
+  ): Promise<Boolean> => {
+    if (typeOfService === ETypeOfService.Doctor) {
+      const doctor = await this.doctorLoader.load(serviceId);
+      const facility = await this.facilityLoaderSrv.load(
+        doctor.medicalFactilitiesId,
+      );
+      const isblock = await this.isBlock(facility, profileId, createBy);
+      if (isblock) return true;
+    }
+    if (typeOfService === ETypeOfService.Package) {
+      const p = await this.packageLoader.load(serviceId);
+      const facility = await this.facilityLoaderSrv.load(
+        p.medicalFactilitiesId,
+      );
+      const isblock = await this.isBlock(facility, profileId, createBy);
+      if (isblock) return true;
+    }
+    if (typeOfService === ETypeOfService.Specialty) {
+      const specialty = await this.specialtyLoader.load(serviceId);
+      const facility = await this.facilityLoaderSrv.load(
+        specialty.medicalFactilityId,
+      );
+      const isblock = await this.isBlock(facility, profileId, createBy);
+
+      if (isblock) return true;
+    }
+    if (typeOfService === ETypeOfService.Vaccine) {
+      const p = await this.vaccinationLoader.load(serviceId);
+      const facility = await this.facilityLoaderSrv.load(
+        p.medicalFactilitiesId,
+      );
+      const isblock = await this.isBlock(facility, profileId, createBy);
+      if (isblock) return true;
+    }
+  };
+
   async checkVaildReigs(
     typeOfService: ETypeOfService,
     profileId: string,
@@ -682,6 +951,7 @@ export class RegisterResolver {
     date: string,
     session: SessionInput,
     maxSlot?: number,
+    createBy: string = undefined,
   ) {
     const allRegisDateSession = await this.regisService.getRegisDate(date);
     const isExistProfileInSesssion = allRegisDateSession.find(
@@ -742,7 +1012,16 @@ export class RegisterResolver {
             r.session.endTime === session.endTime,
         ).length;
     };
-    // ----------------------------------------------------------------
+    const checkBlock = await this.checkBlock(
+      typeOfService,
+      serviceId,
+      profileId,
+      createBy,
+    );
+
+    // ---------------------------------------------------------------
+
+    if (checkBlock) throw new Error('Cơ sở y tế đã chặn đăng ký');
     if (isExistProfileInSesssion) {
       throw new Error('Phiên khám đã tồn tại'); // check
     }
@@ -888,7 +1167,7 @@ export class RegisterResolver {
             notification.detailPath,
           );
         this.emailService.sendUserConfirmation(
-          profile.email,
+          customer.email,
           customer.fullname,
           profile.fullname,
           regis.typeOfService,
@@ -907,7 +1186,7 @@ export class RegisterResolver {
             notification.detailPath,
           );
         this.emailService.sendUserSuccesss(
-          profile.email,
+          customer.email,
           customer.fullname,
           profile.fullname,
           regis.typeOfService,
@@ -972,5 +1251,42 @@ export class RegisterResolver {
       vaccinesIds: vaccinatioIds,
       specialtiesIds: specialtyIds,
     };
+  }
+  async checkWarningRegis(
+    regisPending: Register[],
+    serviceIds: IServiceIds,
+  ): Promise<Register[]> {
+    const profileIds = regisPending.map((r) => r.profileId);
+    const regisMiss = await this.regisService.getAllReistrationMissed(
+      profileIds,
+      serviceIds,
+    );
+    var newRegis = regisPending;
+    regisMiss.map((r) => {
+      newRegis = regisPending.map((rr) => {
+        if (rr.profileId === r.profileId) {
+          var regisAddWarning: Register = rr;
+          if (regisAddWarning.warning) {
+            regisAddWarning.warning = regisAddWarning.warning + 1;
+          } else {
+            regisAddWarning.warning = 1;
+          }
+          const now = new Date();
+          const isDateInCurrentMonth =
+            r.date.getFullYear() === now.getFullYear() &&
+            r.date.getMonth() === now.getMonth();
+          if (isDateInCurrentMonth) {
+            if (regisAddWarning.warningThisMonth) {
+              regisAddWarning.warningThisMonth++;
+            } else {
+              regisAddWarning.warningThisMonth = 1;
+            }
+          }
+          return regisAddWarning;
+        } else return rr;
+      });
+    });
+
+    return newRegis; // added warning
   }
 }

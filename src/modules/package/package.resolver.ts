@@ -82,11 +82,12 @@ export class PackageResolver {
     @Args('sortField', { nullable: true, defaultValue: 'packageName' })
     sortField: string,
     @Args('sortOrder', { nullable: true }) sortOrder: string,
-    @Args('userId', { nullable: true, defaultValue: '' }) userId: string,
-    @Args('staffId', { nullable: true, defaultValue: '' }) staffId: string,
+    @Args('userId', { nullable: true, defaultValue: undefined }) userId: string,
+    @Args('staffId', { nullable: true, defaultValue: undefined })
+    staffId: string,
   ): Promise<Package[]> {
     {
-      if (userId !== '') {
+      if (userId) {
         const facility = await this.facilitySvr.findOneByUserId(userId);
         if (facility) {
           const docs =
@@ -101,7 +102,9 @@ export class PackageResolver {
           return docs;
         } else return null;
       } else {
-        if (staffId !== '') {
+        if (staffId) {
+          // console.log('test ==== staffId', staffId);
+
           const staff = await this.staffSvr.findById(staffId);
           if (staff) {
             const docs =
@@ -283,6 +286,8 @@ export class PackageResolver {
     isPending: boolean,
     @Args('isCancel', { nullable: true, defaultValue: false })
     isCancel: boolean,
+    @Args('missed', { nullable: true, defaultValue: false })
+    missed: boolean,
   ): Promise<number> {
     const count = this.registerSrv.regisPackageCount(
       p.id,
@@ -290,6 +295,7 @@ export class PackageResolver {
       endTime,
       isPending,
       isCancel,
+      missed,
     );
     return count;
   }

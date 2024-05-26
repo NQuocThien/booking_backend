@@ -1,5 +1,6 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
 import { EGender } from 'src/contain';
+import { Blocks } from 'src/modules/contains/blocks/blocks.entityt';
 import { Profile } from 'src/modules/profile/entity/profile.entity';
 @ObjectType()
 export class Customer {
@@ -32,6 +33,9 @@ export class Customer {
 
   @Field()
   ethnic: string;
+
+  // @Field(() => [Blocks], { nullable: true })
+  // blocks: Blocks[];
 
   @Field(() => [Profile], { nullable: true })
   profiles: Profile[];

@@ -6,4 +6,8 @@ export class Session {
 
   @Prop()
   endTime: string;
+  // ngoại lệ
+  // ngày
+  // trangthai
+  // soluong
 }

@@ -5,10 +5,10 @@ export class UpdateUserAndStaffInput {
   @Field()
   id: string;
 
-  @Field()
-  password: string;
+  @Field({ nullable: true })
+  password?: string;
 
-  @Field()
+  @Field({ nullable: true })
   userId: string;
 
   @Field()

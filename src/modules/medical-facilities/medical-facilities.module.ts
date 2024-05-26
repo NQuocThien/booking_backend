@@ -12,6 +12,10 @@ import { VaccinationModule } from '../vaccination/vaccination.module';
 import { MedicalSpecialtiesModule } from '../medical-specialties/medical-specialties.module';
 import { MedicalStaffModule } from '../medical-staff/medical-staff.module';
 import { FacilitiesLoaderService } from './facility-loader';
+import { CustomerModule } from '../customer/customer.module';
+import { ProfileService } from '../profile/profile.service';
+import { ProfileModule } from '../profile/profile.module';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
   imports: [
@@ -26,6 +30,10 @@ import { FacilitiesLoaderService } from './facility-loader';
     forwardRef(() => VaccinationModule),
     forwardRef(() => MedicalSpecialtiesModule),
     forwardRef(() => MedicalStaffModule),
+    forwardRef(() => ProfileModule),
+    forwardRef(() => CustomerModule),
+    NotificationModule,
+    // forwardRef(() => CustomerModule),
   ],
   providers: [
     MedicalFacilitiesResolver,

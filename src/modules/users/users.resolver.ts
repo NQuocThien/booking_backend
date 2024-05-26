@@ -91,8 +91,8 @@ export class UsersResolver {
   }
 
   @Query(() => [User], { name: 'getUserSelect' })
-  @UseGuards(JWtAuthGuard, RolesGuard)
-  @Roles(Role.Admin)
+  @UseGuards(JWtAuthGuard, RolesGuard) // xác thực
+  @Roles(Role.Admin) // phân quyền
   async getUserSelect(
     @Args('roleInput') input: UserSelectInput,
   ): Promise<User[]> {
@@ -244,6 +244,7 @@ export class UsersResolver {
   // @UseGuards(JWtAuthGuard)
   async getAllUsersPagination(
     @Args('search', { nullable: true }) search: string,
+    @Args('role', { nullable: true }) role: string,
     @Args('page', { defaultValue: 1 }) page: number,
     @Args('limit', { defaultValue: 10 }) limit: number,
     @Args('sortField', { nullable: true, defaultValue: 'username' })
@@ -253,6 +254,7 @@ export class UsersResolver {
     {
       const user = await this.usersService.getAllUsersPagination(
         search,
+        role,
         page,
         limit,
         sortField,

@@ -1,4 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import {
+  Blocks,
+  BlocksSchema,
+} from 'src/modules/contains/blocks/blocks.schema';
 import { LinkImage } from 'src/modules/users/schema/linkImage.schema';
 @Schema({
   timestamps: true,
@@ -57,6 +61,9 @@ export class MedicalFacilities {
 
   @Prop()
   schedule: string;
+
+  @Prop({ type: [] })
+  blocks?: Blocks[];
 }
 export const MedicalFacilitiesSchema =
   SchemaFactory.createForClass(MedicalFacilities);

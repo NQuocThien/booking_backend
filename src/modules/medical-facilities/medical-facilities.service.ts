@@ -9,6 +9,7 @@ import { DoctorsService } from '../doctors/doctors.service';
 import { PackageService } from '../package/package.service';
 import { MedicalSpecialtiesService } from '../medical-specialties/medical-specialties.service';
 import { VaccinationService } from '../vaccination/vaccination.service';
+import { BlockCustomerInput } from './entities/dto/block-customer.input';
 
 @Injectable()
 export class MedicalFacilitiesService {
@@ -176,6 +177,41 @@ export class MedicalFacilitiesService {
     } catch (error) {
       return null;
     }
+  }
+  async addBlockCustomerByProfileId(
+    input: BlockCustomerInput,
+    isBlock: boolean = true,
+  ): Promise<MedicalFacilities> {
+    const existingDoc = await this.medicalModel.findById(input.id);
+    if (!existingDoc) {
+      return null;
+    }
+    const newDoc = existingDoc;
+    if (isBlock)
+      if (newDoc.blocks) {
+        const find = newDoc.blocks.find(
+          (b) => b.customerId === input.block.customerId,
+        );
+        if (find) {
+          throw new Error('Đã chặn');
+        }
+        newDoc.blocks = [...newDoc.blocks, input.block];
+      } else {
+        newDoc.blocks = [input.block];
+      }
+    else {
+      const find = newDoc.blocks.find(
+        (b) => b.customerId === input.block.customerId,
+      );
+      if (find) {
+        newDoc.blocks = newDoc.blocks.filter(
+          (b) => b.customerId !== input.block.customerId,
+        );
+      } else throw new Error('Không tồn tại');
+    }
+    Object.assign(existingDoc, newDoc);
+    const updatedDoc = await existingDoc.save();
+    return updatedDoc;
   }
   async delete(id: String): Promise<MedicalFacilities> {
     return await this.medicalModel.findByIdAndDelete(id);

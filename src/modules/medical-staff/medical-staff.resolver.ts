@@ -111,30 +111,58 @@ export class MedicalStaffResolver {
     @Args('sortField', { nullable: true, defaultValue: 'name' })
     sortField: string,
     @Args('sortOrder', { nullable: true }) sortOrder: string,
-    @Args('userId', { nullable: true }) userId: string,
+    @Args('userId', { nullable: true, defaultValue: undefined }) userId: string,
+    @Args('facilityId', { nullable: true, defaultValue: undefined })
+    facilityId: string,
   ): Promise<MedicalStaff[]> {
     {
-      const facility = await this.facilitySvr.findOneByUserId(userId);
-      if (facility) {
-        const docs =
-          await this.medicalStaffService.getAllMedicalStaffPaginationOfFacility(
-            search,
-            page,
-            limit,
-            sortField,
-            sortOrder,
-            facility.id,
-          );
-        return docs;
-      } else return null;
+      if (userId) {
+        const facility = await this.facilitySvr.findOneByUserId(userId);
+        if (facility) {
+          const docs =
+            await this.medicalStaffService.getAllMedicalStaffPaginationOfFacility(
+              search,
+              page,
+              limit,
+              sortField,
+              sortOrder,
+              facility.id,
+            );
+          return docs;
+        } else return null;
+      } else {
+        if (facilityId) {
+          const docs =
+            await this.medicalStaffService.getAllMedicalStaffPaginationOfFacility(
+              search,
+              page,
+              limit,
+              sortField,
+              sortOrder,
+              facilityId,
+            );
+          return docs;
+        }
+        return null;
+      }
     }
   }
 
   @Query(() => Number, { name: 'totalStaffsCount' })
   async totalStaffsCount(
-    @Args('search', { nullable: true }) search?: string,
-    @Args('userId', { nullable: true, defaultValue: '' }) userId?: string,
+    @Args('search', { nullable: true }) search: string,
+    @Args('userId', { nullable: true, defaultValue: '' }) userId: string,
+    @Args('facilityId', { nullable: true, defaultValue: undefined })
+    facilityId: string,
   ): Promise<number> {
+    if (facilityId) {
+      const count = await this.medicalStaffService.getTotalStaffCountOfFacility(
+        search || '',
+        facilityId,
+      );
+
+      return count;
+    }
     if (userId === '') {
       const count = await this.medicalStaffService.getTotalStaffCount(
         search || '',

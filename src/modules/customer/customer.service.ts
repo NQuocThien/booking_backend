@@ -7,6 +7,7 @@ import { UpdateCustomerInput } from './entities/dto/update-customer.input';
 import * as DataLoader from 'dataloader';
 import { CustomerInput } from './entities/dto/customer.input';
 import { generateShortCode } from 'src/utils/contain';
+import { CreateBlockInput } from '../contains/blocks/blocks.input';
 @Injectable()
 export class CustomerService {
   constructor(
@@ -67,6 +68,57 @@ export class CustomerService {
     return result;
   }
 
+  async findByIdsAndKeys(
+    customerIds: string[],
+    keys: string[],
+    page: number,
+    limit: number,
+    search: string,
+    sortField: string = 'fullname',
+    sortOrder: string = 'asc',
+  ): Promise<Customer[]> {
+    const sortOptions: { [key: string]: 'asc' | 'desc' } = {};
+    sortOptions[sortField] = sortOrder === 'asc' ? 'asc' : 'desc';
+    const skip = (page - 1) * limit;
+
+    const query: any = {
+      $or: [{ _id: { $in: customerIds } }, { customerKey: { $in: keys } }],
+    };
+
+    if (search) {
+      query.$text = { $search: search };
+    }
+
+    const result = await this.customerModel
+      .find({
+        ...query,
+      })
+      .limit(limit)
+      .skip(skip)
+      .sort(sortOptions)
+      .exec();
+    return result;
+  }
+
+  async findByIdsAndKeysCount(
+    customerIds: string[],
+    keys: string[],
+    search: string,
+  ): Promise<number> {
+    const query: any = {
+      $or: [{ _id: { $in: customerIds } }, { customerKey: { $in: keys } }],
+    };
+
+    if (search) {
+      query.$text = { $search: search };
+    }
+
+    const result = await this.customerModel.count({
+      ...query,
+    });
+    return result;
+  }
+
   async findCustomerById(customerId: string): Promise<Customer> {
     const result = await this.customerModel.findById(customerId);
     return result;
@@ -96,4 +148,24 @@ export class CustomerService {
       return null;
     }
   }
+  // async addBlockCustomer(customerId: string, input: CreateBlockInput) {
+  //   try {
+  //     const existingDoc = await this.customerModel.findById(customerId);
+  //     if (!existingDoc) {
+  //       return null;
+  //     }
+  //     const newDoc = existingDoc;
+  //     if (newDoc.blocks) {
+  //       newDoc.blocks = [...newDoc.blocks, input];
+  //     } else {
+  //       newDoc.blocks = [input];
+  //     }
+  //     Object.assign(existingDoc, newDoc);
+  //     const updatedDoc = await existingDoc.save();
+  //     return updatedDoc;
+  //   } catch (error) {
+  //     // console.error('Error updating document:', error);
+  //     return null;
+  //   }
+  // }
 }

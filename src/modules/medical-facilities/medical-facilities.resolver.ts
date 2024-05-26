@@ -32,16 +32,26 @@ import {
   ETypeOfFacility,
   ETypeOfService,
 } from 'src/contain';
+import { BlockCustomerInput } from './entities/dto/block-customer.input';
+import { ProfileService } from '../profile/profile.service';
+import { NotificationResolver } from '../notification/notification.resolver';
+import { CreateNotificationInput } from '../notification/entities/dtos/create-notification.input';
+import { CustomerService } from '../customer/customer.service';
+import { FacilitiesLoaderService } from './facility-loader';
 
 @Resolver(() => MedicalFacilities)
 export class MedicalFacilitiesResolver {
   constructor(
     private readonly medicalService: MedicalFacilitiesService,
+    private readonly medicalLoaderService: FacilitiesLoaderService,
     private readonly doctorService: DoctorsService,
     private readonly packageSrv: PackageService,
     private readonly vaccineSvr: VaccinationService,
     private readonly specialtySrv: MedicalSpecialtiesService,
     private readonly staffSvr: MedicalStaffService,
+    private readonly cusSrv: CustomerService,
+    private readonly profileSrv: ProfileService,
+    private readonly notifyResolver: NotificationResolver,
   ) {}
   // @UseGuards(JWtAuthGuard, RolesGuard)
   @Query(() => [MedicalFacilities], { name: 'getAllMedicalFacility' })
@@ -49,9 +59,9 @@ export class MedicalFacilitiesResolver {
     return await this.medicalService.findAll();
   }
 
-  @UseGuards(JWtAuthGuard, RolesGuard)
+  // @UseGuards(JWtAuthGuard, RolesGuard)
   @Roles(Role.Facility)
-  @Roles(Role.Staff)
+  // @Roles(Role.Staff)
   @Query(() => MedicalFacilities, { name: 'getMedicalFacilityInfo' })
   async getMedicalFacilityInfo(
     @Args('userId', { nullable: true, defaultValue: '' }) userId: String,
@@ -63,7 +73,10 @@ export class MedicalFacilitiesResolver {
     } else {
       if (staffId !== '') {
         const staff = await this.staffSvr.findById(staffId);
-        if (staff.permissions.includes(EPermission.Magager)) {
+        if (
+          staff.permissions.includes(EPermission.Magager) ||
+          staff.permissions.includes(EPermission.MagagerPending)
+        ) {
           const result = await this.medicalService.findById(
             staff.medicalFacilityId,
           );
@@ -92,7 +105,6 @@ export class MedicalFacilitiesResolver {
     @Args('sortOrder', { nullable: true }) sortOrder: string,
     @Args('type', { nullable: true }) type: ETypeOfFacility,
   ): Promise<MedicalFacilities[]> {
-    // console.log('test: ', type);
     const user = await this.medicalService.getAllMedicalFacilityPagination(
       search,
       page,
@@ -122,7 +134,6 @@ export class MedicalFacilitiesResolver {
     @Args('sortOrder', { nullable: true }) sortOrder: string,
     @Args('type', { nullable: true }) type: ETypeOfFacility,
   ): Promise<MedicalFacilities[]> {
-    // console.log('test: ', type);
     const user =
       await this.medicalService.getAllMedicalFacilityPaginationForClient(
         search,
@@ -219,7 +230,7 @@ export class MedicalFacilitiesResolver {
     );
     return count;
   }
-
+  // =====================>> MUTATION <<================================
   @Mutation(() => MedicalFacilities, { name: 'createMedicalFacility' })
   async createMedicalFacility(
     @Args('input')
@@ -253,6 +264,104 @@ export class MedicalFacilitiesResolver {
     }
 
     return await this.medicalService.updateMedicalFacilities(input);
+  }
+
+  @Mutation(() => MedicalFacilities, { name: 'addBlockCustomerByProfileId' })
+  async addBlockCustomerByProfileId(
+    @Args('facilityId', { nullable: true, defaultValue: undefined })
+    facilityId: string,
+    @Args('userId', { nullable: true, defaultValue: undefined })
+    userId: string,
+    @Args('profileId', { nullable: true, defaultValue: undefined })
+    profileId: string,
+    @Args('customerId', { nullable: true, defaultValue: undefined })
+    customerId: string,
+    @Args('content')
+    content: string,
+    @Args('isBlock', { nullable: true, defaultValue: true })
+    isBlock: boolean,
+  ): Promise<MedicalFacilities> {
+    if (profileId) {
+      var fId: string = '';
+      var facilityName: string = '';
+      if (facilityId) {
+        // by staff
+        fId = facilityId;
+        facilityName = (await this.medicalService.findById(facilityId))
+          .medicalFacilityName;
+      } else if (userId) {
+        // by medical
+        const facily = await this.medicalService.findOneByUserId(userId);
+        facilityName = facily.medicalFacilityName;
+        if (facily) fId = facily.id;
+      }
+      if (fId === '') return null;
+      const profile = await this.profileSrv.findById(profileId);
+      if (profile) {
+        const blockInput: BlockCustomerInput = {
+          id: fId,
+          block: {
+            content: content,
+            customerId: profile.customerId,
+            seen: false,
+          },
+        };
+
+        const res = await this.medicalService.addBlockCustomerByProfileId(
+          blockInput,
+          isBlock,
+        );
+        this.medicalLoaderService.clean(res.id);
+        const customer = await this.cusSrv.findById(profile.customerId);
+        this.createNotifyBlocked(
+          (await customer).userId,
+          `${facilityName} ${
+            isBlock ? 'đã chặn đăng ký' : 'đã bỏ chặn đăng ký'
+          }'${content}'`,
+        );
+        if (res) return res;
+        return null;
+      }
+    } else if (customerId) {
+      // block by customer
+      var fId: string = '';
+      var facilityName: string = '';
+      if (facilityId) {
+        fId = facilityId;
+        facilityName = (await this.medicalService.findById(facilityId))
+          .medicalFacilityName;
+      } else if (userId) {
+        const facily = await this.medicalService.findOneByUserId(userId);
+        facilityName = facily.medicalFacilityName;
+        if (facily) fId = facily.id;
+      }
+      if (fId === '') return null;
+      const blockInput: BlockCustomerInput = {
+        id: fId,
+        block: {
+          content: content,
+          customerId: customerId,
+          seen: false,
+        },
+      };
+      const res = await this.medicalService.addBlockCustomerByProfileId(
+        blockInput,
+        isBlock,
+      );
+      this.medicalLoaderService.clean(res.id);
+      const customer = await this.cusSrv.findById(customerId);
+      this.createNotifyBlocked(
+        (await customer).userId,
+        `${facilityName} ${
+          isBlock ? 'đã chặn đăng ký' : 'đã bỏ chặn đăng ký'
+        } '${content}'`,
+      );
+      if (res) return res;
+      return null;
+    }
+
+    // return await this.medicalService.updateMedicalFacilities(input);
+    else return;
   }
   @Mutation(() => MedicalFacilities, { name: 'deleteMedicalFacility' })
   async deleteMedicalFacility(
@@ -409,5 +518,14 @@ export class MedicalFacilitiesResolver {
         isClient,
       );
     }
+  }
+
+  async createNotifyBlocked(userId: string, content: string) {
+    const notifyInput: CreateNotificationInput = {
+      userId: userId,
+      content: content,
+      detailPath: '',
+    };
+    this.notifyResolver.createNotification(notifyInput);
   }
 }

@@ -286,6 +286,8 @@ export class MedicalSpecialtiesResolver {
     isPending: boolean,
     @Args('isCancel', { nullable: true, defaultValue: false })
     isCancel: boolean,
+    @Args('missed', { nullable: true, defaultValue: false })
+    missed: boolean,
   ): Promise<number> {
     const count = this.registerSrv.regisSpecialtyCount(
       p.id,
@@ -293,6 +295,7 @@ export class MedicalSpecialtiesResolver {
       endTime,
       isPending,
       isCancel,
+      missed,
     );
     return count;
   }

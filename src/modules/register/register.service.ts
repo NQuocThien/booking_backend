@@ -19,6 +19,13 @@ import { LinkImage } from '../users/dto/image';
 import { deleteDocument } from 'src/utils/delete_image';
 import { RegisPendingInput } from './entities/dtos/regis-pending.input';
 import { ProfileService } from '../profile/profile.service';
+
+interface IServiceIds {
+  doctorsIds: string[];
+  packagesIds: string[];
+  vaccinesIds: string[];
+  specialtiesIds: string[];
+}
 @Injectable()
 export class RegisterService {
   constructor(
@@ -139,6 +146,7 @@ export class RegisterService {
     page: number,
     limit: number,
     search: string = undefined,
+    missed: boolean = false,
   ): Promise<Register[]> {
     const startOfDay = new Date(input.startTime);
     const endOfDay = new Date(input.endTime);
@@ -149,13 +157,13 @@ export class RegisterService {
     const query: any = { $or: [] };
     if (search) {
       const ids = await this.profileSrv.findByFullName(search);
-      console.log('test search: ', ids, search);
       query.profileId = { $in: ids };
     }
     query.date = {
       $gte: startOfDay,
       $lte: endOfDay,
     };
+
     if (input.typeOfService) query.typeOfService = { $eq: input.typeOfService };
     query.$or.push({ doctorId: { $in: input.doctorIds } });
     query.$or.push({ packageId: { $in: input.packageIds } });
@@ -164,6 +172,13 @@ export class RegisterService {
 
     query.state = { $eq: EStateRegister.Pending };
     query.cancel = { $eq: input.cancel };
+    if (missed) {
+      query.state = { $eq: EStateRegister.Approved };
+      query.date = {
+        $lte: startOfDay,
+      };
+      query.cancel = { $eq: false };
+    }
 
     const skip = (page - 1) * limit;
     const data = await this.model
@@ -176,7 +191,10 @@ export class RegisterService {
     return data;
   }
 
-  async getAllRegisPendingCount(input: RegisPendingInput): Promise<number> {
+  async getAllRegisPendingCount(
+    input: RegisPendingInput,
+    missed: boolean = false,
+  ): Promise<number> {
     const startOfDay = new Date(input.startTime);
     const endOfDay = new Date(input.endTime);
 
@@ -188,6 +206,11 @@ export class RegisterService {
       $gte: startOfDay,
       $lte: endOfDay,
     };
+    if (missed) {
+      query.date = {
+        $lte: startOfDay,
+      };
+    }
     if (input.typeOfService) query.typeOfService = { $eq: input.typeOfService };
     query.$or.push({ doctorId: { $in: input.doctorIds } });
     query.$or.push({ packageId: { $in: input.packageIds } });
@@ -195,6 +218,9 @@ export class RegisterService {
     query.$or.push({ vaccineId: { $in: input.vaccineIds } });
 
     query.state = { $eq: EStateRegister.Pending };
+    if (missed) {
+      query.state = { $eq: false };
+    }
     query.cancel = { $eq: input.cancel };
     const data = await this.model
       .find({
@@ -305,9 +331,8 @@ export class RegisterService {
       cancel: false,
       createdBy: data.createBy,
     };
-    console.log('-> input: ', datainput);
+    // console.log('-> input: ', datainput);
     const res = await this.model.create(datainput);
-    console.log('-> created: ', res);
     return res;
   }
 
@@ -423,6 +448,7 @@ export class RegisterService {
     endTime: string,
     isPending: boolean = false,
     isCancel: boolean = false,
+    missed: boolean = false,
   ): Promise<number> {
     const startDate = new Date(startTime);
     const endDate = new Date(endTime);
@@ -435,10 +461,19 @@ export class RegisterService {
       $gte: startDate,
       $lte: endDate,
     };
+
     query.cancel = { $eq: isCancel };
     if (isPending) query.state = { $eq: EStateRegister.Pending };
     else query.state = { $ne: EStateRegister.Pending };
-
+    if (missed) {
+      query.date = {
+        $lte: startDate,
+      };
+      query.cancel = { $eq: false };
+      query.state = { $eq: EStateRegister.Approved };
+    }
+    // console.log('doctor missed', missed);
+    // console.log('doctor query:', query);
     const count = await this.model.count({
       ...query,
     });
@@ -450,6 +485,7 @@ export class RegisterService {
     endTime: string,
     isPending: boolean = false,
     isCancel: boolean = false,
+    missed: boolean = false,
   ): Promise<number> {
     const startDate = new Date(startTime);
     const endDate = new Date(endTime);
@@ -465,7 +501,13 @@ export class RegisterService {
     query.cancel = { $eq: isCancel };
     if (isPending) query.state = { $eq: EStateRegister.Pending };
     else query.state = { $ne: EStateRegister.Pending };
-
+    if (missed) {
+      query.date = {
+        $lte: startDate,
+      };
+      query.cancel = { $eq: false };
+      query.state = { $eq: EStateRegister.Approved };
+    }
     const count = await this.model.count({
       ...query,
     });
@@ -477,6 +519,7 @@ export class RegisterService {
     endTime: string,
     isPending: boolean = false,
     isCancel: boolean = false,
+    missed: boolean = false,
   ): Promise<number> {
     const startDate = new Date(startTime);
     const endDate = new Date(endTime);
@@ -492,6 +535,13 @@ export class RegisterService {
     query.cancel = isCancel;
     if (isPending) query.state = { $eq: EStateRegister.Pending };
     else query.state = { $ne: EStateRegister.Pending };
+    if (missed) {
+      query.date = {
+        $lte: startDate,
+      };
+      query.cancel = { $eq: false };
+      query.state = { $eq: EStateRegister.Approved };
+    }
     const count = await this.model
       .count({
         ...query,
@@ -505,6 +555,7 @@ export class RegisterService {
     endTime: string,
     isPending: boolean = false,
     isCancel: boolean = false,
+    missed: boolean = false,
   ): Promise<number> {
     const startDate = new Date(startTime);
     const endDate = new Date(endTime);
@@ -520,7 +571,13 @@ export class RegisterService {
     query.cancel = { $eq: isCancel };
     if (isPending) query.state = { $eq: EStateRegister.Pending };
     else query.state = { $ne: EStateRegister.Pending };
-
+    if (missed) {
+      query.date = {
+        $lte: startDate,
+      };
+      query.cancel = { $eq: false };
+      query.state = { $eq: EStateRegister.Approved };
+    }
     const count = await this.model
       .count({
         ...query,
@@ -543,5 +600,63 @@ export class RegisterService {
     currentDate.setHours(hours);
     currentDate.setMinutes(minutes);
     return currentDate;
+  }
+  async getAllReistrationMissed(
+    profileIds: String[],
+    serviceIds: IServiceIds,
+  ): Promise<Register[]> {
+    const now = new Date();
+    const query: any = { $or: [] };
+    query.$or.push({ doctorId: { $in: serviceIds.doctorsIds } });
+    query.$or.push({ packageId: { $in: serviceIds.packagesIds } });
+    query.$or.push({ specialtyId: { $in: serviceIds.specialtiesIds } });
+    query.$or.push({ vaccineId: { $in: serviceIds.vaccinesIds } });
+    query.date = { $lte: now };
+    query.profileId = { $in: profileIds };
+    query.cancel = { $eq: false };
+    query.state = { $eq: EStateRegister.Approved };
+    const res = await this.model.find({
+      ...query,
+    });
+    return res;
+  }
+  async getAllReistrationMissedThisMonth(
+    profileIds: String[],
+    serviceIds: IServiceIds,
+  ): Promise<Register[]> {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    const query: any = { $or: [] };
+    query.$or.push({ doctorId: { $in: serviceIds.doctorsIds } });
+    query.$or.push({ packageId: { $in: serviceIds.packagesIds } });
+    query.$or.push({ specialtyId: { $in: serviceIds.specialtiesIds } });
+    query.$or.push({ vaccineId: { $in: serviceIds.vaccinesIds } });
+    query.date = {};
+
+    const res = this.model.find({
+      date: {
+        $gte: startOfMonth,
+        $lte: endOfMonth,
+      },
+      profileId: { $in: profileIds },
+    });
+    return res;
+  }
+  async getAllReistrationByIdService(
+    serviceIds: IServiceIds,
+  ): Promise<Register[]> {
+    const query: any = { $or: [] };
+    query.$or.push({ doctorId: { $in: serviceIds.doctorsIds } });
+    query.$or.push({ packageId: { $in: serviceIds.packagesIds } });
+    query.$or.push({ specialtyId: { $in: serviceIds.specialtiesIds } });
+    query.$or.push({ vaccineId: { $in: serviceIds.vaccinesIds } });
+    const res = await this.model
+      .find({
+        ...query,
+      })
+      .sort({ date: 'desc' });
+    return res;
   }
 }

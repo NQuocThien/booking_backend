@@ -1,5 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { EGender } from 'src/contain';
+import {
+  Blocks,
+  BlocksSchema,
+} from 'src/modules/contains/blocks/blocks.schema';
 @Schema({
   timestamps: true,
 })
@@ -10,7 +14,7 @@ export class Customer {
   @Prop()
   customerKey: string;
 
-  @Prop()
+  @Prop({ text: true })
   fullname: String;
 
   @Prop({ type: String, enum: EGender })
@@ -30,5 +34,11 @@ export class Customer {
 
   @Prop()
   ethnic: String;
+
+  // @Prop({
+  //   type: [BlocksSchema],
+  //   default: null,
+  // })
+  // blocks?: Blocks[];
 }
 export const CustomerSchema = SchemaFactory.createForClass(Customer);

@@ -13,7 +13,6 @@ import { JWtAuthGuard } from './jwt-auth.guard';
 import { Roles } from './roles.decorator';
 import { Role } from './entities/role.enum';
 import { Doctor } from '../doctors/entities/doctor.entity';
-import { MedicalFacilitiesService } from '../medical-facilities/medical-facilities.service';
 import { FacilitiesLoaderService } from '../medical-facilities/facility-loader';
 import { MedicalStaffService } from '../medical-staff/medical-staff.service';
 import { EPermission } from 'src/contain';

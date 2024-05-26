@@ -269,6 +269,8 @@ export class VaccinationResolver {
     isPending: boolean,
     @Args('isCancel', { nullable: true, defaultValue: false })
     isCancel: boolean,
+    @Args('missed', { nullable: true, defaultValue: false })
+    missed: boolean,
   ): Promise<number> {
     const count = this.registerSrv.regisVaccinationCount(
       vaccination.id,
@@ -276,6 +278,7 @@ export class VaccinationResolver {
       endTime,
       isPending,
       isCancel,
+      missed,
     );
     return count;
   }

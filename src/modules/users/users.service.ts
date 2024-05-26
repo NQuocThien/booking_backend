@@ -109,12 +109,16 @@ export class UsersService {
   }
   async getAllUsersPagination(
     search: string,
+    role: string = undefined,
     page: number,
     limit: number,
     sortField: string,
     sortOrder: string,
   ): Promise<User[]> {
-    const query = search ? { username: { $regex: search, $options: 'i' } } : {};
+    const query: any = {};
+    if (search)
+      query.username = { username: { $regex: search, $options: 'i' } };
+    if (role) query.roles = role;
     const sortOptions: { [key: string]: 'asc' | 'desc' } = {};
     sortOptions[sortField] = sortOrder === 'asc' ? 'asc' : 'desc';
     const skip = (page - 1) * limit;

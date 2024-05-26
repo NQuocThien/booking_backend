@@ -29,6 +29,7 @@ export class NotificationService {
       status: ETypeOfNotification.NotSeen,
       userId: data.userId,
     };
+    // console.log('create notification input: ', input);
     return await this.doctorModel.create(input);
   }
   async updateById(data: UpdateNotificationInput) {

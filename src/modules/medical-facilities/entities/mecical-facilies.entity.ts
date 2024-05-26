@@ -1,5 +1,6 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
 import { EStatusService, ETypeOfFacility } from 'src/contain';
+import { Blocks } from 'src/modules/contains/blocks/blocks.entityt';
 import { Doctor } from 'src/modules/doctors/entities/doctor.entity';
 import { MedicalSpecialties } from 'src/modules/medical-specialties/entities/medical-specialties.entity';
 import { MedicalStaff } from 'src/modules/medical-staff/entities/medical-staff.entity';
@@ -64,6 +65,9 @@ export class MedicalFacilities {
 
   @Field()
   schedule: string;
+
+  @Field(() => [Blocks], { nullable: true })
+  blocks: Blocks[];
 
   @Field(() => [Doctor], { nullable: true })
   doctors: Doctor[];

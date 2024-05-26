@@ -190,6 +190,9 @@ export class DoctorsResolver {
     @Args('facilityId') facilityId: string,
   ): Promise<Doctor[]> {
     {
+      console.log(
+        '================================================================================================',
+      );
       const docs = await this.doctorService.getAllDoctorPaginationOfFacility(
         filter,
         page,
@@ -296,6 +299,8 @@ export class DoctorsResolver {
     isPending: boolean,
     @Args('isCancel', { nullable: true, defaultValue: false })
     isCancel: boolean,
+    @Args('missed', { nullable: true, defaultValue: false })
+    missed: boolean,
   ): Promise<number> {
     const count = this.registerSrv.regisDoctorCount(
       doctor.id,
@@ -303,6 +308,7 @@ export class DoctorsResolver {
       endTime,
       isPending,
       isCancel,
+      missed,
     );
     return count;
   }

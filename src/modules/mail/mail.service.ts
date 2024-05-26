@@ -8,6 +8,7 @@ export class MailService {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   }
+
   async sendUserConfirmation(
     email: string,
     customerName: string,

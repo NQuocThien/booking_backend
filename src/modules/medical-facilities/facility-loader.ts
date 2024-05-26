@@ -34,6 +34,9 @@ export class FacilitiesLoaderService {
     const data = await this.loader.load(id);
     return data;
   }
+  async clean(faciityId: string): Promise<void> {
+    await this.loader.clear(faciityId);
+  }
   async loadByUserId(id: string): Promise<MedicalFacilities> {
     const data = await this.loader2.load(id);
     return data;

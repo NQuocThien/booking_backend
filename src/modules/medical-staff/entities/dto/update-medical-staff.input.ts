@@ -5,8 +5,8 @@ export class UpdateMedicalStaffInput {
   @Field()
   id: String;
 
-  @Field()
-  userId: string;
+  @Field({ nullable: true })
+  userId?: string;
 
   @Field()
   medicalFacilityId: String;

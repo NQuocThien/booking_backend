@@ -217,29 +217,31 @@ export class AuthService {
     const user = await this.userService.findOneById(input.userId);
     if (!user) throw new Error(`User no exists ! `);
 
-    const password = await bcrypt.hash(input.password, 10);
-    const userUpdated = await this.userService.updateUser({
-      id: user.id,
-      email: input.email,
-      password: password,
-      active: true,
-      avatar: user.avatar,
-    });
-    if (userUpdated) {
-      const inputUpdateStaff: UpdateMedicalStaffInput = {
-        id: input.id,
-        userId: userUpdated.id,
+    if (input.password) {
+      const password = await bcrypt.hash(input.password, 10);
+      const userUpdated = await this.userService.updateUser({
+        id: user.id,
         email: input.email,
-        gender: input.gender,
-        numberPhone: input.numberPhone,
-        medicalFacilityId: input.medicalFacilityId,
-        permissions: input.permissions,
-        staffName: input.staffName,
-        specialtyId: input.specialtyId,
-      };
-      const staff = this.staffSrv.updateMedicalStaff(inputUpdateStaff);
-      return staff;
+        password: password,
+        active: true,
+        avatar: user.avatar,
+      });
     }
+    // if (userUpdated) {
+    const inputUpdateStaff: UpdateMedicalStaffInput = {
+      id: input.id,
+      // userId: userUpdated.id,
+      email: input.email,
+      gender: input.gender,
+      numberPhone: input.numberPhone,
+      medicalFacilityId: input.medicalFacilityId,
+      permissions: input.permissions,
+      staffName: input.staffName,
+      specialtyId: input.specialtyId,
+    };
+    const staff = this.staffSrv.updateMedicalStaff(inputUpdateStaff);
+    return staff;
+    // }
   }
   async logout() {
     var reponse: LogoutUser = new LogoutUser();

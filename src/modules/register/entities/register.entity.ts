@@ -1,6 +1,7 @@
 import { Field, ID, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { EStateRegister, ETypeOfService } from 'src/contain';
 import { Session } from 'src/modules/contains/session/session.entitty';
+import { Customer } from 'src/modules/customer/entities/customer.entity';
 import { Doctor } from 'src/modules/doctors/entities/doctor.entity';
 import { MedicalSpecialties } from 'src/modules/medical-specialties/entities/medical-specialties.entity';
 import { Package } from 'src/modules/package/entities/package.entity';
@@ -62,6 +63,12 @@ export class Register {
   @Field(() => [LinkImage], { nullable: true })
   files: LinkImage[];
 
+  @Field(() => Number, { nullable: true, defaultValue: null })
+  warning: number | null;
+
+  @Field(() => Number, { nullable: true, defaultValue: null })
+  warningThisMonth: number | null;
+
   @Field(() => Profile, { nullable: true })
   profile: Profile;
 
@@ -76,4 +83,7 @@ export class Register {
 
   @Field(() => MedicalSpecialties, { nullable: true })
   specialty: MedicalSpecialties;
+
+  @Field(() => Customer, { nullable: true })
+  createRegisBy: Customer;
 }

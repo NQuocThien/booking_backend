@@ -41,7 +41,7 @@ export class Register {
   @Prop()
   createdAt: Date;
 
-  @Prop(() => String)
+  @Prop()
   createdBy: string;
 
   @Prop({
