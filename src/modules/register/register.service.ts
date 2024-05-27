@@ -475,8 +475,6 @@ export class RegisterService {
       query.cancel = { $eq: false };
       query.state = { $eq: EStateRegister.Approved };
     }
-    // console.log('doctor missed', missed);
-    // console.log('doctor query:', query);
     const count = await this.model.count({
       ...query,
     });

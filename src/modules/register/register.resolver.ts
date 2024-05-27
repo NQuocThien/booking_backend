@@ -50,6 +50,7 @@ import { CreateBlockInput } from '../contains/blocks/blocks.input';
 import { MedicalFacilities } from '../medical-facilities/entities/mecical-facilies.entity';
 import { GetRegisterHaveInput } from './entities/dtos/get-register-have.input';
 import { formatDate } from 'src/utils/contain';
+import { share } from 'rxjs';
 const pubSub = new PubSub();
 interface IServiceIds {
   doctorsIds: string[];
@@ -1306,9 +1307,11 @@ export class RegisterResolver {
       }
     }
     // subscription cho user
-    await this.notificationSrv
-      .create(notification)
-      .then((res) => this.notificationResolver.emitNotifyCreatedEvent(res));
+    if (!isShare)
+      await this.notificationSrv.create(notification).then((res) => {
+        this.notificationResolver.emitNotifyCreatedEvent(res);
+        // console.log('load: ', res);
+      });
   }
   async createNottifyAndEmailByCustomerKey(
     regis: Register,

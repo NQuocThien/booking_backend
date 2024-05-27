@@ -70,7 +70,9 @@ export class ProfileResolver {
 
   @Mutation(() => Profile, { name: 'createProfile' })
   async create(@Args('input') input: CreateProfileInput): Promise<Profile> {
-    return this.profileService.create(input);
+    const res = await this.profileService.create(input);
+    this.profileLoader.clean(res.id);
+    return res;
   }
 
   @Mutation(() => Profile, { name: 'updateProfile' })
@@ -87,6 +89,7 @@ export class ProfileResolver {
       profileId,
       customerKey,
     );
+    this.profileLoader.clean(profileShare.id);
     const customerFrom = await this.customerSvr.findCustomerById(
       profileShare?.customerId,
     );
