@@ -22,4 +22,7 @@ export class VaccinationLoaderService {
     const data = await this.loader.load(id);
     return data;
   }
+  async clean(id: string): Promise<void> {
+    this.loader.clear(id);
+  }
 }

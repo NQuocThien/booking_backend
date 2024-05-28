@@ -22,10 +22,12 @@ import { RegisterService } from '../register/register.service';
 import { FacilitiesLoaderService } from '../medical-facilities/facility-loader';
 import { RegisterLoaderService } from '../register/register-loader.service';
 import { Response } from 'express';
+import { DoctorLoaderService } from './doctor-loader.service';
 @Resolver(() => Doctor)
 export class DoctorsResolver {
   constructor(
     private readonly doctorService: DoctorsService,
+    private readonly doctorServiceLoader: DoctorLoaderService,
     private readonly specialtySvr: MedicalSpecialtiesService,
     private readonly facilitySvr: MedicalFacilitiesService,
     private readonly facilityLoaderSvr: FacilitiesLoaderService,
@@ -190,9 +192,6 @@ export class DoctorsResolver {
     @Args('facilityId') facilityId: string,
   ): Promise<Doctor[]> {
     {
-      console.log(
-        '================================================================================================',
-      );
       const docs = await this.doctorService.getAllDoctorPaginationOfFacility(
         filter,
         page,
@@ -252,6 +251,7 @@ export class DoctorsResolver {
       console.log('Error Delete Image');
     }
     const res = await this.doctorService.updateById(data);
+    this.doctorServiceLoader.clean(res.id);
     res && this.registerLoaderSrv.cleanDoctorIdsByFacilityId(res.id);
     return res;
   }

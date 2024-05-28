@@ -17,11 +17,13 @@ import { UnauthorizedException } from '@nestjs/common';
 import { MedicalFacilities } from '../medical-facilities/entities/mecical-facilies.entity';
 import { RegisterService } from '../register/register.service';
 import { FacilitiesLoaderService } from '../medical-facilities/facility-loader';
+import { VaccinationLoaderService } from './vaccination-loader.service';
 
 @Resolver(() => Vaccination)
 export class VaccinationResolver {
   constructor(
     private readonly vaccinationService: VaccinationService,
+    private readonly vaccinationServiceLoad: VaccinationLoaderService,
     private readonly facilitySvr: MedicalFacilitiesService,
     private readonly staffSvr: MedicalStaffService,
     private readonly facilityLoaderSvr: FacilitiesLoaderService,
@@ -248,6 +250,7 @@ export class VaccinationResolver {
     @Args('input') input: UpdateVaccineInput,
   ): Promise<Vaccination> {
     const res = await this.vaccinationService.update(input);
+    this.vaccinationServiceLoad.clean(res.id);
     return res;
   }
 

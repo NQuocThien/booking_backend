@@ -16,11 +16,13 @@ import { EPermission } from 'src/contain';
 import { MedicalFacilities } from '../medical-facilities/entities/mecical-facilies.entity';
 import { FacilitiesLoaderService } from '../medical-facilities/facility-loader';
 import { RegisterService } from '../register/register.service';
+import { MedicalSpecialtiesLoaderService } from './medical-specialties-loader.service';
 
 @Resolver(() => MedicalSpecialties)
 export class MedicalSpecialtiesResolver {
   constructor(
     private readonly medicalSpecialtiesService: MedicalSpecialtiesService,
+    private readonly medicalSpecialtiesServicLoad: MedicalSpecialtiesLoaderService,
     private readonly facilitySvr: MedicalFacilitiesService,
     private readonly staffSvr: MedicalStaffService,
     private readonly facilityLoaderSrv: FacilitiesLoaderService,
@@ -39,7 +41,9 @@ export class MedicalSpecialtiesResolver {
 
   @Mutation(() => MedicalSpecialties, { name: 'updateMedicalSpecialty' })
   async update(@Args('input') input: UpdateMedicalSpecialtyInput) {
-    return await this.medicalSpecialtiesService.update(input);
+    const res = await this.medicalSpecialtiesService.update(input);
+    this.medicalSpecialtiesServicLoad.clean(res.id);
+    return res;
   }
 
   @Mutation(() => MedicalSpecialties, { name: 'deleteMecialSpecialty' })

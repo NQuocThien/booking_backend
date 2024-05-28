@@ -18,11 +18,13 @@ import { UnauthorizedException } from '@nestjs/common';
 import { MedicalFacilities } from '../medical-facilities/entities/mecical-facilies.entity';
 import { RegisterService } from '../register/register.service';
 import { FacilitiesLoaderService } from '../medical-facilities/facility-loader';
+import { PackageLoaderService } from './package-loader.service';
 
 @Resolver(() => Package)
 export class PackageResolver {
   constructor(
     private readonly packageService: PackageService,
+    private readonly packageServiceLoad: PackageLoaderService,
     private readonly facilitySvr: MedicalFacilitiesService,
     private readonly staffSvr: MedicalStaffService,
     private readonly registerSrv: RegisterService,
@@ -69,8 +71,9 @@ export class PackageResolver {
     if (compare) {
       deleteImage(currDocs.image, 'packages');
     }
-
-    return await this.packageService.update(input);
+    const res = await this.packageService.update(input);
+    this.packageServiceLoad.clean(res.id);
+    return res;
   }
 
   @Query(() => [Package], { name: 'getAllPackagePaginationOfFacility' })
